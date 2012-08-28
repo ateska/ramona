@@ -1,12 +1,7 @@
-import logging, json
-###
-
-L = logging.getLogger("status")
-
+import json
 ###
 
 def main(svrapp, params):
-	L.info("Retrieving status ...")
 	return json.dumps([{
 		'ident': p.ident,
 		'state': p.state,

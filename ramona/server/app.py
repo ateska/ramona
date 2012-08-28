@@ -7,8 +7,7 @@ from ..config import config, read_config
 from .cnscon import console_connection
 from .program import program_roaster
 
-from . import call_start
-from . import call_status
+from . import call_start, call_status, call_stop
 
 ###
 
@@ -131,7 +130,11 @@ class server_app(program_roaster):
 
 	def dispatch_ctrl(self, callid, params):
 		if callid == cnscom.callid_start:
-			return call_start.main(self, params)
+			return self.start_program()
+
+		elif callid == cnscom.callid_stop:
+			return self.stop_program()
+
 		elif callid == cnscom.callid_status:
 			return call_status.main(self, params)
 		else:

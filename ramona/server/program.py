@@ -1,4 +1,4 @@
-import sys, os, time, logging, shlex
+import sys, os, time, logging, shlex, signal
 from ..config import config
 #
 
@@ -16,22 +16,24 @@ class program(object):
 
 	class state_enum:
 		'''Enum'''
-		TERMINATED = 0
+		STOPPED = 0
 		STARTING = 10
 		RUNNING = 20
+		STOPPING = 30
 		FATAL = 200
-		
+
 		labels = {
-			TERMINATED: 'TERMINATED',
+			STOPPED: 'STOPPED',
 			STARTING: 'STARTING',
 			RUNNING: 'RUNNING',
+			STOPPING: 'STOPPING',
 			FATAL: 'FATAL',
 		}
 
 
 	def __init__(self, config_section):
 		_, self.ident = config_section.split(':', 2)
-		self.state = program.state_enum.TERMINATED
+		self.state = program.state_enum.STOPPED
 		self.pid = None
 
 		self.launch_cnt = 0
@@ -56,7 +58,7 @@ class program(object):
 
 	def start(self):
 		'''Transition to state STARTING'''
-		assert self.state == program.state_enum.TERMINATED
+		assert self.state == program.state_enum.STOPPED
 
 		L.debug("{0} -> STARTING".format(self))
 
@@ -67,6 +69,15 @@ class program(object):
 		self.launch_cnt += 1
 
 
+	def stop(self):
+		'''Transition to state STOPPING'''
+		assert self.pid is not None
+
+		L.debug("{0} -> STOPPING".format(self))
+		os.kill(self.pid, signal.SIGTERM) #TODO: Configure signals that are used for process stop
+		self.state = program.state_enum.STOPPING
+
+
 	def on_terminate(self, status):
 		self.term_time = time.time()
 		self.pid = None
@@ -75,9 +86,13 @@ class program(object):
 			L.warning("{0} exited too quickly (-> FATAL)".format(self))
 			self.state = program.state_enum.FATAL
 
+		elif self.state == program.state_enum.STOPPING:
+			L.debug("{0} -> STOPPED".format(self))
+			self.state = program.state_enum.STOPPED
+
 		else:
-			L.debug("{0} -> TERMINATED".format(self))
-			self.state = program.state_enum.TERMINATED
+			L.warning("{0} exited unexpectedly (-> FATAL)".format(self))
+			self.state = program.state_enum.FATAL
 
 
 	def on_tick(self, now):
@@ -100,11 +115,19 @@ class program_roaster(object):
 
 
 	def start_program(self):
-		# Start processes that are in TERMINATED
+		# Start processes that are STOPPED
 		#TODO: Switch to allow starting state.FATAL programs too
 		for p in self.roaster:
-			if p.state not in (program.state_enum.TERMINATED,): continue
+			if p.state not in (program.state_enum.STOPPED,): continue
 			p.start()
+
+
+	def stop_program(self):
+		# Stop processes that are RUNNING and STARTING
+		for p in self.roaster:
+			if p.state not in (program.state_enum.RUNNING, program.state_enum.STARTING): continue
+			p.stop()
+
 
 
 	def on_terminate_program(self, pid, status):

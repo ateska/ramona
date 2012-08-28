@@ -7,5 +7,4 @@ class MyDemoConsoleApp(ramona.console_app):
 if __name__ == '__main__':
 	app = MyDemoConsoleApp()
 	app.run()
-  
-  
+ 
