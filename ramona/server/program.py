@@ -38,6 +38,7 @@ class program(object):
 
 		self.launch_cnt = 0
 		self.start_time = None
+		self.stop_time = None
 		self.term_time = None
 
 		# Build configuration
@@ -65,6 +66,7 @@ class program(object):
 		self.pid = os.spawnvp(os.P_NOWAIT, self.cmdline[0], self.cmdline) #TODO: self.cmdline[0] can be substituted by self.ident or any arbitrary string
 		self.state = program.state_enum.STARTING
 		self.start_time = time.time()
+		self.stop_time = None
 		self.term_time = None
 		self.launch_cnt += 1
 
@@ -72,10 +74,12 @@ class program(object):
 	def stop(self):
 		'''Transition to state STOPPING'''
 		assert self.pid is not None
+		assert self.state == program.state_enum.RUNNING
 
 		L.debug("{0} -> STOPPING".format(self))
 		os.kill(self.pid, signal.SIGTERM) #TODO: Configure signals that are used for process stop
 		self.state = program.state_enum.STOPPING
+		self.stop_time = time.time()
 
 
 	def on_terminate(self, status):
@@ -101,6 +105,10 @@ class program(object):
 			if now - self.start_time >= self.config['launchtime']:
 				L.debug("{0} -> RUNNING".format(self))
 				self.state = program.state_enum.RUNNING
+
+		elif self.state == program.state_enum.STOPPING:
+			#TODO: This !!!
+			pass
 
 ###
 
@@ -138,7 +146,8 @@ class program_roaster(object):
 			L.warning("Unknown program died (pid={0}, status={1})".format(pid, status))
 
 
-	def on_periodic_program_check(self):
+	def on_tick(self):
+		'''Periodic check of program states'''
 		now = time.time()
 		for p in self.roaster:
 			p.on_tick(now)

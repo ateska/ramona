@@ -115,7 +115,7 @@ class server_app(program_roaster):
 
 
 	def __tick_cb(self, watcher, revents):
-		self.on_periodic_program_check()
+		self.on_tick()
 
 
 	def stop(self):
