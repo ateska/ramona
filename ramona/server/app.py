@@ -21,6 +21,9 @@ class server_app(program_roaster):
 	NONBLOCKING = frozenset([errno.EAGAIN, errno.EWOULDBLOCK])
 
 	def __init__(self):
+		# Create own process group
+		os.setpgrp()
+
 		# Parse command line arguments
 		parser = argparse.ArgumentParser()
 		parser.add_argument('-c', '--config', metavar="CONFIGFILE", action='append', help='Specify config file(s) to read (this option can be given more times).')
