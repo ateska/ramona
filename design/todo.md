@@ -8,7 +8,7 @@ Generic
 - core dump enabled launch/kill
 - priority (order) in which programs are launched ...
 - Unify sys.exit codes
-     - 2 ... configuration error
+     - 2 = configuration error
 
 Windows
 -------
@@ -19,11 +19,14 @@ Console
 -------
 - ramonactl interface is compatible with init.d scripts (start/stop/restart/status/...)
 - ramonactl is embeddable in custom python app + it is extendable to provide similar functionality as 'pan.sh':
+
 ```python
-class PanCtlApp(ramona.ctlapp):
-     # Add 'unittest' option ...
-     # Add 'floader' option ...
+class MyConsoleApp(ramona.console_app):
+	pass
+	# Add 'unittest' option ...
+	# Add 'floader' option ...
 ```
+
 - recover (in running console) from situation when server is shutdown during run
 
 Logging
