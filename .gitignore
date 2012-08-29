@@ -26,4 +26,6 @@ pip-log.txt
 #Mr Developer
 .mr.developer.cfg
 
+# Ramona specific ignores
 ramona.sublime-project
+demo_history
