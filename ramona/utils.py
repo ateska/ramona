@@ -1,4 +1,4 @@
-import os, sys, urlparse, socket
+import os, sys, urlparse, socket, signal
 ###
 
 def daemonize():
@@ -125,3 +125,16 @@ Socket factory that is configured using socket URI.
 			raise RuntimeError("Unknown/unsuported protocol '{0}'".format(self.protocol))
 		
 		return s
+
+###
+
+def parse_signals(signals):
+	ret = []
+	signame2signum = dict((name, num) for name, num in signal.__dict__.iteritems() if name.startswith('SIG') and not name.startswith('SIG_'))
+	for signame in signals.split(','):
+		signame = signame.strip().upper()
+		if not signame.startswith('SIG'): signame = 'SIG'+signame
+		signum = signame2signum.get(signame)
+		if signum is None: raise RuntimeError("Unknown signal '{0}'".format(signame))
+		ret.append(signum)
+	return ret

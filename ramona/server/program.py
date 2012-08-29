@@ -1,5 +1,6 @@
 import sys, os, time, logging, shlex, signal
 from ..config import config
+from ..utils import parse_signals
 #
 
 L = logging.getLogger("subproc")
@@ -10,7 +11,9 @@ class program(object):
 
 	DEFAULTS = {
 		'command': None,
-		'launchtime': 5,
+		'starttimeout': 1,
+		'stoptimeout': 3,
+		'stopsignal': 'INT,TERM,KILL',
 	}
 
 
@@ -51,6 +54,9 @@ class program(object):
 			sys.exit(2)
 
 		self.cmdline = shlex.split(cmd)
+		self.stopsignals = parse_signals(self.config['stopsignal'])
+		if len(self.stopsignals) == 0: self.stopsignals = [signal.SIGTERM]
+		self.act_stopsignals = None
 
 
 	def __repr__(self):
@@ -74,10 +80,15 @@ class program(object):
 	def stop(self):
 		'''Transition to state STOPPING'''
 		assert self.pid is not None
-		assert self.state == program.state_enum.RUNNING
+		assert self.state in (program.state_enum.RUNNING, program.state_enum.STARTING)
 
 		L.debug("{0} -> STOPPING".format(self))
-		os.kill(self.pid, signal.SIGTERM) #TODO: Configure signals that are used for process stop
+		self.act_stopsignals = self.stopsignals[:]
+		signal = self.get_next_stopsignal()
+		try:
+			os.kill(self.pid, signal)
+		except:
+			pass
 		self.state = program.state_enum.STOPPING
 		self.stop_time = time.time()
 
@@ -102,13 +113,23 @@ class program(object):
 	def on_tick(self, now):
 		# Switch starting programs into running state
 		if self.state == program.state_enum.STARTING:
-			if now - self.start_time >= self.config['launchtime']:
+			if now - self.start_time >= self.config['starttimeout']:
 				L.debug("{0} -> RUNNING".format(self))
 				self.state = program.state_enum.RUNNING
 
 		elif self.state == program.state_enum.STOPPING:
-			#TODO: This !!!
-			pass
+			if now - self.start_time >= self.config['stoptimeout']:
+				L.warning("{0} is still terminating - sending another signal".format(self))
+				signal = self.get_next_stopsignal()
+				try:
+					os.kill(self.pid, signal)
+				except:
+					pass
+
+
+	def get_next_stopsignal(self):
+		if len(self.act_stopsignals) == 0: return signal.SIGKILL
+		return self.act_stopsignals.pop(0)
 
 ###
 
