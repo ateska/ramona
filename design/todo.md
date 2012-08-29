@@ -54,3 +54,7 @@ Python specific
 HTTP frontend
 -------------
 - eventual HTTP frontend is subprocess using standard socket API to communicate with daemon
+
+Error reporting
+---------------
+- Scan output of the program for keywords (by default 'error', 'fatal', 'exception') and send email when such event occurs
