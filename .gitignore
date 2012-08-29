@@ -29,3 +29,4 @@ pip-log.txt
 # Ramona specific ignores
 ramona.sublime-project
 demo_history
+log/*.log

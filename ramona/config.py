@@ -6,6 +6,7 @@ config_defaults = {
 		'svrname': 'ramona',
 		'consoleuri': 'tcp://localhost:9876',
 		'pidfile': '', 
+		'logdir': '.',
 	},
 	'console' : {
 		'serveruri': 'tcp://localhost:9876',

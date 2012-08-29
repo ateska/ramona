@@ -1,9 +1,15 @@
-import sys, os, time, logging, shlex, signal
+import sys, os, time, logging, shlex, signal, resource, fcntl, errno
+import pyev
 from ..config import config
 from ..utils import parse_signals
 #
 
 L = logging.getLogger("subproc")
+
+#
+
+MAXFD = resource.getrlimit(resource.RLIMIT_NOFILE)[1]
+if (MAXFD == resource.RLIM_INFINITY): MAXFD = 1024
 
 #
 
@@ -34,7 +40,7 @@ class program(object):
 		}
 
 
-	def __init__(self, config_section):
+	def __init__(self, loop, config_section):
 		_, self.ident = config_section.split(':', 2)
 		self.state = program.state_enum.STOPPED
 		self.pid = None
@@ -43,6 +49,13 @@ class program(object):
 		self.start_time = None
 		self.stop_time = None
 		self.term_time = None
+
+		self.stdout = None
+		self.stderr = None
+		self.watchers = [
+			pyev.Io(0, 0, loop, self.__read_stdfd, 0),
+			pyev.Io(0, 0, loop, self.__read_stdfd, 1),
+		]
 
 		# Build configuration
 		self.config = self.DEFAULTS.copy()
@@ -58,9 +71,49 @@ class program(object):
 		if len(self.stopsignals) == 0: self.stopsignals = [signal.SIGTERM]
 		self.act_stopsignals = None
 
+		# Prepare log files
+		self.log_out = None
+		self.log_out_fname = os.path.join(config.get('server','logdir'), self.ident + '-out.log')
+		self.log_err = None
+		self.log_err_fname = os.path.join(config.get('server','logdir'), self.ident + '-err.log')
+
 
 	def __repr__(self):
 		return "<{0} {1} state={2} pid={3}>".format(self.__class__.__name__, self.ident, program.state_enum.labels[self.state],self.pid if self.pid is not None else '?')
+
+
+	def spawn(self, cmd, args):
+		self.stdout, stdout = os.pipe()
+		self.stderr, stderr = os.pipe()
+
+		pid = os.fork()
+		if pid !=0:
+			os.close(stdout)
+			os.close(stderr)
+
+			fl = fcntl.fcntl(self.stdout, fcntl.F_GETFL)
+			fcntl.fcntl(self.stdout, fcntl.F_SETFL, fl | os.O_NONBLOCK)
+			self.watchers[0].set(self.stdout, pyev.EV_READ)
+			self.watchers[0].start()
+
+			fl = fcntl.fcntl(self.stderr, fcntl.F_GETFL)
+			fcntl.fcntl(self.stderr, fcntl.F_SETFL, fl | os.O_NONBLOCK)
+			self.watchers[1].set(self.stderr, pyev.EV_READ)
+			self.watchers[1].start()
+
+			return pid
+
+		stdin = os.open('/dev/null', os.O_RDONLY) # Open stdin
+		os.dup2(stdin, 0)
+		os.dup2(stdout, 1) # Prepare stdout
+		os.dup2(stderr, 2) # Prepare stderr
+
+		# Close all open file descriptors above standard ones.  This prevents the child from keeping
+   		# open any file descriptors inherited from the parent.
+		os.closerange(3, MAXFD)
+
+		os.execvp(cmd, args)
+		sys.exit(3)
 
 
 	def start(self):
@@ -69,7 +122,10 @@ class program(object):
 
 		L.debug("{0} -> STARTING".format(self))
 
-		self.pid = os.spawnvp(os.P_NOWAIT, self.cmdline[0], self.cmdline) #TODO: self.cmdline[0] can be substituted by self.ident or any arbitrary string
+		self.log_out = open(self.log_out_fname,'a')
+		self.log_err = open(self.log_err_fname,'a')
+
+		self.pid = self.spawn(self.cmdline[0], self.cmdline) #TODO: self.cmdline[0] can be substituted by self.ident or any arbitrary string
 		self.state = program.state_enum.STARTING
 		self.start_time = time.time()
 		self.stop_time = None
@@ -97,6 +153,24 @@ class program(object):
 		self.term_time = time.time()
 		self.pid = None
 
+		# Close log files
+		self.log_out.close()
+		self.log_out = None
+		self.log_err.close()
+		self.log_err = None
+
+		# Close process stdout and stderr pipes
+		self.watchers[0].stop()
+		if self.stdout is not None:
+			os.close(self.stdout)
+			self.stdout = None
+
+		self.watchers[1].stop()
+		if self.stderr is not None:
+			os.close(self.stderr)
+			self.stderr = None
+
+		# Handle state change properly
 		if self.state == program.state_enum.STARTING:
 			L.warning("{0} exited too quickly (-> FATAL)".format(self))
 			self.state = program.state_enum.FATAL
@@ -131,6 +205,26 @@ class program(object):
 		if len(self.act_stopsignals) == 0: return signal.SIGKILL
 		return self.act_stopsignals.pop(0)
 
+
+	def __read_stdfd(self, watcher, revents):
+		while 1:
+			try:
+				data = os.read(watcher.fd, 4096)
+			except OSError, e:
+				if e.errno == errno.EAGAIN: return # No more data to read (would block)
+				raise
+
+			if len(data) == 0: # File descriptor is closed
+				watcher.stop()
+				os.close(watcher.fd)
+				if watcher.data == 0: self.stderr = None
+				elif watcher.data == 1: self.stdout = None
+				return 
+
+			if watcher.data == 0: self.log_out.write(data)
+			elif watcher.data == 1: self.log_err.write(data)
+
+
 ###
 
 class program_roaster(object):
@@ -139,7 +233,7 @@ class program_roaster(object):
 		self.roaster = []
 		for config_section in config.sections():
 			if config_section.find('program:') != 0: continue
-			sp = program(config_section)
+			sp = program(self.loop, config_section)
 			self.roaster.append(sp)
 
 
@@ -172,4 +266,3 @@ class program_roaster(object):
 		now = time.time()
 		for p in self.roaster:
 			p.on_tick(now)
-
