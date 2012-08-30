@@ -38,6 +38,22 @@ Configuration
 -------------
 - configuration files - app.conf & site.conf - describe differences, implement
 - section in config to define environment variables
+- optional alterative configuration for environment variables:
+```
+[env]
+FOO=bar
+
+[env:alternative1]
+BAR=foo
+
+[program:one]
+# Uses [env]
+
+[program:two]
+# Uses [env:alternative1]
+env=&alternative1
+```
+
 - environment variables expansion in configuration
 - includes in config files
 
