@@ -32,15 +32,21 @@ class MyConsoleApp(ramona.console_app):
 Logging
 -------
 - logging configuration:
-stdout=/stderr=
+
 
 ```
-<null> (redirect to /dev/null)
-<stderr> (redirect stdout to stderr)
-<stdout> (redirect stderr to stdout)
-<logdir>  (file in [server]logdir named [ident]-stderr.log, [ident].log respectively [ident].log)
+[program:x]
+stdout=[<null>|<stderr>|<stdout>|<logdir>|FILENAME]
+stderr=[<null>|<stderr>|<stdout>|<logdir>|FILENAME]
+```
+Options:
+* <null> (redirect to /dev/null)
+* <stderr> (redirect stdout to stderr)
+* <stdout> (redirect stderr to stdout)
+* <logdir>  (file in [server]logdir named [ident]-stderr.log, [ident].log respectively [ident].log)
 
-default config:
+Defaults:
+```
 stdout=<stderr>
 stderr=<logdir>
 ```
