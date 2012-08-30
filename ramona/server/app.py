@@ -138,6 +138,9 @@ class server_app(program_roaster):
 		elif callid == cnscom.callid_stop:
 			return self.stop_program()
 
+		elif callid == cnscom.callid_restart:
+			return self.restart_program()
+
 		elif callid == cnscom.callid_status:
 			return call_status.main(self, params)
 		else:

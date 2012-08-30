@@ -1,3 +1,5 @@
+from .. import cnscom
+###
 
 name = 'restart'
 cmdhelp = 'Restart subprocess(es)'
@@ -10,4 +12,4 @@ def init_parser(parser):
 ###
 
 def main(cnsapp, args):
-	print "TODO"
+	cnsapp.svrcall(cnscom.callid_restart, auto_connect=True)

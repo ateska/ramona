@@ -263,6 +263,10 @@ class program_roaster(object):
 			p.stop()
 
 
+	def restart_program(self):
+		#TODO: This ...
+		pass
+
 
 	def on_terminate_program(self, pid, status):
 		for p in self.roaster:
