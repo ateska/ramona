@@ -2,6 +2,8 @@ import sys, os, time, logging, shlex, signal, resource, fcntl, errno
 import pyev
 from ..config import config
 from ..utils import parse_signals
+from ..kmpsearch import KnuthMorrisPratt
+
 #
 
 L = logging.getLogger("subproc")
@@ -76,6 +78,9 @@ class program(object):
 		self.log_out_fname = os.path.join(config.get('server','logdir'), self.ident + '-out.log')
 		self.log_err = None
 		self.log_err_fname = os.path.join(config.get('server','logdir'), self.ident + '-err.log')
+
+		# Log searching 
+		self.kmp = KnuthMorrisPratt('error')
 
 
 	def __repr__(self):
@@ -223,6 +228,12 @@ class program(object):
 
 			if watcher.data == 0: self.log_out.write(data)
 			elif watcher.data == 1: self.log_err.write(data)
+
+			if watcher.data == 0: 
+				i = self.kmp.search(data)
+				if i >= 0:
+					# Pattern detected in the data
+					pass
 
 
 ###
