@@ -9,6 +9,7 @@ Generic
 - Unify sys.exit codes
      - 2 = configuration error
 - When ramona daemon is exiting, it has to try to terminate all childs (using stop functionality first and then kill whole process group)
+- Launch priority (start/stop job sequence)
 
 Windows
 -------
@@ -30,6 +31,20 @@ class MyConsoleApp(ramona.console_app):
 
 Logging
 -------
+- logging configuration:
+stdout=/stderr=
+
+```
+<null> (redirect to /dev/null)
+<stderr> (redirect stdout to stderr)
+<stdout> (redirect stderr to stdout)
+<logdir>  (file in [server]logdir named [ident]-stderr.log, [ident].log respectively [ident].log)
+
+default config:
+stdout=<stderr>
+stderr=<logdir>
+```
+
 - (--log-level) command-line option
 - log rotate
 - log location is given as directory (or environment variable)
