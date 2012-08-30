@@ -32,5 +32,5 @@ stderr=<logdir>
 ```
 
 - log location is given as directory by:
-	1) [server] logdir option
-	2) environment variable LOGDIR
+	1. [server] logdir option
+	2. environment variable LOGDIR
