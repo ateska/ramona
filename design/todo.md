@@ -40,10 +40,10 @@ stdout=[<null>|<stderr>|<stdout>|<logdir>|FILENAME]
 stderr=[<null>|<stderr>|<stdout>|<logdir>|FILENAME]
 ```
 Options:
-* <null> (redirect to /dev/null)
-* <stderr> (redirect stdout to stderr)
-* <stdout> (redirect stderr to stdout)
-* <logdir>  (file in [server]logdir named [ident]-stderr.log, [ident].log respectively [ident].log)
+* &lt;null> (redirect to /dev/null)
+* &lt;stderr> (redirect stdout to stderr)
+* &lt;stdout> (redirect stderr to stdout)
+* &lt;logdir>  (file in [server]logdir named [ident]-stderr.log, [ident].log respectively [ident].log)
 
 Defaults:
 ```
