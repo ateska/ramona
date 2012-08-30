@@ -6,7 +6,7 @@ config_defaults = {
 		'svrname': 'ramona',
 		'consoleuri': 'tcp://localhost:9876',
 		'pidfile': '', 
-		'logdir': '.',
+		'logdir': '<none>',
 	},
 	'console' : {
 		'serveruri': 'tcp://localhost:9876',
@@ -49,3 +49,9 @@ def read_config(configs):
 			config_files.append(cfile)
 	
 	config.read(config_files)
+
+	# Special treatment of some values
+	if config.get('server', 'logdir') == '<none>':
+		logdir = os.environ.get('LOGDIR')
+		if logdir is None: logdir = '.'
+		config.set('server','logdir',logdir)

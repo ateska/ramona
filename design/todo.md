@@ -31,29 +31,8 @@ class MyConsoleApp(ramona.console_app):
 
 Logging
 -------
-- logging configuration:
-
-
-```
-[program:x]
-stdout=[<null>|<stderr>|<stdout>|<logdir>|FILENAME]
-stderr=[<null>|<stderr>|<stdout>|<logdir>|FILENAME]
-```
-Options:
-* &lt;null> (redirect to /dev/null)
-* &lt;stderr> (redirect stdout to stderr)
-* &lt;stdout> (redirect stderr to stdout)
-* &lt;logdir>  (file in [server]logdir named [ident]-stderr.log, [ident].log respectively [ident].log)
-
-Defaults:
-```
-stdout=<stderr>
-stderr=<logdir>
-```
-
 - (--log-level) command-line option
 - log rotate
-- log location is given as directory (or environment variable)
 
 Configuration
 -------------

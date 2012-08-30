@@ -22,6 +22,9 @@ class program(object):
 		'starttimeout': 1,
 		'stoptimeout': 3,
 		'stopsignal': 'INT,TERM,KILL',
+		'stdin': '<null>',
+		'stdout': '<stderr>',
+		'stderr': '<logdir>',
 	}
 
 
@@ -32,6 +35,7 @@ class program(object):
 		RUNNING = 20
 		STOPPING = 30
 		FATAL = 200
+		CFGERROR=201
 
 		labels = {
 			STOPPED: 'STOPPED',
@@ -39,6 +43,7 @@ class program(object):
 			RUNNING: 'RUNNING',
 			STOPPING: 'STOPPING',
 			FATAL: 'FATAL',
+			CFGERROR: 'CFGERROR',
 		}
 
 
@@ -73,11 +78,55 @@ class program(object):
 		if len(self.stopsignals) == 0: self.stopsignals = [signal.SIGTERM]
 		self.act_stopsignals = None
 
+		if self.config['stdin'] != '<null>':
+			L.error("Unknown stdin option '{0}' in {1} -> CFGERROR".format(self.config['stdin'], config_section))
+			self.state = program.state_enum.CFGERROR
+			return
+
 		# Prepare log files
+		stdout_cnf = self.config['stdout']
+		stderr_cnf = self.config['stderr']
+
+		if (stdout_cnf == '<stderr>') and (stderr_cnf == '<stdout>'):
+			L.error("Invalid stdout and stderr combination in {0} -> CFGERROR".format(config_section))
+			self.state = program.state_enum.CFGERROR
+			return			
+
+		# Stdout settings
 		self.log_out = None
-		self.log_out_fname = os.path.join(config.get('server','logdir'), self.ident + '-out.log')
+		if stdout_cnf == '<logdir>':
+			if stderr_cnf  in ('<stderr>','<null>') :
+				self.log_out_fname = os.path.join(config.get('server','logdir'), self.ident + '.log')
+			else:
+				self.log_out_fname = os.path.join(config.get('server','logdir'), self.ident + '-out.log')
+		elif stdout_cnf == '<stderr>':
+			self.log_out_fname = None
+		elif stdout_cnf == '<null>':
+			self.log_out_fname = None
+		elif stdout_cnf[:1] == '<':
+			L.error("Unknown stdout option in {0} -> CFGERROR".format(config_section))
+			self.state = program.state_enum.CFGERROR
+			return			
+		else:
+			self.log_out_fname = stdout_cnf
+
+		# Stderr settings
 		self.log_err = None
-		self.log_err_fname = os.path.join(config.get('server','logdir'), self.ident + '-err.log')
+		if stderr_cnf == '<logdir>':
+			if stdout_cnf in ('<stderr>','<null>') :
+				self.log_err_fname = os.path.join(config.get('server','logdir'), self.ident + '.log')
+			else:
+				self.log_err_fname = os.path.join(config.get('server','logdir'), self.ident + '-err.log')
+		elif stderr_cnf == '<stdout>':
+			self.log_err_fname = None
+		elif stderr_cnf == '<null>':
+			self.log_err_fname = None
+		elif stderr_cnf[:1] == '<':
+			L.error("Unknown stderr option in {0} -> CFGERROR".format(config_section))
+			self.state = program.state_enum.CFGERROR
+			return
+		else:
+			self.log_err_fname = stderr_cnf
 
 		# Log searching 
 		self.kmp = KnuthMorrisPratt('error')
@@ -108,7 +157,11 @@ class program(object):
 
 			return pid
 
-		stdin = os.open('/dev/null', os.O_RDONLY) # Open stdin
+		if self.config['stdin'] == '<null>':
+			stdin = os.open('/dev/null', os.O_RDONLY) # Open stdin
+		else:
+			# Default is to open /dev/null
+			stdin = os.open('/dev/null', os.O_RDONLY) # Open stdin
 		os.dup2(stdin, 0)
 		os.dup2(stdout, 1) # Prepare stdout
 		os.dup2(stderr, 2) # Prepare stderr
@@ -127,8 +180,16 @@ class program(object):
 
 		L.debug("{0} -> STARTING".format(self))
 
-		self.log_out = open(self.log_out_fname,'a')
-		self.log_err = open(self.log_err_fname,'a')
+		if self.log_out_fname is not None:
+			self.log_out = open(self.log_out_fname,'a')
+
+		if self.log_err_fname is not None:
+			self.log_err = open(self.log_err_fname,'a')
+
+		if self.config['stdout'] == '<stderr>':
+			self.log_out = self.log_err
+		elif self.config['stderr'] == '<stdout>':
+			self.log_err = self.log_out
 
 		self.pid = self.spawn(self.cmdline[0], self.cmdline) #TODO: self.cmdline[0] can be substituted by self.ident or any arbitrary string
 		self.state = program.state_enum.STARTING
@@ -159,9 +220,13 @@ class program(object):
 		self.pid = None
 
 		# Close log files
-		self.log_out.close()
+		if self.log_out is not None:
+			self.log_out.close()
+
+		if self.log_err is not None and self.log_out != self.log_err:
+			self.log_err.close()
+
 		self.log_out = None
-		self.log_err.close()
 		self.log_err = None
 
 		# Close process stdout and stderr pipes
@@ -226,8 +291,8 @@ class program(object):
 				elif watcher.data == 1: self.stdout = None
 				return 
 
-			if watcher.data == 0: self.log_out.write(data)
-			elif watcher.data == 1: self.log_err.write(data)
+			if watcher.data == 0 and self.log_out is not None: self.log_out.write(data)
+			elif watcher.data == 1 and self.log_err is not None: self.log_err.write(data)
 
 			if watcher.data == 0: 
 				i = self.kmp.search(data)
