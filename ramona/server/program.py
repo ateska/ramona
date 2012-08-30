@@ -128,6 +128,17 @@ class program(object):
 		else:
 			self.log_err_fname = stderr_cnf
 
+		# Environment variables
+		self.env = os.environ.copy()
+		if config.has_section('env'):
+			for name, value in config.items('env'):
+				name = name.upper()
+				if value != '':
+					self.env[name] = value
+				else:
+					self.env.pop(name, 0)
+		print ">>>", self.env
+
 		# Log searching 
 		self.kmp = KnuthMorrisPratt('error')
 
@@ -170,7 +181,7 @@ class program(object):
    		# open any file descriptors inherited from the parent.
 		os.closerange(3, MAXFD)
 
-		os.execvp(cmd, args)
+		os.execvpe(cmd, args, self.env)
 		sys.exit(3)
 
 

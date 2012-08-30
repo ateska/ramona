@@ -37,7 +37,7 @@ Logging
 Configuration
 -------------
 - configuration files - app.conf & site.conf - describe differences, implement
-- section in config to define environment variables
+- ConfigParser changes case of the keys/name to lower-case (e.g. PATH=/bin -> ['path']='/bin') 
 - optional alterative configuration for environment variables:
 ```
 [env]

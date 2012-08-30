@@ -34,3 +34,13 @@ stderr=<logdir>
 - log location is given as directory by:
 	1. [server] logdir option
 	2. environment variable LOGDIR
+
+Configuration
+-------------
+- section [env] in config defines environment variables (blends them with actual environment vars)
+```
+[env]
+PYTHONPATH=./libraries
+CLASSPATH=
+```
+Empty variable (e.g. CLASSPATH in previous example) will explicitly remove mentioned environment variable
