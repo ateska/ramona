@@ -20,6 +20,7 @@ def init_parser(parser):
 
 class _console_cmd(cmd.Cmd):
 
+
 	def __init__(self, cnsapp):
 		cmd.Cmd.__init__(self)
 		self.prompt = '> '
