@@ -10,6 +10,9 @@ L = logging.getLogger('proaster')
 ###
 
 class program_roaster(object):
+	'''
+Program roaster is object that control all configured programs, their start/stop operations etc.
+	'''
 
 	def __init__(self):
 		self.start_seq = None

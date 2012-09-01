@@ -2,7 +2,7 @@
 class sequence_controller(object):
 	'''
 Start/Stop program sequence controller.
-It is implementation of "SELECT * FROM programs GROUP BY priority"
+It is implementation of "SELECT * FROM programs GROUP BY priority" with a little bit of logic on top of that
 	'''
 
 	def __init__(self):

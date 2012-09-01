@@ -3,7 +3,7 @@ Features
 
 - ramonactl command line usage is compatible with init.d scripts (start/stop/restart/status/...)
 - Console can be started without start of subprocesses
-- Creates it's own progress group
+- Creates it's own progress group (Unix)
 - configuration is ConfigParser compatible
 
 
