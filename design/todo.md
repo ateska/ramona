@@ -42,6 +42,7 @@ Logging
 Configuration
 -------------
 - configuration files - app.conf & site.conf - describe differences, implement
+- includes in config files
 - ConfigParser changes case of the keys/name to lower-case (e.g. PATH=/bin -> ['path']='/bin') 
 - optional alterative configuration for environment variables:
 ```
@@ -60,7 +61,6 @@ env=&alternative1
 ```
 
 - environment variables expansion in configuration
-- includes in config files
 
 Watchdog
 --------
@@ -69,10 +69,6 @@ Watchdog
 Python specific
 ---------------
 - native python program execution (using sys.executable)
-
-HTTP frontend
--------------
-- eventual HTTP frontend is subprocess using standard socket API to communicate with daemon
 
 Error reporting
 ---------------
@@ -84,3 +80,6 @@ Mailing to admin
 - In case of watchdog issue
 - In case of finding keywork in output streams
 
+HTTP frontend
+-------------
+- eventual HTTP frontend is subprocess using standard socket API to communicate with daemon
