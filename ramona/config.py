@@ -8,7 +8,7 @@ config_defaults = {
 	'server' : {
 		'svrname': 'ramona',
 		'consoleuri': 'tcp://localhost:9876',
-		'pidfile': '', 
+		'pidfile': '',
 		'log': '<logdir>',
 	},
 	'console' : {
