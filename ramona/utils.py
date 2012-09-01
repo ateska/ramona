@@ -31,25 +31,31 @@ It detaches the process context from parent (caller) and session.
 In comparison to launch_server() it returns.
 	"""
 	from .config import config
-	logfname = os.path.join(config.get('server','logdir'), config.get('server','logname'))
 
-	pid = os.fork()
-	if pid > 0:
-		return pid
+	logfname = config.get('server','log')
+	if logfname == '<logdir>':
+		logfname = os.path.join(config.get('general','logdir'), 'ramona.log')
+	elif logfname[:1] == '<':
+		L.error("Unknown log option in [server] section - server not started")
+		return
 
-	os.setsid()
+	with open(logfname, 'a') as logf:
 
-	pid = os.fork()
-	if pid > 0:
-		os._exit(0)
+		pid = os.fork()
+		if pid > 0:
+			return pid
 
-	stdin = os.open(os.devnull, os.O_RDONLY)
-	os.dup2(stdin, 0)
+		os.setsid()
 
-	logf=open(logfname, 'a')
-	os.dup2(logf.fileno(), 1) # Prepare stdout
-	os.dup2(logf.fileno(), 2) # Prepare stderr
-	logf.close()
+		pid = os.fork()
+		if pid > 0:
+			os._exit(0)
+
+		stdin = os.open(os.devnull, os.O_RDONLY)
+		os.dup2(stdin, 0)
+
+		os.dup2(logf.fileno(), 1) # Prepare stdout
+		os.dup2(logf.fileno(), 2) # Prepare stderr
 
 	launch_server()
 

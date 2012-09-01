@@ -99,9 +99,9 @@ class program(object):
 		self.log_out = None
 		if stdout_cnf == '<logdir>':
 			if stderr_cnf  in ('<stderr>','<null>') :
-				self.log_out_fname = os.path.join(config.get('server','logdir'), self.ident + '.log')
+				self.log_out_fname = os.path.join(config.get('general','logdir'), self.ident + '.log')
 			else:
-				self.log_out_fname = os.path.join(config.get('server','logdir'), self.ident + '-out.log')
+				self.log_out_fname = os.path.join(config.get('general','logdir'), self.ident + '-out.log')
 		elif stdout_cnf == '<stderr>':
 			self.log_out_fname = None
 		elif stdout_cnf == '<null>':
@@ -117,9 +117,9 @@ class program(object):
 		self.log_err = None
 		if stderr_cnf == '<logdir>':
 			if stdout_cnf in ('<stderr>','<null>') :
-				self.log_err_fname = os.path.join(config.get('server','logdir'), self.ident + '.log')
+				self.log_err_fname = os.path.join(config.get('general','logdir'), self.ident + '.log')
 			else:
-				self.log_err_fname = os.path.join(config.get('server','logdir'), self.ident + '-err.log')
+				self.log_err_fname = os.path.join(config.get('general','logdir'), self.ident + '-err.log')
 		elif stderr_cnf == '<stdout>':
 			self.log_err_fname = None
 		elif stderr_cnf == '<null>':

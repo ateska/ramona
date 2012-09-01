@@ -2,12 +2,14 @@ import os, sys, ConfigParser
 ###
 
 config_defaults = {
+	'general' : {
+		'logdir': '<none>',
+	},
 	'server' : {
 		'svrname': 'ramona',
 		'consoleuri': 'tcp://localhost:9876',
 		'pidfile': '', 
-		'logdir': '<none>',
-		'logname': 'ramona.log',
+		'log': '<logdir>',
 	},
 	'console' : {
 		'serveruri': 'tcp://localhost:9876',
@@ -52,7 +54,7 @@ def read_config(configs):
 	config.read(config_files)
 
 	# Special treatment of some values
-	if config.get('server', 'logdir') == '<none>':
+	if config.get('general', 'logdir') == '<none>':
 		logdir = os.environ.get('LOGDIR')
 		if logdir is None: logdir = '.'
-		config.set('server','logdir',logdir)
+		config.set('general','logdir',logdir)
