@@ -2,7 +2,7 @@ import sys, os, time, logging, shlex, signal, resource, fcntl, errno
 import pyev
 from ..config import config
 from ..utils import parse_signals, MAXFD
-from ..kmpsearch import knuth_morris_pratt_search
+from ..kmpsearch import kmp_search
 
 #
 
@@ -141,8 +141,8 @@ class program(object):
 				else:
 					self.env.pop(name, 0)
 
-		# Log searching 
-		self.kmp = knuth_morris_pratt_search('error')
+		# Log searching (just example)
+		self.kmp = kmp_search('error')
 
 
 	def __repr__(self):

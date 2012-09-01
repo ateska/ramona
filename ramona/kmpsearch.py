@@ -1,4 +1,4 @@
-class knuth_morris_pratt_search(object):
+class kmp_search(object):
 	'''Implementation of Knuth-Morris-Pratt string matching algorithm
 	See http://en.wikipedia.org/wiki/Knuth-Morris-Pratt_algorithm for more details.
 
