@@ -56,7 +56,10 @@ In comparison to launch_server() it returns.
 ###
 
 class deleteing_unix_socket(socket.socket):
-
+	'''
+This class is used as wrapper to socket object that represent listening UNIX socket.
+It added ability to delete socket file when destroyed.
+	'''
 
 	def __init__(self):
 		socket.socket.__init__(self, socket.AF_UNIX, socket.SOCK_STREAM)
