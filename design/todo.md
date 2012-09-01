@@ -1,6 +1,10 @@
 TODO list
 =========
 
+Design questions
+----------------
+- tail of log ... how to do that
+
 Generic
 -------
 - SSL (optional) for protecting console-server channel
@@ -71,4 +75,11 @@ HTTP frontend
 
 Error reporting
 ---------------
-- Scan output of the program for keywords (by default 'error', 'fatal', 'exception') and send email when such event occurs
+- Scan output streams of the program for keywords (by default 'error', 'fatal', 'exception') and send email when such event occurs
+
+Mailing to admin
+----------------
+- In case of launch/stop sequence failure
+- In case of watchdog issue
+- In case of finding keywork in output streams
+
