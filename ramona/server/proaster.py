@@ -13,6 +13,7 @@ class program_roaster(object):
 
 	def __init__(self):
 		self.start_seq = None
+		self.stop_seq = None
 		self.roaster = []
 		for config_section in config.sections():
 			if config_section.find('program:') != 0: continue
@@ -21,11 +22,11 @@ class program_roaster(object):
 
 
 	def start_program(self):
-		# Start processes that are STOPPED
+		'''Start processes that are STOPPED'''
 		#TODO: Switch to allow starting state.FATAL programs too
 
 		assert self.start_seq is None #TODO: Better handling of this situation
-		#TODO: Also handle conflict with stop_pad
+		assert self.stop_seq is None #TODO: Better handling of this situation
 		L.debug("Initializing start sequence")
 		self.start_seq = sequence_controller()
 
@@ -33,24 +34,35 @@ class program_roaster(object):
 			if p.state not in (program.state_enum.STOPPED,): continue
 			self.start_seq.add(p)		
 
-		self.__start_pad_next()
-
-
-	def __start_pad_next(self):
-		pg = self.start_seq.next()
-		if pg is None:
-			self.start_seq = None
-			L.debug("Starting sequence completed.")
-		else:
-			# Start all programs in the active set
-			map(program.start, pg)
+		self.__startstop_pad_next(True)
 
 
 	def stop_program(self):
-		# Stop processes that are RUNNING and STARTING
+		'''Stop processes that are RUNNING and STARTING'''
+		assert self.start_seq is None #TODO: Better handling of this situation
+		assert self.stop_seq is None #TODO: Better handling of this situation
+		L.debug("Initializing stop sequence")
+		self.stop_seq = sequence_controller()
+
 		for p in self.roaster:
 			if p.state not in (program.state_enum.RUNNING, program.state_enum.STARTING): continue
-			p.stop()
+			self.stop_seq.add(p)		
+
+		self.__startstop_pad_next(False)
+
+
+	def __startstop_pad_next(self, start=True):
+		pg = self.start_seq.next() if start else self.stop_seq.next()
+		if pg is None:
+			if start:
+				self.start_seq = None
+				L.debug("Start sequence completed.")
+			else:
+				self.stop_seq = None
+				L.debug("Stop sequence completed.")
+		else:
+			# Start/stop all programs in the active set
+			map(program.start if start else program.stop, pg)
 
 
 	def restart_program(self):
@@ -75,6 +87,11 @@ class program_roaster(object):
 		if self.start_seq is not None:
 			r = self.start_seq.check(program.state_enum.STARTING, program.state_enum.RUNNING)
 			if r is None:
-				L.warning("Starting sequence aborted due to program error")
-			elif r: self.__start_pad_next()
+				L.warning("Start sequence aborted due to program error")
+			elif r: self.__startstop_pad_next(True)
 
+		if self.stop_seq is not None:
+			r = self.stop_seq.check(program.state_enum.STOPPING, program.state_enum.STOPPED)
+			if r is None:
+				L.warning("Stop sequence aborted due to program error")
+			elif r: self.__startstop_pad_next(False)
