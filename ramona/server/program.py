@@ -2,7 +2,7 @@ import sys, os, time, logging, shlex, signal, resource, fcntl, errno
 import pyev
 from ..config import config
 from ..utils import parse_signals
-from ..kmpsearch import KnuthMorrisPratt
+from ..kmpsearch import knuth_morris_pratt_search
 
 #
 
@@ -19,12 +19,13 @@ class program(object):
 
 	DEFAULTS = {
 		'command': None,
-		'starttimeout': 1,
+		'starttimeout': 0.5,
 		'stoptimeout': 3,
 		'stopsignal': 'INT,TERM,KILL',
 		'stdin': '<null>',
 		'stdout': '<stderr>',
 		'stderr': '<logdir>',
+		'priority': 100,
 	}
 
 
@@ -83,6 +84,13 @@ class program(object):
 			self.state = program.state_enum.CFGERROR
 			return
 
+		try:
+			self.priority = int(self.config.get('priority'))
+		except:
+			L.error("Invalid priority option '{0}' in {1} -> CFGERROR".format(self.config['priority'], config_section))
+			self.state = program.state_enum.CFGERROR
+			return			
+
 		# Prepare log files
 		stdout_cnf = self.config['stdout']
 		stderr_cnf = self.config['stderr']
@@ -137,10 +145,9 @@ class program(object):
 					self.env[name] = value
 				else:
 					self.env.pop(name, 0)
-		print ">>>", self.env
 
 		# Log searching 
-		self.kmp = KnuthMorrisPratt('error')
+		self.kmp = knuth_morris_pratt_search('error')
 
 
 	def __repr__(self):
@@ -311,49 +318,3 @@ class program(object):
 					# Pattern detected in the data
 					pass
 
-
-###
-
-class program_roaster(object):
-
-	def __init__(self):
-		self.roaster = []
-		for config_section in config.sections():
-			if config_section.find('program:') != 0: continue
-			sp = program(self.loop, config_section)
-			self.roaster.append(sp)
-
-
-	def start_program(self):
-		# Start processes that are STOPPED
-		#TODO: Switch to allow starting state.FATAL programs too
-		for p in self.roaster:
-			if p.state not in (program.state_enum.STOPPED,): continue
-			p.start()
-
-
-	def stop_program(self):
-		# Stop processes that are RUNNING and STARTING
-		for p in self.roaster:
-			if p.state not in (program.state_enum.RUNNING, program.state_enum.STARTING): continue
-			p.stop()
-
-
-	def restart_program(self):
-		#TODO: This ...
-		pass
-
-
-	def on_terminate_program(self, pid, status):
-		for p in self.roaster:
-			if pid != p.pid: continue
-			return p.on_terminate(status)
-		else:
-			L.warning("Unknown program died (pid={0}, status={1})".format(pid, status))
-
-
-	def on_tick(self):
-		'''Periodic check of program states'''
-		now = time.time()
-		for p in self.roaster:
-			p.on_tick(now)

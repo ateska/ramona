@@ -5,7 +5,7 @@ from .. import cnscom
 from ..utils import socket_uri
 from ..config import config, read_config
 from .cnscon import console_connection
-from .program import program_roaster
+from .proaster import program_roaster
 
 from . import call_start, call_status, call_stop
 
