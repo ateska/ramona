@@ -7,6 +7,7 @@ config_defaults = {
 		'consoleuri': 'tcp://localhost:9876',
 		'pidfile': '', 
 		'logdir': '<none>',
+		'logname': 'ramona.log',
 	},
 	'console' : {
 		'serveruri': 'tcp://localhost:9876',

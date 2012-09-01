@@ -1,5 +1,6 @@
 import time
 from .. import cnscom
+from ..utils import launch_server, launch_server_daemonized
 #
 name = 'start'
 cmdhelp = 'Launch subprocess(es)'
@@ -18,8 +19,8 @@ def main(cnsapp, args):
 	if s is None:
 		#TODO: This is only verbose print
 		print "It looks like server is not running - launching server"
-		launch_server()
-		
+		launch_server_daemonized()
+
 		for _ in range(100): # Check server availability for next 10 seconds 
 			time.sleep(0.1)
 			s = cnsapp.connect()
@@ -32,14 +33,3 @@ def main(cnsapp, args):
 
 	cnsapp.svrcall(cnscom.callid_start)
 
-#
-
-def launch_server():
-	from ..utils import daemonize
-	ret = daemonize()
-	if ret != 0:
-		print "Child is running"
-		return
-
-	from ..utils import launch_server
-	launch_server()

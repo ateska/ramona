@@ -1,17 +1,12 @@
 import sys, os, time, logging, shlex, signal, resource, fcntl, errno
 import pyev
 from ..config import config
-from ..utils import parse_signals
+from ..utils import parse_signals, MAXFD
 from ..kmpsearch import knuth_morris_pratt_search
 
 #
 
 L = logging.getLogger("subproc")
-
-#
-
-MAXFD = resource.getrlimit(resource.RLIMIT_NOFILE)[1]
-if (MAXFD == resource.RLIM_INFINITY): MAXFD = 1024
 
 #
 
@@ -176,10 +171,10 @@ class program(object):
 			return pid
 
 		if self.config['stdin'] == '<null>':
-			stdin = os.open('/dev/null', os.O_RDONLY) # Open stdin
+			stdin = os.open(os.devnull, os.O_RDONLY) # Open stdin
 		else:
 			# Default is to open /dev/null
-			stdin = os.open('/dev/null', os.O_RDONLY) # Open stdin
+			stdin = os.open(os.devnull, os.O_RDONLY) # Open stdin
 		os.dup2(stdin, 0)
 		os.dup2(stdout, 1) # Prepare stdout
 		os.dup2(stderr, 2) # Prepare stderr

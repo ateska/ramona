@@ -1,19 +1,37 @@
-import os, sys, urlparse, socket, signal
+import os, sys, urlparse, socket, signal, resource
 ###
 
-def daemonize():
-	""" Detach the process context from parent and session.
 
-	Detach from the parent process and session group, allowing the
-	parent to exit while this process continues running.
+def launch_server():
+	'''
+This function launches Ramona server - in 'os.exec' manner which means that this function will not return
+and instead of that, current process will be replaced by launched server. 
 
-	Reference: "Advanced Programming in the Unix Environment",
-	section 13.3, by W. Richard Stevens, published 1993 by
-	Addison-Wesley.
+All file descriptors above 2 are closed.
+	'''
+	from .config import config, config_files
+	
+	args = []
+	for cfile in config_files:
+		args.append('-c')
+		args.append(cfile)
+	
+	# Close all open file descriptors above standard ones.  This prevents the child from keeping
+	# open any file descriptors inherited from the parent.
+	os.closerange(3, MAXFD)
 
+	os.execl(sys.executable, config.get('server', 'svrname'), "-m", "ramona.server", *args)
 
-	@return: pid ( > 0) - for 'parent' process and 0 for daemonized process
+#
+
+def launch_server_daemonized():
 	"""
+This function launches Ramona server as a UNIX daemon.
+It detaches the process context from parent (caller) and session.
+In comparison to launch_server() it returns.
+	"""
+	from .config import config
+	logfname = os.path.join(config.get('server','logdir'), config.get('server','logname'))
 
 	pid = os.fork()
 	if pid > 0:
@@ -25,19 +43,15 @@ def daemonize():
 	if pid > 0:
 		os._exit(0)
 
-	return 0
+	stdin = os.open(os.devnull, os.O_RDONLY)
+	os.dup2(stdin, 0)
 
-###
+	logf=open(logfname, 'a')
+	os.dup2(logf.fileno(), 1) # Prepare stdout
+	os.dup2(logf.fileno(), 2) # Prepare stderr
+	logf.close()
 
-def launch_server():
-	from .config import config, config_files
-	
-	args = []
-	for cfile in config_files:
-		args.append('-c')
-		args.append(cfile)
-	
-	os.execl(sys.executable, config.get('server', 'svrname'), "-m", "ramona.server", *args)
+	launch_server()
 
 ###
 
@@ -138,3 +152,8 @@ def parse_signals(signals):
 		if signum is None: raise RuntimeError("Unknown signal '{0}'".format(signame))
 		ret.append(signum)
 	return ret
+
+###
+
+MAXFD = resource.getrlimit(resource.RLIMIT_NOFILE)[1]
+if (MAXFD == resource.RLIM_INFINITY): MAXFD = 1024

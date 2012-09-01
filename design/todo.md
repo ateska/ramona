@@ -37,6 +37,7 @@ Logging
 -------
 - (--log-level) command-line option
 - log rotate
+- log rotate of server log (stdout/stderr redirection)
 
 Configuration
 -------------
