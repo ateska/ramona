@@ -31,7 +31,13 @@ Console application (base for custom implementations)
 		read_config(self.argparser.args.config)
 
 		# Configure logging
-		logging.basicConfig(level=logging.DEBUG) #TODO: Improve this ...
+		logging.basicConfig(
+			level=logging.DEBUG if self.argparser.args.debug else logging.INFO,
+			stream=sys.stderr,
+			format="%(levelname)s: %(message)s"
+		)
+		if self.argparser.args.debug:
+			L.debug("Debug output is enabled.")
 
 		# Prepare server connection factory
 		self.cnsconuri = socket_uri(config.get('console','serveruri'))

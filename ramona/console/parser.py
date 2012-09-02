@@ -63,6 +63,9 @@ class argparser(_parser_base):
 		# Add config file option
 		self.add_argument('-c', '--config', metavar="CONFIGFILE", action='append', help='Specify config file(s) to read (this option can be given more times).')
 
+		# Add debug log level option
+		self.add_argument('-d', '--debug', action='store_true', help='Enable debug (verbose) output.')
+
 
 	def build_cmdlist(self):
 		for cmd in _parser_base.build_cmdlist(self): yield cmd

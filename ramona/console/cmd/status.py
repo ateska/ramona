@@ -1,10 +1,14 @@
-import json, time
+import json, time, logging
 from ... import cnscom
 from .. import exitcode, exception
 ###
 
 name = 'status'
 cmdhelp = 'Show status of subprocess(es)'
+
+###
+
+L = logging.getLogger('status')
 
 ###
 
@@ -17,7 +21,7 @@ def main(cnsapp, args):
 	try:
 		ret = cnsapp.svrcall(cnscom.callid_status, auto_connect=True)
 	except exception.server_not_responing_error:
-		print "It seems that Ramona server is not running."
+		L.error("It seems that Ramona server is not running.")
 		return exitcode.SERVER_NOT_RUNNING
 
 	status = json.loads(ret)
