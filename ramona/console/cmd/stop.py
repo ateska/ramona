@@ -1,4 +1,4 @@
-from .. import cnscom
+from ... import cnscom
 ###
 
 name = 'stop'

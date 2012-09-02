@@ -25,19 +25,19 @@ class _parser_base(argparse.ArgumentParser):
 
 
 	def build_cmdlist(self):
-		from .cnscmd import start
+		from .cmd import start
 		yield start
 
-		from .cnscmd import stop
+		from .cmd import stop
 		yield stop
 
-		from .cnscmd import restart
+		from .cmd import restart
 		yield restart
 
-		from .cnscmd import status
+		from .cmd import status
 		yield status
 
-		from .cnscmd import help
+		from .cmd import help
 		yield help
 
 
@@ -67,10 +67,10 @@ class argparser(_parser_base):
 	def build_cmdlist(self):
 		for cmd in _parser_base.build_cmdlist(self): yield cmd
 
-		from .cnscmd import console
+		from .cmd import console
 		yield console
 
-		from .cnscmd import server
+		from .cmd import server
 		yield server
 
 #
@@ -83,7 +83,7 @@ class consoleparser(_parser_base):
 	def build_cmdlist(self):
 		for cmd in _parser_base.build_cmdlist(self): yield cmd
 
-		from .cnscmd import exit
+		from .cmd import exit
 		yield exit
 
 

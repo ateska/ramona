@@ -1,8 +1,9 @@
 import sys, socket, errno, struct, logging
-from .cnsparser import argparser
-from .config import config
-from .utils import socket_uri
-from . import cnsexitcode, cnscom, cnsexc
+from ..config import config, read_config
+from ..utils import socket_uri
+from .. import cnscom
+from .parser import argparser
+from . import exitcode, exception
 
 ###
 
@@ -27,7 +28,6 @@ Console application (base for custom implementations)
 		self.argparser.parse(argv)
 
 		# Read config
-		from .config import read_config
 		read_config(self.argparser.args.config)
 
 		# Configure logging
@@ -39,8 +39,8 @@ Console application (base for custom implementations)
 
 
 	def run(self):
-		exitcode = self.argparser.execute(self)
-		sys.exit(exitcode if not None else cnsexitcode.OK)
+		ec = self.argparser.execute(self)
+		sys.exit(ec if ec is not None else exitcode.OK)
 
 
 	def connect(self):
@@ -60,7 +60,7 @@ Console application (base for custom implementations)
 			if self.ctlconsock is None:
 				s = self.connect()
 				if s is None:
-					raise cnsexc.server_not_responing_error("Server is not responding - maybe it isn't running.")
+					raise exception.server_not_responing_error("Server is not responding - maybe it isn't running.")
 
 		else:
 			assert self.ctlconsock is not None

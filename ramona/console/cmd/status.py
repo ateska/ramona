@@ -1,5 +1,6 @@
 import json, time
-from .. import cnscom, cnsexitcode, cnsexc
+from ... import cnscom
+from .. import exitcode, exception
 ###
 
 name = 'status'
@@ -14,10 +15,10 @@ def init_parser(parser):
 
 def main(cnsapp, args):
 	try:
-		cnsapp.svrcall(cnscom.callid_status, auto_connect=True)
-	except cnsexc.server_not_responing_error:
+		ret = cnsapp.svrcall(cnscom.callid_status, auto_connect=True)
+	except exception.server_not_responing_error:
 		print "It seems that Ramona server is not running."
-		return cnsexitcode.SERVER_NOT_RUNNING
+		return exitcode.SERVER_NOT_RUNNING
 
 	status = json.loads(ret)
 	

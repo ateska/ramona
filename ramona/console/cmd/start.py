@@ -1,6 +1,6 @@
 import time
-from .. import cnscom
-from ..utils import launch_server, launch_server_daemonized
+from ... import cnscom
+from ...utils import launch_server, launch_server_daemonized
 #
 name = 'start'
 cmdhelp = 'Launch subprocess(es)'

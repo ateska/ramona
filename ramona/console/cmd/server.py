@@ -10,5 +10,5 @@ def init_parser(parser):
 ###
 
 def main(cnsapp, args):
-	from ..utils import launch_server
+	from ...utils import launch_server
 	launch_server()

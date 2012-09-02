@@ -1,6 +1,6 @@
 import cmd, logging
 import readline #TODO: optional
-from ..config import config
+from ...config import config
 
 ###
 
@@ -38,7 +38,7 @@ class _console_cmd(cmd.Cmd):
 		if line == '?':
 			line = 'help'
 
-		from ..cnsparser import consoleparser
+		from ..parser import consoleparser
 		
 		parser = consoleparser()
 		

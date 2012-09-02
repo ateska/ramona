@@ -1,1 +1,1 @@
-from ._cnsapp import console_app
+from .console.app import console_app
