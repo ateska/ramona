@@ -44,7 +44,7 @@ Configuration
 - includes in config files
 - ConfigParser changes case of the keys/name to lower-case (e.g. PATH=/bin -> ['path']='/bin') 
 - optional alterative configuration for environment variables:
-```
+```config
 [env]
 FOO=bar
 
