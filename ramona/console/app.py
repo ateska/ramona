@@ -31,8 +31,11 @@ Console application (base for custom implementations)
 		read_config(self.argparser.args.config)
 
 		# Configure logging
+		llvl = logging.INFO
+		if self.argparser.args.silent: llvl = logging.ERROR
+		if self.argparser.args.debug: llvl = logging.DEBUG
 		logging.basicConfig(
-			level=logging.DEBUG if self.argparser.args.debug else logging.INFO,
+			level=llvl,
 			stream=sys.stderr,
 			format="%(levelname)s: %(message)s"
 		)

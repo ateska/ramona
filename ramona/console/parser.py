@@ -66,6 +66,9 @@ class argparser(_parser_base):
 		# Add debug log level option
 		self.add_argument('-d', '--debug', action='store_true', help='Enable debug (verbose) output.')
 
+		# Add silent log level option
+		self.add_argument('-s', '--silent', action='store_true', help='Enable silent mode of operation (only errors are printed).')
+
 
 	def build_cmdlist(self):
 		for cmd in _parser_base.build_cmdlist(self): yield cmd

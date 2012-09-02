@@ -67,6 +67,8 @@ def main(cnsapp, args):
 		except IOError:
 			pass
 
+	L.info("Ramona console") #TODO: Add version info
+
 	c = _console_cmd(cnsapp)
 	try:
 		c.cmdloop()
