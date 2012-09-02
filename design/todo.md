@@ -43,22 +43,7 @@ Configuration
 - configuration files - app.conf & site.conf - describe differences, implement
 - includes in config files
 - ConfigParser changes case of the keys/name to lower-case (e.g. PATH=/bin -> ['path']='/bin') 
-- optional alterative configuration for environment variables:
-```config
-[env]
-FOO=bar
-
-[env:alternative1]
-BAR=foo
-
-[program:one]
-# Uses [env]
-
-[program:two]
-# Uses [env:alternative1]
-env=&alternative1
-```
-
+- optional alterative configuration for environment variables: https://github.com/ateska/ramona/issues/2
 - environment variables expansion in configuration
 
 Watchdog
@@ -75,10 +60,7 @@ Error reporting
 
 Mailing to admin
 ----------------
-See https://github.com/ateska/ramona/issues/1
-- In case of launch/stop sequence failure
-- In case of watchdog issue
-- In case of finding keywork in output streams
+- Mailing issues to admin: https://github.com/ateska/ramona/issues/1
 
 HTTP frontend
 -------------
