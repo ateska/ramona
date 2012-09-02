@@ -35,6 +35,8 @@ stderr=<logdir>
 	1. [server] logdir option
 	2. environment variable LOGDIR
 
+- (-s/--silent and -d/--debug) command-line options
+
 Configuration
 -------------
 - section [env] in config defines environment variables (blends them with actual environment vars)
