@@ -75,6 +75,7 @@ Error reporting
 
 Mailing to admin
 ----------------
+See https://github.com/ateska/ramona/issues/1
 - In case of launch/stop sequence failure
 - In case of watchdog issue
 - In case of finding keywork in output streams
