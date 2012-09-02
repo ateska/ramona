@@ -2,7 +2,7 @@ import sys, socket, errno, struct, logging
 from .cnsparser import argparser
 from .config import config
 from .utils import socket_uri
-from .import cnscom
+from . import cnsexitcode, cnscom, cnsexc
 
 ###
 
@@ -40,7 +40,7 @@ Console application (base for custom implementations)
 
 	def run(self):
 		exitcode = self.argparser.execute(self)
-		sys.exit(exitcode if not None else 0)
+		sys.exit(exitcode if not None else cnsexitcode.OK)
 
 
 	def connect(self):
@@ -60,10 +60,11 @@ Console application (base for custom implementations)
 			if self.ctlconsock is None:
 				s = self.connect()
 				if s is None:
-					L.error("Connection to server failed.")
-					return -1
+					raise cnsexc.server_not_responing_error("Server is not responding - maybe it isn't running.")
+
 		else:
 			assert self.ctlconsock is not None
+
 		paramlen = len(params)
 		if paramlen >= 256*256:
 			raise RuntimeError("Transmitted parameters are too long.")
