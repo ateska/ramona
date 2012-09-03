@@ -9,12 +9,12 @@ L = logging.getLogger('sendmail')
 
 def send_mail(recipient, subject, mail_body):
 
-	smtp_host = config.get('smtp','host')
+	smtp_host = config.get('ramona:smtp','host')
 	if smtp_host == '':
 		L.error('Cannot send mail - SMTP server is not configured.')
 		return
 
-	sender = config.get('smtp','sender')
+	sender = config.get('ramona:smtp','sender')
 	if sender is None:
 		sender = "{0}@{1}".format(
 			os.getusername(), #TODO: Probably not working in windows - http://stackoverflow.com/questions/842059/is-there-a-portable-way-to-get-the-current-username-in-python
@@ -26,6 +26,6 @@ def send_mail(recipient, subject, mail_body):
 	msg['From'] = sender
 	msg['To'] = recipient
 
-	s = smtplib.SMTP( config.getint('smtp','port'))
+	s = smtplib.SMTP( config.getint('ramona:smtp','port'))
 	s.sendmail(sender, [recipient], msg.as_string())
 	s.quit()

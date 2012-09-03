@@ -43,7 +43,7 @@ Console application (base for custom implementations)
 			L.debug("Debug output is enabled.")
 
 		# Prepare server connection factory
-		self.cnsconuri = socket_uri(config.get('console','serveruri'))
+		self.cnsconuri = socket_uri(config.get('ramona:console','serveruri'))
 		self.ctlconsock = None
 
 

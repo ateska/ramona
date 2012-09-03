@@ -35,7 +35,7 @@ class server_app(program_roaster):
 		# Configure logging
 		logging.basicConfig(level=logging.DEBUG) #TODO: Improve this ...
 		
-		socket_factory = socket_uri(config.get("server", "consoleuri"))
+		socket_factory = socket_uri(config.get("ramona:server", "consoleuri"))
 		try:
 			
 			self.sock = socket_factory.create_socket_listen()
@@ -62,7 +62,7 @@ class server_app(program_roaster):
 			watcher.start()
 
 		# Create pid file
-		pidfile = config.get('server','pidfile')
+		pidfile = config.get('ramona:server','pidfile')
 		if pidfile !='':
 			try:
 				open(pidfile,'w').write("{0}\n".format(os.getpid()))

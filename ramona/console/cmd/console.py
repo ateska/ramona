@@ -60,7 +60,7 @@ class _console_cmd(cmd.Cmd):
 
 def main(cnsapp, args):
 	
-	histfile = config.get('console', 'history')
+	histfile = config.get('ramona:console', 'history')
 	if histfile != '':
 		try:
 			readline.read_history_file(histfile)

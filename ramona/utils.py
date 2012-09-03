@@ -25,7 +25,7 @@ All file descriptors above 2 are closed.
 	# open any file descriptors inherited from the parent.
 	os.closerange(3, MAXFD)
 
-	os.execl(sys.executable, config.get('server', 'svrname'), "-m", "ramona.server", *args)
+	os.execl(sys.executable, config.get('ramona:server', 'svrname'), "-m", "ramona.server", *args)
 
 #
 
@@ -37,7 +37,7 @@ In comparison to launch_server() it returns.
 	"""
 	from .config import config
 
-	logfname = config.get('server','log')
+	logfname = config.get('ramona:server','log')
 	if logfname == '<logdir>':
 		logfname = os.path.join(config.get('general','logdir'), 'ramona.log')
 	elif logfname[:1] == '<':

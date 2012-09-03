@@ -5,19 +5,19 @@ config_defaults = {
 	'general' : {
 		'logdir': '<none>',
 	},
-	'server' : {
+	'ramona:server' : {
 		'svrname': 'ramona',
 		'consoleuri': 'tcp://localhost:9876',
 		'pidfile': '',
 		'log': '<logdir>',
 	},
-	'console' : {
+	'ramona:console' : {
 		'serveruri': 'tcp://localhost:9876',
 		'history': '',
 	},
-	'smtp' : {
-		'host': '',
-		'port': '25',
+	'ramona:smtp' : {
+		'smtphost': '',
+		'smtpport': '25',
 		'sender': '',
 	}
 }
