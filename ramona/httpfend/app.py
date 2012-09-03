@@ -4,6 +4,7 @@ from ..utils import socket_uri
 from .. import cnscom
 import SimpleHTTPServer, BaseHTTPServer, SocketServer
 import httplib
+import os
 
 ###
 
@@ -39,13 +40,35 @@ class httpfend_app(object):
 
 
 class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+	if not mimetypes.inited:
+		mimetypes.init()
+	
 	def do_GET(self):
+		scriptdir = os.path.dirname(os.path.realpath(__file__))
 		if self.path.startswith("/static/"):
+			parts = self.path.split("/")
+			fname = os.path.join(scriptdir, *[x for x in parts if len(x) > 0])
+			if not os.path.isfile(fname):
+				self.send_error(httplib.NOT_FOUND)
+				return
+			try:
+				f = open(fname, "r")
+			except IOError, e:
+				self.send_error(httplib.NOT_FOUND)
+				return
+			with f:
+				self.send_response(httplib.OK)
+				self.send_header("Content-Type", mimetypes.guess_type(self.path)[0])
+				self.end_headers()
+				self.wfile.write(f.read())
+		elif self.path == "/":
 			self.send_response(httplib.OK)
 			self.send_header("Content-Type", mimetypes.guess_type(self.path))
 			self.end_headers()
-			self.wfile.write(f.read())
-	
+			with open(os.path.join(scriptdir, "index.tmpl.html")) as f:
+				self.wfile.write(f.read().format())
+		else:
+			self.send_error(httplib.NOT_FOUND)
 	
 
 if __name__ == '__main__':
