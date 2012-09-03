@@ -25,7 +25,9 @@ All file descriptors above 2 are closed.
 	# open any file descriptors inherited from the parent.
 	os.closerange(3, MAXFD)
 
-	os.execl(sys.executable, config.get('server', 'svrname'), "-m", "ramona.server", *args)
+	#TODO: Rewise following line - maybe config.get('server', 'svrname') is not viable concept
+	#os.execl(sys.executable, config.get('server', 'svrname'), "-m", "ramona.server", *args)
+	os.execl(sys.executable, sys.executable, "-m", "ramona.server", *args)
 
 #
 
