@@ -1,7 +1,7 @@
-import sys, os, time, logging, shlex, signal, resource, fcntl, errno
+import sys, os, time, logging, shlex, signal, resource, errno
 import pyev
 from ..config import config
-from ..utils import parse_signals, MAXFD
+from ..utils import parse_signals, MAXFD, enable_nonblocking, disable_nonblocking
 from ..kmpsearch import kmp_search
 
 #
@@ -159,40 +159,41 @@ class program(object):
 			os.close(stdout)
 			os.close(stderr)
 
-			fl = fcntl.fcntl(self.stdout, fcntl.F_GETFL)
-			fcntl.fcntl(self.stdout, fcntl.F_SETFL, fl | os.O_NONBLOCK)
+			enable_nonblocking(self.stdout)
 			self.watchers[0].set(self.stdout, pyev.EV_READ)
 			self.watchers[0].start()
 
-			fl = fcntl.fcntl(self.stderr, fcntl.F_GETFL)
-			fcntl.fcntl(self.stderr, fcntl.F_SETFL, fl | os.O_NONBLOCK)
+			enable_nonblocking(self.stdout)
 			self.watchers[1].set(self.stderr, pyev.EV_READ)
 			self.watchers[1].start()
 
 			return pid
 
-		if self.config['stdin'] == '<null>':
-			stdin = os.open(os.devnull, os.O_RDONLY) # Open stdin
-		else:
-			# Default is to open /dev/null
-			stdin = os.open(os.devnull, os.O_RDONLY) # Open stdin
-
-		os.dup2(stdin, 0)
-		os.dup2(stdout, 1) # Prepare stdout
-		os.dup2(stderr, 2) # Prepare stderr
-
-
-		# Close all open file descriptors above standard ones.  This prevents the child from keeping
-		# open any file descriptors inherited from the parent.
-		os.closerange(3, MAXFD)
-
 		try:
-			os.execvpe(cmd, args, self.env)
-		except Exception, e:
-			#TODO: Resolve sync issue on following line (program can exit without flushing stderr buffer) 
-			os.write(2, "Execution of command '{1}' failed: {0}\n".format(e, cmd))
+			if self.config['stdin'] == '<null>':
+				stdin = os.open(os.devnull, os.O_RDONLY) # Open stdin
+			else:
+				# Default is to open /dev/null
+				stdin = os.open(os.devnull, os.O_RDONLY) # Open stdin
 
-		os._exit(3)
+			os.dup2(stdin, 0)
+			os.dup2(stdout, 1) # Prepare stdout
+			os.dup2(stderr, 2) # Prepare stderr
+
+			# Close all open file descriptors above standard ones.  This prevents the child from keeping
+			# open any file descriptors inherited from the parent.
+			os.closerange(3, MAXFD)
+
+			try:
+				os.execvpe(cmd, args, self.env)
+			except Exception, e:
+				os.close(1)
+				os.write(2, "Execution of command '{1}' failed: {0}\n".format(e, cmd))
+				os.close(2)
+
+		finally:
+			# No pasaran
+			os._exit(3)
 
 
 	def start(self):
@@ -240,6 +241,27 @@ class program(object):
 		self.term_time = time.time()
 		self.pid = None
 
+		# Close process stdout and stderr pipes (including vacuum of actual content)
+		self.watchers[0].stop()
+		if self.stdout is not None:
+			disable_nonblocking(self.stdout)
+			while True:
+				data = os.read(self.stdout, 4096)
+				if len(data) == 0: break
+				self.__process_output(self.log_out, 0, data)
+			os.close(self.stdout)
+			self.stdout = None
+
+		self.watchers[1].stop()
+		if self.stderr is not None:
+			disable_nonblocking(self.stderr)
+			while True:
+				data = os.read(self.stderr, 4096)
+				if len(data) == 0: break
+				self.__process_output(self.log_err, 1, data)
+			os.close(self.stderr)
+			self.stderr = None
+
 		# Close log files
 		if self.log_out is not None:
 			self.log_out.close()
@@ -249,17 +271,6 @@ class program(object):
 
 		self.log_out = None
 		self.log_err = None
-
-		# Close process stdout and stderr pipes
-		self.watchers[0].stop()
-		if self.stdout is not None:
-			os.close(self.stdout)
-			self.stdout = None
-
-		self.watchers[1].stop()
-		if self.stderr is not None:
-			os.close(self.stderr)
-			self.stderr = None
 
 		# Handle state change properly
 		if self.state == program.state_enum.STARTING:
@@ -312,10 +323,15 @@ class program(object):
 				elif watcher.data == 1: self.stdout = None
 				return 
 
-			if watcher.data == 0 and self.log_out is not None: self.log_out.write(data)
-			elif watcher.data == 1 and self.log_err is not None: self.log_err.write(data)
+			if watcher.data == 0: self.__process_output(self.log_out, 0, data)
+			elif watcher.data == 1: self.__process_output(self.log_err, 1, data)
 
-			if watcher.data == 0: 
+
+	def __process_output(self, logf, sourceid, data):
+			if logf is not None: logf.write(data)
+
+			# Following code is just example
+			if sourceid == 1:
 				i = self.kmp.search(data)
 				if i >= 0:
 					# Pattern detected in the data

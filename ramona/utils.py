@@ -1,4 +1,4 @@
-import os, sys, signal, resource, logging
+import os, sys, signal, resource, fcntl, logging
 ###
 
 L = logging.getLogger("utils")
@@ -83,3 +83,14 @@ def parse_signals(signals):
 
 MAXFD = resource.getrlimit(resource.RLIMIT_NOFILE)[1]
 if (MAXFD == resource.RLIM_INFINITY): MAXFD = 1024
+
+###
+
+def enable_nonblocking(fd):
+	fl = fcntl.fcntl(fd, fcntl.F_GETFL)
+	fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
+
+def disable_nonblocking(fd):
+	fl = fcntl.fcntl(fd, fcntl.F_GETFL)
+	fcntl.fcntl(fd, fcntl.F_SETFL, fl ^ os.O_NONBLOCK)
+
