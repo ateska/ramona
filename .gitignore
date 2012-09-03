@@ -30,3 +30,9 @@ pip-log.txt
 ramona.sublime-project
 demo_history
 log/*.log
+log
+
+# Eclipse/PyDev
+.project
+.pydevproject
+
