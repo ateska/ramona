@@ -29,7 +29,7 @@ config_files = []
 
 ###
 
-def read_config(configs):
+def read_config(configs, use_env=True):
 	global config
 	assert len(config.sections()) == 0
 
@@ -45,7 +45,19 @@ def read_config(configs):
 	# Load configuration files
 	global config_files
 
-	if configs is None or len(configs) == 0: 	
+	if configs is not None:
+		configs = configs[:]
+	else:
+		configs = []
+	if use_env:
+		# Configs from environment variables
+		config_envs = os.environ.get('RAMONA_CONFIG')
+		if config_envs is not None:
+			for config_file in config_envs.split(':'):
+				configs.append(config_file)
+
+
+	if len(configs) == 0: 	
 		# Use platform defaults
 		configs = [
 			os.path.splitext(sys.argv[0])[0] + '.conf',
