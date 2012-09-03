@@ -2,7 +2,6 @@ import sys, os, socket, signal, errno, weakref, logging, argparse
 import pyev
 
 from .. import cnscom
-from ..utils import socket_uri
 from ..config import config, read_config, config_files
 from .cnscon import console_connection
 from .proaster import program_roaster
@@ -37,7 +36,7 @@ class server_app(program_roaster):
 
 		L.debug("Configuration loaded from: {0}".format(':'.join(config_files)))
 		
-		socket_factory = socket_uri(config.get("ramona:server", "consoleuri"))
+		socket_factory = cnscom.socket_uri(config.get("ramona:server", "consoleuri"))
 		try:
 			
 			self.sock = socket_factory.create_socket_listen()

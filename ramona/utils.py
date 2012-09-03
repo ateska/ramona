@@ -1,11 +1,9 @@
-import os, sys, urlparse, socket, signal, resource, logging
+import os, sys, signal, resource, logging
 ###
 
 L = logging.getLogger("utils")
 
 ###
-
-
 
 def launch_server():
 	'''
@@ -67,98 +65,6 @@ In comparison to launch_server() it returns.
 		os.dup2(logf.fileno(), 1) # Prepare stdout
 		os.dup2(logf.fileno(), 2) # Prepare stderr
 	launch_server()
-	
-		
-
-###
-
-class deleteing_unix_socket(socket.socket):
-	'''
-This class is used as wrapper to socket object that represent listening UNIX socket.
-It added ability to delete socket file when destroyed.
-	'''
-
-	def __init__(self):
-		socket.socket.__init__(self, socket.AF_UNIX, socket.SOCK_STREAM)
-		self.__sockfile = None
-
-
-	def __del__(self):
-		if self.__sockfile is not None:
-			fname = self.__sockfile
-			self.__sockfile = None
-			os.unlink(fname)
-			assert not os.path.isfile(fname)
-
-
-	def bind(self, fname):
-		socket.socket.bind(self, fname)
-		self.__sockfile = fname
-
-###
-
-class socket_uri(object):
-	'''
-Socket factory that is configured using socket URI.
-	'''
-
-	# Configure urlparce
-	if 'unix' not in urlparse.uses_params: urlparse.uses_params.append('unix')
-
-	def __init__(self, uri):
-		self.uri = urlparse.urlparse(uri)
-		self.uriparams = dict(urlparse.parse_qsl(self.uri.params))
-
-		self.protocol = self.uri.scheme.lower()
-		if self.protocol == 'tcp':
-			try:
-				_port = self.uri.port
-			except ValueError:
-				raise RuntimeError("Invalid port number in socket URI {0}".format(uri))
-
-			if self.uri.path != '': raise RuntimeError("Path has to be empty in socket URI {0}".format(uri))
-
-		elif self.protocol == 'unix':
-			pass
-
-		else:
-			raise RuntimeError("Unknown/unsuported protocol '{0}' in socket URI {1}".format(self.protocol, uri))
-
-
-	def create_socket_listen(self):
-		if self.protocol == 'tcp':
-			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-			s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-			s.bind((self.uri.hostname, self.uri.port))
-
-		elif self.protocol == 'unix':
-			mode = self.uriparams.get('mode',None)
-			if mode is None: mode = 0o600
-			else: mode = int(mode,8)
-			oldmask = os.umask(mode ^ 0o777)
-			s = deleteing_unix_socket()
-			s.bind(self.uri.path)
-			os.umask(oldmask)
-
-		else:
-			raise RuntimeError("Unknown/unsuported protocol '{0}'".format(self.protocol))
-		
-		return s
-
-
-	def create_socket_connect(self):
-		if self.protocol == 'tcp':
-			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-			s.connect((self.uri.hostname, self.uri.port))
-
-		elif self.protocol == 'unix':
-			s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-			s.connect(self.uri.path)
-
-		else:
-			raise RuntimeError("Unknown/unsuported protocol '{0}'".format(self.protocol))
-		
-		return s
 
 ###
 
