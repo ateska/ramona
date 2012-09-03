@@ -15,6 +15,11 @@ config_defaults = {
 		'serveruri': 'tcp://localhost:9876',
 		'history': '',
 	},
+	'smtp' : {
+		'host': '',
+		'port': '25',
+		'sender': '',
+	}
 }
 
 ###
