@@ -24,6 +24,7 @@ config_defaults = {
 ###
 
 config = ConfigParser.SafeConfigParser()
+config.optionxform = str # Disable default 'lowecasing' behavior of ConfigParser
 config_files = []
 
 ###

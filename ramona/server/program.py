@@ -135,7 +135,6 @@ class program(object):
 		self.env = os.environ.copy()
 		if config.has_section('env'):
 			for name, value in config.items('env'):
-				name = name.upper()
 				if value != '':
 					self.env[name] = value
 				else:

@@ -42,7 +42,6 @@ Configuration
 -------------
 - configuration files - app.conf & site.conf - describe differences, implement
 - includes in config files
-- ConfigParser changes case of the keys/name to lower-case (e.g. PATH=/bin -> ['path']='/bin') 
 - optional alterative configuration for environment variables: https://github.com/ateska/ramona/issues/2
 - environment variables expansion in configuration
 
