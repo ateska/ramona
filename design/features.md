@@ -3,7 +3,7 @@ Features
 
 - ramonactl command line usage is compatible with init.d scripts (start/stop/restart/status/...)
 	- Also user can specify 'filtering' of start/stop/restart/status scope by:
-```shell
+```bash
 ./console start program-name1 program-name2 ...
 ```
 
@@ -48,9 +48,10 @@ stderr=<logdir>
 Configuration
 -------------
 - section [env] in config defines environment variables (blends them with actual environment vars)
-```
+```ini
 [env]
 PYTHONPATH=./libraries
 CLASSPATH=
 ```
+
 Empty variable (e.g. CLASSPATH in previous example) will explicitly remove mentioned environment variable
