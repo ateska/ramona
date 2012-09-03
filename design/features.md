@@ -19,7 +19,6 @@ Logging
 -------
 - logging configuration:
 
-
 ```ini
 [program:x]
 stdin=[<null>]
@@ -48,6 +47,7 @@ stderr=<logdir>
 Configuration
 -------------
 - section [env] in config defines environment variables (blends them with actual environment vars)
+
 ```ini
 [env]
 PYTHONPATH=./libraries
