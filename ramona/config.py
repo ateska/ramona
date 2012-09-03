@@ -6,7 +6,6 @@ config_defaults = {
 		'logdir': '<none>',
 	},
 	'ramona:server' : {
-		'svrname': 'ramona',
 		'consoleuri': 'tcp://localhost:9876',
 		'pidfile': '',
 		'log': '<logdir>',

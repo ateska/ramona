@@ -12,8 +12,6 @@ Generic
 - Unify sys.exit codes
      - 2 = configuration error
 - When ramona daemon is exiting, it has to try to terminate all childs (using stop functionality first and then kill whole process group)
-- Add following environment variables:
-	- RAMONA_PYTHON (name of Python interpretter - as sys.executable can be empty on line - really ?)
 - Ramona server terminates after stopping all childs (if any in fatal state, terminate and log that)
 	- eventually override this automatic server termination by server command-line argument
 
