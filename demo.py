@@ -8,3 +8,6 @@ if __name__ == '__main__':
 	app = MyDemoConsoleApp()
 	app.run()
  
+
+ #TODO: clean -> find . -name "*.pyc" -or -name "*.pyo" | xargs rm
+ 

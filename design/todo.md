@@ -9,11 +9,9 @@ Generic
 -------
 - SSL (optional) for protecting console-server channel
 - core dump enabled launch/kill
-- priority (order) in which programs are launched ...
 - Unify sys.exit codes
      - 2 = configuration error
 - When ramona daemon is exiting, it has to try to terminate all childs (using stop functionality first and then kill whole process group)
-- Launch priority (start/stop job sequence)
 
 Windows
 -------
@@ -36,7 +34,7 @@ class MyConsoleApp(ramona.console_app):
 Logging
 -------
 - log rotate
-- log rotate of server log (stdout/stderr redirection)
+- log rotate of Ramona server log (stdout/stderr redirection)
 
 Configuration
 -------------

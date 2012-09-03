@@ -5,7 +5,7 @@ Features
 - Console can be started without start of subprocesses
 - Creates it's own progress group (Unix)
 - configuration is ConfigParser compatible
-
+- priority (order) in which programs are started/stopped
 
 Logging
 -------

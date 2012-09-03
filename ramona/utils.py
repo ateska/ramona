@@ -45,27 +45,30 @@ In comparison to launch_server() it returns.
 		return
 
 	try:
-		with open(logfname, 'a') as logf:
-	
-			pid = os.fork()
-			if pid > 0:
-				return pid
-	
-			os.setsid()
-	
-			pid = os.fork()
-			if pid > 0:
-				os._exit(0)
-	
-			stdin = os.open(os.devnull, os.O_RDONLY)
-			os.dup2(stdin, 0)
-	
-			os.dup2(logf.fileno(), 1) # Prepare stdout
-			os.dup2(logf.fileno(), 2) # Prepare stderr
-		launch_server()
+		logf = open(logfname, 'a')
 	except IOError, e:
 		L.fatal("Cannot open logfile {0} for writing: {1}. Check the configuration in [server] section. Exiting.".format(logfname, e))
 		return
+
+	with logf:
+		pid = os.fork()
+		if pid > 0:
+			return pid
+
+		os.setsid()
+
+		pid = os.fork()
+		if pid > 0:
+			os._exit(0)
+
+		stdin = os.open(os.devnull, os.O_RDONLY)
+		os.dup2(stdin, 0)
+
+		os.dup2(logf.fileno(), 1) # Prepare stdout
+		os.dup2(logf.fileno(), 2) # Prepare stderr
+	launch_server()
+	
+		
 
 ###
 
