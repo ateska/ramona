@@ -3,7 +3,7 @@ from ..config import config, read_config
 from ..utils import socket_uri
 from .. import cnscom
 from .parser import argparser
-from . import exitcode, exception
+from . import exception
 
 ###
 
@@ -48,8 +48,15 @@ Console application (base for custom implementations)
 
 
 	def run(self):
-		ec = self.argparser.execute(self)
-		sys.exit(ec if ec is not None else exitcode.OK)
+		try:
+			ec = self.argparser.execute(self)
+		except exception.ramona_runtime_errorbase, e:
+			L.error("{0}".format(e))
+			ec = e.exitcode
+		except Exception, e:
+			L.error("{0}".format(e))
+			ec = 100 # Generic error exit code
+		sys.exit(ec if ec is not None else 0)
 
 
 	def connect(self):
@@ -69,7 +76,7 @@ Console application (base for custom implementations)
 			if self.ctlconsock is None:
 				s = self.connect()
 				if s is None:
-					raise exception.server_not_responing_error("Server is not responding - maybe it isn't running.")
+					raise exception.server_not_responding_error("Server is not responding - maybe it isn't running.")
 
 		else:
 			assert self.ctlconsock is not None

@@ -49,10 +49,10 @@ class _console_cmd(cmd.Cmd):
 		except SystemExit:
 			return False
 
-		self.cnsapp.exitcode = None
-		parser.execute(self.cnsapp)
-		if (self.cnsapp.exitcode is not None) and (self.cnsapp.exitcode != 0):
-			L.error("Last command failed.")
+		try:
+			parser.execute(self.cnsapp)
+		except Exception, e:
+			L.error("{0}".format(e))
 
 		return False
 
