@@ -45,7 +45,7 @@ def read_config(configs):
 	# Load configuration files
 	global config_files
 
-	if configs is None: 	
+	if configs is None or len(configs) == 0: 	
 		# Use platform defaults
 		configs = [
 			os.path.splitext(sys.argv[0])[0] + '.conf',

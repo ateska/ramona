@@ -15,11 +15,9 @@ and instead of that, current process will be replaced by launched server.
 All file descriptors above 2 are closed.
 	'''
 	from .config import config, config_files
-	
-	args = []
-	for cfile in config_files:
-		args.append('-c')
-		args.append(cfile)
+
+	env = os.environ.copy()
+	env['RAMONA_CONFIG'] = ':'.join(config_files)
 	
 	# Close all open file descriptors above standard ones.  This prevents the child from keeping
 	# open any file descriptors inherited from the parent.
@@ -27,7 +25,7 @@ All file descriptors above 2 are closed.
 
 	#TODO: Rewise following line - maybe config.get('ramona:server', 'svrname') is not viable concept
 	#os.execl(sys.executable, config.get('ramona:server', 'svrname'), "-m", "ramona.server", *args)
-	os.execl(sys.executable, sys.executable, "-m", "ramona.server", *args)
+	os.execle(sys.executable, sys.executable, "-m", "ramona.server", env)
 
 #
 

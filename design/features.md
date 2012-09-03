@@ -6,6 +6,8 @@ Features
 - Creates it's own progress group (Unix)
 - configuration is ConfigParser compatible
 - priority (order) in which programs are started/stopped
+- Following environment variables are available:
+	- RAMONA_CONFIGS (filled by console, list of config files as given on command line or by default mechanism, delimiter is ':')
 
 Logging
 -------

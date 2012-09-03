@@ -29,11 +29,25 @@ class server_app(program_roaster):
 		parser.add_argument('-c', '--config', metavar="CONFIGFILE", action='append', help='Specify config file(s) to read (this option can be given more times).')
 		self.args = parser.parse_args()
 
+		config_files = []
+
+		# Configs from environment variables
+		config_envs = os.environ.get('RAMONA_CONFIG')
+		if config_envs is not None:
+			for config_file in config_envs.split(':'):
+				config_files.append(config_file)
+
+		# Configs from command-line arguments
+		if self.args.config is not None:
+			config_files.extend(self.args.config)
+
 		# Read configuration
-		read_config(self.args.config)
+		read_config(config_files)
 
 		# Configure logging
 		logging.basicConfig(level=logging.DEBUG) #TODO: Improve this ...
+
+		L.debug("Configuration loaded from: {0}".format(config_files))
 		
 		socket_factory = socket_uri(config.get("ramona:server", "consoleuri"))
 		try:
