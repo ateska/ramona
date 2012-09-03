@@ -64,7 +64,7 @@ In comparison to launch_server() it returns.
 			os.dup2(logf.fileno(), 2) # Prepare stderr
 		launch_server()
 	except IOError, e:
-		L.fatal("Cannot open logfile {0} for writing. Check the configuration in [server] section. Exiting.".format(logfname))
+		L.fatal("Cannot open logfile {0} for writing: {1}. Check the configuration in [server] section. Exiting.".format(logfname, e))
 		return
 
 ###
