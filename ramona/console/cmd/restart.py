@@ -12,4 +12,4 @@ def init_parser(parser):
 ###
 
 def main(cnsapp, args):
-	cnsapp.svrcall(cnscom.callid_restart, auto_connect=True)
+	cnsapp.svrcall(cnscom.callid_restart, auto_server_start=True)

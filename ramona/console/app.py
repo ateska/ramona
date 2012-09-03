@@ -1,6 +1,6 @@
-import sys, socket, errno, struct, logging
+import sys, socket, errno, struct, logging, time
 from ..config import config, read_config
-from ..utils import socket_uri
+from ..utils import socket_uri, launch_server_daemonized
 from .. import cnscom
 from .parser import argparser
 from . import exception
@@ -71,12 +71,33 @@ Console application (base for custom implementations)
 		return self.ctlconsock
 
 
-	def svrcall(self, callid, params="", auto_connect=False):
+	def svrcall(self, callid, params="", auto_connect=False, auto_server_start=False):
+		'''
+		@param auto_connect: Automatically establish server connection if not present
+		@param auto_server_start: Automatically start server if not running and establish connection
+		'''
+		assert not (auto_connect & auto_server_start), "Only one of auto_connect and auto_server_start can be true"
 		if auto_connect:
 			if self.ctlconsock is None:
 				s = self.connect()
 				if s is None:
 					raise exception.server_not_responding_error("Server is not responding - maybe it isn't running.")
+
+		elif auto_server_start:
+			# Fist check if ramona server is running and if not, launch that
+			s = self.connect()
+			if s is None:
+				L.debug("It looks like Ramona server is not running - launching server")
+				launch_server_daemonized()
+
+				for _ in range(100): # Check server availability for next 10 seconds 
+					# TODO: Also improve 'crash-start' detection (to reduce lag when server fails to start)
+					time.sleep(0.1)
+					s = self.connect()
+					if s is not None: break
+
+			if s is None:
+				raise exception.server_start_error("Ramona server process start failed")
 
 		else:
 			assert self.ctlconsock is not None
