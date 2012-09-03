@@ -45,10 +45,8 @@ def read_config(configs, use_env=True):
 	# Load configuration files
 	global config_files
 
-	if configs is not None:
-		configs = configs[:]
-	else:
-		configs = []
+	if configs is not None: configs = configs[:]
+	else: configs = []
 	if use_env:
 		# Configs from environment variables
 		config_envs = os.environ.get('RAMONA_CONFIG')

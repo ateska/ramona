@@ -3,7 +3,7 @@ import pyev
 
 from .. import cnscom
 from ..utils import socket_uri
-from ..config import config, read_config
+from ..config import config, read_config, config_files
 from .cnscon import console_connection
 from .proaster import program_roaster
 
@@ -35,7 +35,7 @@ class server_app(program_roaster):
 		# Configure logging
 		logging.basicConfig(level=logging.DEBUG) #TODO: Improve this ...
 
-		L.debug("Configuration loaded from: {0}".format(config_files))
+		L.debug("Configuration loaded from: {0}".format(':'.join(config_files)))
 		
 		socket_factory = socket_uri(config.get("ramona:server", "consoleuri"))
 		try:
