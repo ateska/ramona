@@ -2,6 +2,11 @@ Features
 ========
 
 - ramonactl command line usage is compatible with init.d scripts (start/stop/restart/status/...)
+	- Also user can specify 'filtering' of start/stop/restart/status scope by:
+```shell
+./console start program-name1 program-name2 ...
+```
+
 - Console can be started without start of subprocesses
 - Creates it's own progress group (Unix)
 - configuration is ConfigParser compatible
@@ -15,7 +20,7 @@ Logging
 - logging configuration:
 
 
-```
+```ini
 [program:x]
 stdin=[<null>]
 stdout=[<null>|<stderr>|<logdir>|FILENAME]

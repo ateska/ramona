@@ -77,7 +77,8 @@ class console_connection(object):
 					try:
 						ret = self.serverapp.dispatch_ctrl(callid, params)
 					except Exception, e:
-						L.exception("Exception during dispatching console call")
+						if not isinstance(e, cnscom.svrcall_error):
+							L.exception("Exception during dispatching console call")
 						ret = str(e)
 						lenret = len(ret)
 						if lenret >= 0x7fff:

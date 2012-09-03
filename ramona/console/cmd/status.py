@@ -13,12 +13,16 @@ L = logging.getLogger('status')
 ###
 
 def init_parser(parser):
-	return
+	parser.add_argument('program', nargs='*', help='Optionally specify program(s) in scope of the command')
 
 ###
 
 def main(cnsapp, args):
-	ret = cnsapp.svrcall(cnscom.callid_status, auto_connect=True)
+	ret = cnsapp.svrcall(
+		cnscom.callid_status,
+		params=json.dumps(args.program),
+		auto_connect=True
+	)
 
 	status = json.loads(ret)
 	

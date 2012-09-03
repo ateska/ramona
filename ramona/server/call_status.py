@@ -1,7 +1,8 @@
 import json
 ###
 
-def main(svrapp, params):
+def main(svrapp, filter_list=None):
+	l = svrapp.filter_roaster_iter(filter_list)
 	return json.dumps([{
 		'ident': p.ident,
 		'state': p.state,
@@ -10,5 +11,5 @@ def main(svrapp, params):
 		'launch_cnt': p.launch_cnt,
 		'start_time': p.start_time,
 		'term_time': p.term_time,
-		} for p in svrapp.roaster
+		} for p in l
 	])

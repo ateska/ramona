@@ -1,5 +1,6 @@
 import logging, time
 from ..config import config
+from ..cnscom import svrcall_error
 from .program import program
 from .seqctrl import sequence_controller
 
@@ -26,49 +27,73 @@ Program roaster is object that control all configured programs, their start/stop
 			self.roaster.append(sp)
 
 
-	def start_program(self):
+	def filter_roaster_iter(self, filter_list = None):
+		if filter_list is None:
+			for p in self.roaster: yield p
+			return
+
+		filter_set = frozenset(filter_list)
+		roaster_dict = dict((p.ident, p) for p in self.roaster)
+
+		# Pass only known program names
+		not_found = filter_set.difference(roaster_dict)
+		if len(not_found) > 0: raise svrcall_error("Unknown/invalid program names: {0}".format(', '.join(not_found)))
+
+		for ident, p in roaster_dict.iteritems():
+			if ident in filter_set: yield p
+
+
+	def start_program(self, filter_list=None):
 		'''Start processes that are STOPPED'''
 		#TODO: Switch to allow starting state.FATAL programs too
 
 		assert self.start_seq is None #TODO: Better handling of this situation
 		assert self.stop_seq is None #TODO: Better handling of this situation
 		assert self.restart_seq is None #TODO: Better handling of this situation
+
+		l = self.filter_roaster_iter(filter_list)
+
 		L.debug("Initializing start sequence")
 		self.start_seq = sequence_controller()
 
-		for p in self.roaster:
+		for p in l:
 			if p.state not in (program.state_enum.STOPPED,): continue
 			self.start_seq.add(p)		
 
 		self.__startstop_pad_next(True)
 
 
-	def stop_program(self):
+	def stop_program(self, filter_list=None):
 		'''Stop processes that are RUNNING and STARTING'''
 		assert self.start_seq is None #TODO: Better handling of this situation
 		assert self.stop_seq is None #TODO: Better handling of this situation
 		assert self.restart_seq is None #TODO: Better handling of this situation
+
+		l = self.filter_roaster_iter(filter_list)
+
 		L.debug("Initializing stop sequence")
 		self.stop_seq = sequence_controller()
 
-		for p in self.roaster:
+		for p in l:
 			if p.state not in (program.state_enum.RUNNING, program.state_enum.STARTING): continue
 			self.stop_seq.add(p)		
 
 		self.__startstop_pad_next(False)
 
 
-	def restart_program(self):
+	def restart_program(self, filter_list=None):
 		'''Restart processes that are RUNNING, STARTING and STOPPED'''
 		assert self.start_seq is None #TODO: Better handling of this situation
 		assert self.stop_seq is None #TODO: Better handling of this situation
 		assert self.restart_seq is None #TODO: Better handling of this situation
 		L.debug("Initializing restart sequence")
 		
+		l = self.filter_roaster_iter(filter_list)
+
 		self.stop_seq = sequence_controller()
 		self.restart_seq = sequence_controller()
 
-		for p in self.roaster:
+		for p in l:
 			if p.state in (program.state_enum.RUNNING, program.state_enum.STARTING):
 				self.stop_seq.add(p)
 				self.restart_seq.add(p)

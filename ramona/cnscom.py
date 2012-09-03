@@ -155,3 +155,11 @@ It is basically used only on server side of UNIX socket.
 	def bind(self, fname):
 		socket.socket.bind(self, fname)
 		self.__sockfile = fname
+
+###
+
+class svrcall_error(RuntimeError):
+	'''
+	Exception used to report error to the console without leaving trace in server error log.
+	'''
+	pass
