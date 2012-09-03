@@ -108,7 +108,6 @@ Console application (base for custom implementations)
 
 		self.ctlconsock.send(struct.pack(cnscom.call_struct_fmt, cnscom.call_magic, callid, paramlen)+params)
 		
-		import time
 		x = time.time()
 		resp = ""
 		while len(resp) < 4:
