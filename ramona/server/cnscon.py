@@ -80,14 +80,14 @@ class console_connection(object):
 						L.exception("Exception during dispatching console call")
 						ret = str(e)
 						lenret = len(ret)
-						if lenret >= 256*256:
+						if lenret >= 0x7fff:
 							self.handle_error()
 							raise RuntimeError("Transmitted parameters are too long.")
 						self.write(struct.pack(cnscom.resp_struct_fmt, cnscom.resp_magic, cnscom.resp_exc, lenret) + ret)						
 					else:
 						ret = str(ret)
 						lenret = len(ret)
-						if lenret >= 256*256:
+						if lenret >= 0x7fff:
 							self.handle_error()
 							raise RuntimeError("Transmitted parameters are too long.")
 						self.write(struct.pack(cnscom.resp_struct_fmt, cnscom.resp_magic, cnscom.resp_ret, lenret) + ret)

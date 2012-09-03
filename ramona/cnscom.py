@@ -34,7 +34,7 @@ def svrcall(cnssocket, callid, params=""):
 	'''
 
 	paramlen = len(params)
-	if paramlen >= 256*256:
+	if paramlen >= 0x7fff:
 		raise RuntimeError("Transmitted parameters are too long.")
 
 	cnssocket.send(struct.pack(call_struct_fmt, call_magic, callid, paramlen)+params)
