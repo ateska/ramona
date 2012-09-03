@@ -118,7 +118,10 @@ class server_app(program_roaster):
 
 
 	def __tick_cb(self, watcher, revents):
-		self.on_tick()
+		try:
+			self.on_tick()
+		except:
+			L.exception("Exception during periodic internal check")
 
 
 	def stop(self):

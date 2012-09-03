@@ -12,14 +12,28 @@ L = logging.getLogger("httpfendapp")
 
 ###
 
+# Initialize mimetypes
+if not mimetypes.inited:
+		mimetypes.init()
+
+
 class httpfend_app(object):
 	def __init__(self):
 
+		# Read config
+		# TODO: Read config from dynamic path
+		read_config(['demo.conf'])
+
+		# Configure logging
+		logging.basicConfig(
+			level=logging.INFO,
+			stream=sys.stderr,
+			format="%(levelname)s: %(message)s"
+		)
 
 		# Prepare server connection factory
-#		self.cnsconuri = socket_uri(config.get('console','serveruri'))
-		self.ctlconsock = None
-
+		self.cnsconuri = socket_uri(config.get('console','serveruri'))
+		
 
 
 	def run(self):
@@ -40,11 +54,9 @@ class httpfend_app(object):
 
 
 class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
-	if not mimetypes.inited:
-		mimetypes.init()
 	
 	def do_GET(self):
-		scriptdir = os.path.dirname(os.path.realpath(__file__))
+		scriptdir = os.path.join(".", "ramona", "httpfend")
 		if self.path.startswith("/static/"):
 			parts = self.path.split("/")
 			fname = os.path.join(scriptdir, *[x for x in parts if len(x) > 0])
@@ -53,7 +65,7 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 				return
 			try:
 				f = open(fname, "r")
-			except IOError, e:
+			except IOError:
 				self.send_error(httplib.NOT_FOUND)
 				return
 			with f:
@@ -69,9 +81,4 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 				self.wfile.write(f.read().format())
 		else:
 			self.send_error(httplib.NOT_FOUND)
-	
-
-if __name__ == '__main__':
-	app = httpfend_app()
-	app.run()
 	

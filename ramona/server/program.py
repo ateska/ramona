@@ -68,6 +68,14 @@ class program(object):
 		if cmd is None:
 			L.fatal("Program {0} doesn't specify command - don't know how to launch it".format(self.ident))
 			sys.exit(2)
+		
+		
+		if cmd == '<httpfend>':
+			cmd = '{0} -m ramona.httpfend'.format(sys.executable)
+		elif cmd == '<':
+			L.error("Unknown command option '{1}' in {0} -> CFGERROR".format(config_section, cmd))
+			self.state = program.state_enum.CFGERROR
+			return
 
 		self.cmdline = shlex.split(cmd)
 		self.stopsignals = parse_signals(self.config['stopsignal'])
@@ -175,16 +183,23 @@ class program(object):
 		else:
 			# Default is to open /dev/null
 			stdin = os.open(os.devnull, os.O_RDONLY) # Open stdin
+
 		os.dup2(stdin, 0)
 		os.dup2(stdout, 1) # Prepare stdout
 		os.dup2(stderr, 2) # Prepare stderr
 
+
 		# Close all open file descriptors above standard ones.  This prevents the child from keeping
-   		# open any file descriptors inherited from the parent.
+		# open any file descriptors inherited from the parent.
 		os.closerange(3, MAXFD)
 
-		os.execvpe(cmd, args, self.env)
-		sys.exit(3)
+		try:
+			os.execvpe(cmd, args, self.env)
+		except Exception, e:
+			#TODO: Resolve sync issue on following line (program can exit without flushing stderr buffer) 
+			os.write(2, "Execution of command '{1}' failed: {0}\n".format(e, cmd))
+
+		os._exit(3)
 
 
 	def start(self):
