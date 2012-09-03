@@ -8,7 +8,7 @@ L = logging.getLogger("cnscon")
 ###
 
 class console_connection(object):
-	'''Server side'''
+	'''Server side of console communication IPC'''
 
 	NONBLOCKING = frozenset([errno.EAGAIN, errno.EWOULDBLOCK])
 
