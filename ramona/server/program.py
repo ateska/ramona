@@ -175,16 +175,23 @@ class program(object):
 		else:
 			# Default is to open /dev/null
 			stdin = os.open(os.devnull, os.O_RDONLY) # Open stdin
+
 		os.dup2(stdin, 0)
 		os.dup2(stdout, 1) # Prepare stdout
 		os.dup2(stderr, 2) # Prepare stderr
 
+
 		# Close all open file descriptors above standard ones.  This prevents the child from keeping
-   		# open any file descriptors inherited from the parent.
+		# open any file descriptors inherited from the parent.
 		os.closerange(3, MAXFD)
 
-		os.execvpe(cmd, args, self.env)
-		sys.exit(3)
+		try:
+			os.execvpe(cmd, args, self.env)
+		except Exception, e:
+			#TODO: Resolve sync issue on following line (program can exit without flushing stderr buffer) 
+			os.write(2, "Execution of command '{1}' failed: {0}\n".format(e, cmd))
+
+		os._exit(3)
 
 
 	def start(self):
