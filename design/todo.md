@@ -51,6 +51,7 @@ Watchdog
 Python specific
 ---------------
 - native python program execution (using sys.executable)
+- python version (minimal) check
 
 Error reporting
 ---------------

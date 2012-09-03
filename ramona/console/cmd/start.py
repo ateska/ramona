@@ -22,6 +22,7 @@ def main(cnsapp, args):
 		launch_server_daemonized()
 
 		for _ in range(100): # Check server availability for next 10 seconds 
+			# TODO: Also improve 'crash-start' detection (to reduce lag when server fails to start)
 			time.sleep(0.1)
 			s = cnsapp.connect()
 			if s is not None: break
