@@ -1,5 +1,10 @@
-import os, sys, urlparse, socket, signal, resource
+import os, sys, urlparse, socket, signal, resource, logging
 ###
+
+L = logging.getLogger("utils")
+
+###
+
 
 
 def launch_server():
@@ -39,8 +44,13 @@ In comparison to launch_server() it returns.
 		L.error("Unknown log option in [server] section - server not started")
 		return
 
-	with open(logfname, 'a') as logf:
+	try:
+		logf = open(logfname, 'a')
+	except IOError, e:
+		L.fatal("Cannot open logfile {0} for writing: {1}. Check the configuration in [server] section. Exiting.".format(logfname, e))
+		return
 
+	with logf:
 		pid = os.fork()
 		if pid > 0:
 			return pid
@@ -56,8 +66,9 @@ In comparison to launch_server() it returns.
 
 		os.dup2(logf.fileno(), 1) # Prepare stdout
 		os.dup2(logf.fileno(), 2) # Prepare stderr
-
 	launch_server()
+	
+		
 
 ###
 
