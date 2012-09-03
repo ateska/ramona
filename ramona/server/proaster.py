@@ -117,15 +117,28 @@ Program roaster is object that control all configured programs, their start/stop
 			r = self.start_seq.check(program.state_enum.STARTING, program.state_enum.RUNNING)
 			if r is None:
 				L.warning("Start sequence aborted due to program error")
-			elif r: self.__startstop_pad_next(True)
+				self.start_seq = None
+				assert self.restart_seq is None
+				return	
+
+			elif r:
+				self.__startstop_pad_next(True)
 
 		if self.stop_seq is not None:
 			r = self.stop_seq.check(program.state_enum.STOPPING, program.state_enum.STOPPED)
 			if r is None:
 				if self.restart_seq is None:
 					L.warning("Stop sequence aborted due to program error")
+					self.stop_seq = None
+					assert self.start_seq is None
+					assert self.restart_seq is None
+					return
 				else:
-					self.restart_seq = None
 					L.warning("Restart sequence aborted due to program error")
+					self.restart_seq = None
+					self.stop_seq = None
+					assert self.start_seq is None
+					return
 
-			elif r: self.__startstop_pad_next(False)
+			elif r:
+				self.__startstop_pad_next(False)
