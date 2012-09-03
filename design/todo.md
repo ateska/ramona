@@ -13,7 +13,6 @@ Generic
      - 2 = configuration error
 - When ramona daemon is exiting, it has to try to terminate all childs (using stop functionality first and then kill whole process group)
 - Add following environment variables:
-	- RAMONA_SECTION (name of [program:?] section in config that is relevant for current program)
 	- RAMONA_PYTHON (name of Python interpretter - as sys.executable can be empty on line - really ?)
 
 Windows

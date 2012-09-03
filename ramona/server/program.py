@@ -140,6 +140,7 @@ class program(object):
 					self.env[name] = value
 				else:
 					self.env.pop(name, 0)
+		self.env['RAMONA_SECTION'] = config_section
 
 		# Log searching (just example)
 		self.kmp = kmp_search('error')

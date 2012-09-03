@@ -8,6 +8,7 @@ Features
 - priority (order) in which programs are started/stopped
 - Following environment variables are available:
 	- RAMONA_CONFIGS (filled by console, list of config files as given on command line or by default mechanism, delimiter is ':')
+	- RAMONA_SECTION (name of [program:?] section in config that is relevant for current program)
 
 Logging
 -------
