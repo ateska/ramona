@@ -69,6 +69,13 @@ class program(object):
 			L.fatal("Program {0} doesn't specify command - don't know how to launch it".format(self.ident))
 			sys.exit(2)
 
+		if cmd == '<httpfend>':
+			cmd = '{0} -m ramona.httpfend'.format(sys.executable)
+		elif cmd == '<':
+			L.error("Unknown command option '{1}' in {0} -> CFGERROR".format(config_section, cmd))
+			self.state = program.state_enum.CFGERROR
+			return
+
 		self.cmdline = shlex.split(cmd)
 		self.stopsignals = parse_signals(self.config['stopsignal'])
 		if len(self.stopsignals) == 0: self.stopsignals = [signal.SIGTERM]
