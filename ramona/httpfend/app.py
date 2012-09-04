@@ -138,7 +138,7 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 				    '<a class="btn btn-small btn-warning" href="">Restart</a>']
 			if progState == program_state_enum.FATAL:
 				actions.append('<a class="btn btn-small btn-danged" href="">Start (force)</a>')
-			ret += '<td>{0}</td>'.format("".join(actions))
+			ret += '<td>{0}</td>'.format(" ".join(actions))
 			
 			ret += "</tr>"
 			
