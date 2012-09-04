@@ -151,5 +151,8 @@ class server_app(program_roaster):
 		elif callid == cnscom.callid_status:
 			return call_status.main(self, **cnscom.parse_json_kwargs(params))
 
+		elif callid == cnscom.callid_ping:
+			return params
+
 		else:
 			L.error("Received unknown callid: {0}".format(callid))

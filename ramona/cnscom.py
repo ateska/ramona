@@ -5,6 +5,7 @@ L = logging.getLogger("cnscom")
 
 ###
 
+callid_ping = 0
 callid_start = 1
 callid_stop = 2
 callid_restart = 3

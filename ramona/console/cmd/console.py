@@ -1,6 +1,7 @@
 import cmd, logging
 import readline #TODO: optional
 from ...config import config
+from ... import cnscom
 
 ###
 
@@ -33,7 +34,13 @@ class _console_cmd(cmd.Cmd):
 			return True
 
 		line = line.strip()
-		if line == '': return False
+		if line == '':
+			# Send 'ping' to server
+			try:
+				self.cnsapp.svrcall(cnscom.callid_ping, '', auto_connect=True)
+			except Exception, e:
+				L.error("{0}".format(e))
+			return False
 
 		if line == '?':
 			line = 'help'
