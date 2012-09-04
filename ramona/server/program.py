@@ -3,6 +3,7 @@ import pyev
 from ..config import config
 from ..utils import parse_signals, MAXFD, enable_nonblocking, disable_nonblocking
 from ..kmpsearch import kmp_search
+from ..cnscom import program_state_enum
 
 #
 
@@ -23,25 +24,8 @@ class program(object):
 		'priority': 100,
 	}
 
-
-	class state_enum:
-		'''Enum'''
-		STOPPED = 0
-		STARTING = 10
-		RUNNING = 20
-		STOPPING = 30
-		FATAL = 200
-		CFGERROR=201
-
-		labels = {
-			STOPPED: 'STOPPED',
-			STARTING: 'STARTING',
-			RUNNING: 'RUNNING',
-			STOPPING: 'STOPPING',
-			FATAL: 'FATAL',
-			CFGERROR: 'CFGERROR',
-		}
-
+	# TODO: Remove this alias
+	state_enum = program_state_enum
 
 	def __init__(self, loop, config_section):
 		_, self.ident = config_section.split(':', 2)
@@ -68,6 +52,13 @@ class program(object):
 		if cmd is None:
 			L.fatal("Program {0} doesn't specify command - don't know how to launch it".format(self.ident))
 			sys.exit(2)
+
+		if cmd == '<httpfend>':
+			cmd = '{0} -m ramona.httpfend'.format(sys.executable)
+		elif cmd == '<':
+			L.error("Unknown command option '{1}' in {0} -> CFGERROR".format(config_section, cmd))
+			self.state = program.state_enum.CFGERROR
+			return
 
 		self.cmdline = shlex.split(cmd)
 		self.stopsignals = parse_signals(self.config['stopsignal'])
@@ -321,7 +312,9 @@ class program(object):
 				if watcher.data == 0: self.stdout = None
 				elif watcher.data == 1: self.stderr = None
 				return 
-
+			
+			print data
+			
 			if watcher.data == 0: self.__process_output(self.log_out, 0, data)
 			elif watcher.data == 1: self.__process_output(self.log_err, 1, data)
 

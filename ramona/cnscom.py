@@ -24,6 +24,28 @@ resp_exc = 'E'
 
 ###
 
+class program_state_enum(object):
+	'''Enum'''
+	STOPPED = 0
+	STARTING = 10
+	RUNNING = 20
+	STOPPING = 30
+	FATAL = 200
+	CFGERROR=201
+
+	labels = {
+		STOPPED: 'STOPPED',
+		STARTING: 'STARTING',
+		RUNNING: 'RUNNING',
+		STOPPING: 'STOPPING',
+		FATAL: 'FATAL',
+		CFGERROR: 'CFGERROR',
+	}
+
+
+###
+
+
 def svrcall(cnssocket, callid, params=""):
 	'''
 	Client side of console communication IPC call (kind of RPC / Remote procedure call).
