@@ -53,6 +53,7 @@ class server_app(program_roaster):
 		self.watchers.append(pyev.Periodic(0, 1.0, self.loop, self.__tick_cb))
 
 		self.conns = weakref.WeakSet()
+		self.termstatus =  None
 
 		program_roaster.__init__(self)
 
@@ -110,8 +111,21 @@ class server_app(program_roaster):
 
 
 	def __terminal_signal_cb(self, watcher, _revents):
-		if watcher.signum == signal.SIGINT: print # Print ENTER when Ctrl-C is pressed
-		self.stop()
+		if watcher.signum == signal.SIGINT:
+			# Print ENTER when Ctrl-C is pressed
+			print
+
+		if self.termstatus is None:
+			self.termstatus =  1 # Soft
+			try:
+				self.stop_program(force=True)
+			except:
+				L.exception("Exception during stop_program()")
+			return
+
+		elif self.termstatus ==  1:
+			self.termstatus =  2 # Hard
+			self.stop()
 
 
 	def __child_signal_cb(self, watcher, _revents):
@@ -129,6 +143,9 @@ class server_app(program_roaster):
 
 
 	def stop(self):
+		'''
+		Stop internal loop and exit.
+		'''
 		self.loop.stop(pyev.EVBREAK_ALL)
 		self.sock.close()
 		while self.watchers:
@@ -139,6 +156,9 @@ class server_app(program_roaster):
 
 
 	def dispatch_ctrl(self, callid, params):
+		if self.termstatus is not None:
+			raise cnscom.svrcall_error('Ramona server is exiting - no further commands will be accepted')
+
 		if callid == cnscom.callid_start:
 			return self.start_program(**cnscom.parse_json_kwargs(params))
 

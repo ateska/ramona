@@ -222,7 +222,9 @@ class program(object):
 
 	def stop(self):
 		'''Transition to state STOPPING'''
-		assert self.pid is not None
+		if self.state == program.state_enum.FATAL: return # This can happen and it is probably OK
+
+		assert self.pid is not None, "Stopping: {0}".format(self)
 		assert self.state in (program.state_enum.RUNNING, program.state_enum.STARTING)
 
 		L.debug("{0} -> STOPPING".format(self))
