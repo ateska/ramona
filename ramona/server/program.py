@@ -325,8 +325,8 @@ class program(object):
 			if len(data) == 0: # File descriptor is closed
 				watcher.stop()
 				os.close(watcher.fd)
-				if watcher.data == 0: self.stderr = None
-				elif watcher.data == 1: self.stdout = None
+				if watcher.data == 0: self.stdout = None
+				elif watcher.data == 1: self.stderr = None
 				return 
 
 			if watcher.data == 0: self.__process_output(self.log_out, 0, data)
