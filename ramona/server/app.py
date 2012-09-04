@@ -140,16 +140,16 @@ class server_app(program_roaster):
 
 	def dispatch_ctrl(self, callid, params):
 		if callid == cnscom.callid_start:
-			return self.start_program(**json.loads(params))
+			return self.start_program(**cnscom.parse_json_kwargs(params))
 
 		elif callid == cnscom.callid_stop:
-			return self.stop_program(**json.loads(params))
+			return self.stop_program(**cnscom.parse_json_kwargs(params))
 
 		elif callid == cnscom.callid_restart:
-			return self.restart_program(**json.loads(params))
+			return self.restart_program(**cnscom.parse_json_kwargs(params))
 
 		elif callid == cnscom.callid_status:
-			return call_status.main(self, **json.loads(params))
+			return call_status.main(self, **cnscom.parse_json_kwargs(params))
 
 		else:
 			L.error("Received unknown callid: {0}".format(callid))

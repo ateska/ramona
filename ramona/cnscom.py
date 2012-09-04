@@ -1,4 +1,4 @@
-import os, urlparse, socket, struct, time, logging
+import os, urlparse, socket, struct, time, json, logging
 ###
 
 L = logging.getLogger("cnscom")
@@ -155,6 +155,13 @@ It is basically used only on server side of UNIX socket.
 	def bind(self, fname):
 		socket.socket.bind(self, fname)
 		self.__sockfile = fname
+
+###
+
+def parse_json_kwargs(params):
+	'''Used when params are transfered as JSON - it also handles situation when 'params' is empty string '''
+	if params == '': return dict()
+	return json.loads(params)
 
 ###
 
