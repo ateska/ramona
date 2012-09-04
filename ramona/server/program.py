@@ -313,8 +313,6 @@ class program(object):
 				elif watcher.data == 1: self.stderr = None
 				return 
 			
-			print data
-			
 			if watcher.data == 0: self.__process_output(self.log_out, 0, data)
 			elif watcher.data == 1: self.__process_output(self.log_err, 1, data)
 
