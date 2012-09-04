@@ -43,8 +43,8 @@ Program roaster is object that control all configured programs, their start/stop
 			if ident in filter_set: yield p
 
 
-	def start_program(self, pfilter=None):
-		'''Start processes that are STOPPED'''
+	def start_program(self, pfilter=None, force=False):
+		'''Start processes that are STOPPED and (forced) FATAL'''
 		#TODO: Switch to allow starting state.FATAL programs too
 
 		assert self.start_seq is None #TODO: Better handling of this situation
@@ -56,8 +56,12 @@ Program roaster is object that control all configured programs, their start/stop
 		L.debug("Initializing start sequence")
 		self.start_seq = sequence_controller()
 
+		# If 'force' is used, include as programs in FATAL state
+		if force: states = (program.state_enum.STOPPED,program.state_enum.FATAL)
+		else: states = (program.state_enum.STOPPED,)
+
 		for p in l:
-			if p.state not in (program.state_enum.STOPPED,): continue
+			if p.state not in states: continue
 			self.start_seq.add(p)		
 
 		self.__startstop_pad_next(True)
@@ -81,8 +85,8 @@ Program roaster is object that control all configured programs, their start/stop
 		self.__startstop_pad_next(False)
 
 
-	def restart_program(self, pfilter=None):
-		'''Restart processes that are RUNNING, STARTING and STOPPED'''
+	def restart_program(self, pfilter=None, force=False):
+		'''Restart processes that are RUNNING, STARTING, STOPPED and (forced) FATAL'''
 		assert self.start_seq is None #TODO: Better handling of this situation
 		assert self.stop_seq is None #TODO: Better handling of this situation
 		assert self.restart_seq is None #TODO: Better handling of this situation
@@ -93,11 +97,15 @@ Program roaster is object that control all configured programs, their start/stop
 		self.stop_seq = sequence_controller()
 		self.restart_seq = sequence_controller()
 
+		# If 'force' is used, include as programs in FATAL state
+		if force: start_states = (program.state_enum.STOPPED,program.state_enum.FATAL)
+		else: start_states = (program.state_enum.STOPPED,)
+
 		for p in l:
 			if p.state in (program.state_enum.RUNNING, program.state_enum.STARTING):
 				self.stop_seq.add(p)
 				self.restart_seq.add(p)
-			elif p.state in (program.state_enum.STOPPED,):
+			elif p.state in start_states:
 				self.restart_seq.add(p)
 
 		self.__startstop_pad_next(False)
