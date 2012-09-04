@@ -15,7 +15,6 @@ Generic
 - Ramona server terminates after stopping all childs (if any in fatal state, terminate and log that)
 	- eventually override this automatic server termination by server command-line argument
 - Reload command
-- Way how to reset progs in 'FATAL' state
 - [program:x] disabled=true options + console command enable/disable to allow change status during runtime
 
 Windows

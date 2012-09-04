@@ -197,7 +197,7 @@ class program(object):
 
 	def start(self):
 		'''Transition to state STARTING'''
-		assert self.state == program.state_enum.STOPPED
+		assert self.state in (program.state_enum.STOPPED, program.state_enum.FATAL)
 
 		L.debug("{0} -> STARTING".format(self))
 
