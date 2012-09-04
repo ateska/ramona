@@ -45,11 +45,8 @@ Program roaster is object that control all configured programs, their start/stop
 
 	def start_program(self, pfilter=None, force=False):
 		'''Start processes that are STOPPED and (forced) FATAL'''
-		#TODO: Switch to allow starting state.FATAL programs too
-
-		assert self.start_seq is None #TODO: Better handling of this situation
-		assert self.stop_seq is None #TODO: Better handling of this situation
-		assert self.restart_seq is None #TODO: Better handling of this situation
+		if self.start_seq is not None or self.stop_seq is not None or self.restart_seq is not None:
+			raise svrcall_error("There is already start/stop sequence running - please wait and try again later.")
 
 		l = self.filter_roaster_iter(pfilter)
 
@@ -69,9 +66,8 @@ Program roaster is object that control all configured programs, their start/stop
 
 	def stop_program(self, pfilter=None):
 		'''Stop processes that are RUNNING and STARTING'''
-		assert self.start_seq is None #TODO: Better handling of this situation
-		assert self.stop_seq is None #TODO: Better handling of this situation
-		assert self.restart_seq is None #TODO: Better handling of this situation
+		if self.start_seq is not None or self.stop_seq is not None or self.restart_seq is not None:
+			raise svrcall_error("There is already start/stop sequence running - please wait and try again later.")
 
 		l = self.filter_roaster_iter(pfilter)
 
@@ -87,9 +83,9 @@ Program roaster is object that control all configured programs, their start/stop
 
 	def restart_program(self, pfilter=None, force=False):
 		'''Restart processes that are RUNNING, STARTING, STOPPED and (forced) FATAL'''
-		assert self.start_seq is None #TODO: Better handling of this situation
-		assert self.stop_seq is None #TODO: Better handling of this situation
-		assert self.restart_seq is None #TODO: Better handling of this situation
+		if self.start_seq is not None or self.stop_seq is not None or self.restart_seq is not None:
+			raise svrcall_error("There is already start/stop sequence running - please wait and try again later.")
+
 		L.debug("Initializing restart sequence")
 		
 		l = self.filter_roaster_iter(pfilter)
