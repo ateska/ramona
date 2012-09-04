@@ -102,4 +102,17 @@ Console application (base for custom implementations)
 		else:
 			assert self.ctlconsock is not None
 
-		return cnscom.svrcall(self.ctlconsock, callid, params)
+		try:
+			return cnscom.svrcall(self.ctlconsock, callid, params)
+		except socket.error:
+			pass
+
+		if auto_connect or auto_server_start:
+			L.debug("Reconnecting to server ...")
+
+			self.ctlconsock = None
+			s = self.connect()
+			if s is None:
+				raise exception.server_not_responding_error("Server is not responding - maybe it isn't running.")
+
+			return cnscom.svrcall(self.ctlconsock, callid, params)

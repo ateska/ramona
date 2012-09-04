@@ -33,8 +33,6 @@ class MyConsoleApp(ramona.console_app):
 	# Add 'floader' option ...
 ```
 
-- recover (in running console) from situation when server is shutdown during run
-
 Logging
 -------
 - log rotate

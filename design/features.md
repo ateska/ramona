@@ -16,6 +16,7 @@ Features
 	- RAMONA_SECTION (name of [program:?] section in config that is relevant for current program)
 
 - Force start/restart of programs in 'FATAL' state (-f option)
+- Console is able to re-establish connection when server goes down during console run-time
 
 Logging
 -------
