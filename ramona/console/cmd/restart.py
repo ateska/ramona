@@ -14,9 +14,11 @@ def init_parser(parser):
 ###
 
 def main(cnsapp, args):
+	params={}
+	if len(args.program) > 0: params['pfilter'] = args.program
 	cnsapp.svrcall(
 		cnscom.callid_restart,
-		params=json.dumps(args.program),
+		json.dumps(params),
 		auto_connect=args.no_server_start,
 		auto_server_start=not args.no_server_start
 	)
