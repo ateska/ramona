@@ -115,7 +115,10 @@ class server_app(program_roaster):
 
 
 	def __child_signal_cb(self, watcher, _revents):
-		self.on_terminate_program(watcher.rpid, watcher.rstatus)
+		try:
+			self.on_terminate_program(watcher.rpid, watcher.rstatus)
+		except:
+			L.exception("Exception during SIGCHLD callback")
 
 
 	def __tick_cb(self, watcher, revents):
