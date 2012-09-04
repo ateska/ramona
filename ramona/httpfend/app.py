@@ -1,10 +1,10 @@
 import sys, socket, errno, struct, logging, mimetypes
 from ..config import config, read_config
-from ..utils import socket_uri
 from .. import cnscom
 import SimpleHTTPServer, BaseHTTPServer, SocketServer
 import httplib
 import os
+import ConfigParser
 
 ###
 
@@ -21,9 +21,9 @@ class httpfend_app(object):
 	def __init__(self):
 
 		# Read config
-		# TODO: Read config from dynamic path
-		read_config(['demo.conf'])
+		read_config()
 
+		print "Config done"
 		# Configure logging
 		logging.basicConfig(
 			level=logging.INFO,
@@ -32,20 +32,21 @@ class httpfend_app(object):
 		)
 
 		# Prepare server connection factory
-		self.cnsconuri = socket_uri(config.get('console','serveruri'))
+#		self.cnsconuri = cnscom.socket_uri(config.get('ramona:console','serveruri'))
+		print "Done with init"
 		
 
 
 	def run(self):
-#		if not config.has_section('httpfend'):
-#			L.debug("Section [httpfend] does not exist in config. Exiting.")
-#			sys.exit(1)
-		
-#		host = config.get('httpfend', 'host')
-#		port = config.get('httpfend', 'host')
-		host = "127.0.0.1"
-		port = 5588
-		# TODO: Missing configuration check
+		try:
+			host = config.get(os.environ['RAMONA_SECTION'], 'host')
+			port = config.getint(os.environ['RAMONA_SECTION'], 'port')
+		except ConfigParser.NoSectionError, e:
+			L.fatal("Missing configuration section {0}. Exiting.".format(os.environ['RAMONA_SECTION']))
+			sys.exit(1)
+		except ConfigParser.NoOptionError, e:
+			L.fatal("Missing configuration option: {0}. Exiting".format(e))
+			sys.exit(1)
 		
 		Handler = RamonaHttpReqHandler
 		httpd = SocketServer.TCPServer((host, port), Handler)
