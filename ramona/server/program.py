@@ -169,7 +169,7 @@ class program(object):
 			self.watchers[0].set(self.stdout, pyev.EV_READ)
 			self.watchers[0].start()
 
-			enable_nonblocking(self.stdout)
+			enable_nonblocking(self.stderr)
 			self.watchers[1].set(self.stderr, pyev.EV_READ)
 			self.watchers[1].start()
 

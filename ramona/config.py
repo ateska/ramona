@@ -29,7 +29,7 @@ config_files = []
 
 ###
 
-def read_config(configs, use_env=True):
+def read_config(configs=None, use_env=True):
 	global config
 	assert len(config.sections()) == 0
 
