@@ -1,8 +1,8 @@
 import json
 ###
 
-def main(svrapp, filter_list=None):
-	l = svrapp.filter_roaster_iter(filter_list)
+def main(svrapp, pfilter=None):
+	l = svrapp.filter_roaster_iter(pfilter)
 	return json.dumps([{
 		'ident': p.ident,
 		'state': p.state,
