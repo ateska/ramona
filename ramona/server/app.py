@@ -1,4 +1,4 @@
-import sys, os, socket, signal, errno, weakref, logging, argparse, json
+import sys, os, socket, signal, errno, weakref, logging, argparse
 import pyev
 
 from .. import cnscom
