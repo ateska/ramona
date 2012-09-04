@@ -320,7 +320,9 @@ class program(object):
 
 
 	def __process_output(self, logf, sourceid, data):
-			if logf is not None: logf.write(data)
+			if logf is not None:
+				logf.write(data)
+				logf.flush() #TODO: Maybe something more clever here can be better (check logging.StreamHandler)
 
 			# Following code is just example
 			if sourceid == 1:
