@@ -64,8 +64,11 @@ Program roaster is object that control all configured programs, their start/stop
 		self.__startstop_pad_next(True)
 
 
-	def stop_program(self, pfilter=None, force=True):
-		'''Stop processes that are RUNNING and STARTING'''
+	def stop_program(self, pfilter=None, force=False):
+		'''
+		Stop processes that are RUNNING and STARTING
+		@param force: If True then it interrupts any concurrently running start/stop sequence.
+		'''
 		if force:
 			self.start_seq = None
 			self.restart_seq = None

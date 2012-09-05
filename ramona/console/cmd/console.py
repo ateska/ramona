@@ -66,22 +66,26 @@ class _console_cmd(cmd.Cmd):
 #
 
 def main(cnsapp, args):
-	
-	histfile = config.get('ramona:console', 'history')
-	if histfile != '':
-		try:
-			readline.read_history_file(histfile)
-		except IOError:
-			pass
-
-	L.info("Ramona console") #TODO: Add version info
-
-	c = _console_cmd(cnsapp)
+	old_is_interactive = cnsapp.is_interactive
+	cnsapp.is_interactive = True
 	try:
-		c.cmdloop()
-	
-	except KeyboardInterrupt:
-		print ""
-	
+		histfile = config.get('ramona:console', 'history')
+		if histfile != '':
+			try:
+				readline.read_history_file(histfile)
+			except IOError:
+				pass
+
+		L.info("Ramona console") #TODO: Add version info
+
+		c = _console_cmd(cnsapp)
+		try:
+			c.cmdloop()
+		
+		except KeyboardInterrupt:
+			print ""
+		
+		finally:
+			if histfile != '': readline.write_history_file(histfile)
 	finally:
-		if histfile != '': readline.write_history_file(histfile)
+		cnsapp.is_interactive = old_is_interactive

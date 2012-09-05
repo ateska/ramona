@@ -42,6 +42,8 @@ Console application (base for custom implementations)
 		if self.argparser.args.debug:
 			L.debug("Debug output is enabled.")
 
+		self.is_interactive = False # Is in interactive console mode
+
 		# Prepare server connection factory
 		self.cnsconuri = cnscom.socket_uri(config.get('ramona:console','serveruri'))
 		self.ctlconsock = None

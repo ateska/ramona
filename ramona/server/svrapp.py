@@ -125,14 +125,12 @@ class server_app(program_roaster, idlework_appmixin):
 
 		if self.termstatus is None:
 			L.info("Exit request received (SIGNAL: {0})".format(watcher.signum))
-			self.termstatus =  1 # Soft
-			self.add_idlework(self.stop_program, force=True)
-			self.add_idlework(self.on_tick) # Schedule extra periodic check 
+			self.__init_soft_exit() # Soft
 			return
 
 		elif self.termstatus ==  1:
 			self.termstatus =  2 # Hard
-			self.add_idlework(self.stop_loop)
+			self.stop_loop()
 
 
 	def __child_signal_cb(self, watcher, _revents):
@@ -170,7 +168,14 @@ class server_app(program_roaster, idlework_appmixin):
 			return self.start_program(**cnscom.parse_json_kwargs(params))
 
 		elif callid == cnscom.callid_stop:
-			return self.stop_program(**cnscom.parse_json_kwargs(params))
+			kwargs = cnscom.parse_json_kwargs(params)
+			mode = kwargs.pop('mode',None)
+			if mode is None or mode == 'stay':
+				return self.stop_program(**kwargs)
+			elif mode == 'exit':
+				return self.__init_soft_exit()
+			else:
+				L.warning("Unknown exit mode issued: {0}".format(mode))
 
 		elif callid == cnscom.callid_restart:
 			return self.restart_program(**cnscom.parse_json_kwargs(params))
@@ -183,6 +188,15 @@ class server_app(program_roaster, idlework_appmixin):
 
 		else:
 			L.error("Received unknown callid: {0}".format(callid))
+
+
+	def __init_soft_exit(self):
+		if self.termstatus > 1: return
+
+		self.termstatus =  1
+		self.stop_program(force=True)
+		self.add_idlework(self.on_tick) # Schedule extra periodic check 
+
 
 
 def _SIGALARM_handler(signum, frame):
