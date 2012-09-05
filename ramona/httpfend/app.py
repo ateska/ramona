@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# TODO: Signal handling 
-
-import sys, socket, errno, struct, logging, mimetypes, json
+import sys, socket, errno, logging, mimetypes, json, signal
 from ..config import config, read_config
 from .. import cnscom
 import BaseHTTPServer
@@ -63,10 +61,15 @@ class httpfend_app(object):
 		
 		self.logmsgcnt = itertools.count()
 		self.logmsgs = dict()
+		signal.signal(signal.SIGINT, self.stop)
 
 	def run(self):
 		L.info("Started HTTP frontend at http://{0}:{1}".format(self.httpd.server_name, self.httpd.server_port))
 		self.httpd.serve_forever()
+	
+	def stop(self, signum, frame):
+		L.info("Received signal {0}. Stopping the server.".format(signum))
+		self.httpd.shutdown()
 
 
 class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
