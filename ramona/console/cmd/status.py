@@ -1,6 +1,7 @@
-import json, time, logging
+import json, time, itertools, collections, logging
 from ... import cnscom
 from .. import exception
+from ... import cnscom
 ###
 
 name = 'status'
@@ -28,25 +29,33 @@ def main(cnsapp, args):
 
 	status = json.loads(ret)
 	
-	# TODO: Probably more info to be printed
 	for sp in status:
 
-		details = []
+		details = collections.OrderedDict()
 
-		pid = sp.get('pid')
-		if pid is not None: details.append("pid:{0}".format(pid))
+		exit_status = sp.pop('exit_status', None)
+		if exit_status is not None: details["exit_status"] = exit_status
 
-		details.append("launches:{0}".format(sp['launch_cnt']))
+		pid = sp.pop('pid', None)
+		if pid is not None: details["pid"] = pid
 
-		t = sp.get('start_time')
-		if t is not None: details.append("start_time:{0}".format(time.strftime("%d-%m-%Y %H:%M:%S",time.localtime(t))))
+		details['launches'] = sp.pop('launch_cnt','')
 
-		t = sp.get('exit_time')
-		if t is not None: details.append("exit_time:{0}".format(time.strftime("%d-%m-%Y %H:%M:%S",time.localtime(t))))
+		t = sp.pop('start_time', None)
+		if t is not None: details["start_time"] = time.strftime("%d-%m-%Y %H:%M:%S",time.localtime(t))
 
-		print "{0:<16} {1:<10} {2}".format(
-			sp.get('ident', '???'), 
-			sp.get('stlbl', '???'),
-			','.join(details),
+		t = sp.pop('exit_time', None)
+		if t is not None: details["exit_time"] = time.strftime("%d-%m-%Y %H:%M:%S",time.localtime(t))
+
+		state = sp.pop('state')
+		stlbl = cnscom.program_state_enum.labels.get(state, "({0})".format(state))
+
+		line = "{0:<16} {1:<10}".format(
+			sp.pop('ident', '???'), 
+			stlbl,
 			)
 
+		line += ', '.join(['{0}:{1}'.format(k,v) for k,v in itertools.chain(details.iteritems(), sp.iteritems())])
+			
+
+		print line
