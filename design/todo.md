@@ -10,9 +10,6 @@ Generic
 - SSL (optional) for protecting console-server channel
 - core dump enabled launch/kill
 - Unify & document sys.exit codes 
-- When ramona daemon is exiting, it has to try to terminate all childs (using stop functionality first and then kill whole process group)
-- Ramona server terminates after stopping all childs (if any in fatal state, terminate and log that)
-	- eventually override this automatic server termination by server command-line argument
 - Reload command
 - [program:x] disabled=true options + console command enable/disable to allow change status during runtime
 
