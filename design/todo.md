@@ -64,4 +64,5 @@ Mailing to admin
 
 HTTP frontend
 -------------
-- eventual HTTP frontend is subprocess using standard socket API to communicate with daemon
+- (medium prio): Basic authentication
+- (low prio): HTTPS

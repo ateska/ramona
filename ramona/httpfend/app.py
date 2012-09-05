@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# TODO: Signal handling
+# TODO: Signal handling 
 
 import sys, socket, errno, struct, logging, mimetypes, json
 from ..config import config, read_config
