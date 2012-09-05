@@ -75,7 +75,7 @@ class console_connection(object):
 					self.read_buf = self.read_buf[4+paramlen:]
 					
 					try:
-						ret = self.serverapp.dispatch_ctrl(callid, params)
+						ret = self.serverapp.dispatch_svrcall(callid, params)
 					except Exception, e:
 						if not isinstance(e, cnscom.svrcall_error):
 							L.exception("Exception during dispatching console call")

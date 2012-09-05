@@ -1,4 +1,4 @@
-import logging, time
+import logging, time, itertools
 from ..config import config
 from ..cnscom import svrcall_error
 from .program import program
@@ -122,12 +122,8 @@ Program roaster is object that control all configured programs, their start/stop
 				L.debug("Start sequence completed.")
 			else:
 				self.stop_seq = None
-				if self.termstatus is not None:
-					L.debug("Stop sequence completed - quiting.")
-					self.stop()
-					return
 
-				if self.restart_seq is None:
+				if self.restart_seq is None or self.termstatus is not None:
 					L.debug("Stop sequence completed.")
 					return
 
@@ -163,8 +159,6 @@ Program roaster is object that control all configured programs, their start/stop
 				L.warning("Start sequence aborted due to program error")
 				self.start_seq = None
 				assert self.restart_seq is None
-				return	
-
 			elif r:
 				self.__startstop_pad_next(True)
 
@@ -176,13 +170,29 @@ Program roaster is object that control all configured programs, their start/stop
 					self.stop_seq = None
 					assert self.start_seq is None
 					assert self.restart_seq is None
-					return
 				else:
 					L.warning("Restart sequence aborted due to program error")
 					self.restart_seq = None
 					self.stop_seq = None
 					assert self.start_seq is None
-					return
 
 			elif r:
 				self.__startstop_pad_next(False)
+
+		if (self.termstatus is not None) and (self.stop_seq is None):
+			# Special care for server terminating condition 
+			not_running_states=frozenset([program.state_enum.STOPPED, program.state_enum.FATAL, program.state_enum.CFGERROR])
+			ready_to_stop = True
+			for p in self.roaster: # Seek for running programs
+				if p.state not in not_running_states:
+					ready_to_stop = False
+					break
+
+			if ready_to_stop: # Happy-flow (stop sequence finished and there is no program running - we can stop looping and exit)
+				for p in self.roaster:
+					if p.state in (program.state_enum.FATAL, program.state_enum.CFGERROR):
+						L.warning("Process in error condition during exit: {0}".format(p))
+				self.stop_loop()
+			else:
+				L.warning("Restarting stop sequence due to exit request.")
+				self.stop_program(force=True)

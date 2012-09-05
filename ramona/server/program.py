@@ -238,7 +238,16 @@ class program(object):
 		if self.stdout is not None:
 			disable_nonblocking(self.stdout)
 			while True:
-				data = os.read(self.stdout, 4096)
+				signal.setitimer(signal.ITIMER_REAL, 0.5) # Set timeout for following operation
+				try:
+					data = os.read(self.stdout, 4096)
+				except OSError, e:
+					if e.errno == errno.EINTR:
+						L.warning("We have stall recovery situation on stdout socket of {0}".format(self))
+						# This stall situation can happen when program shares stdout with its child
+						# e.g. command=bash -c "echo ahoj1; tail -f /dev/null"
+						break
+					raise
 				if len(data) == 0: break
 				self.__process_output(self.log_out, 0, data)
 			os.close(self.stdout)
@@ -248,7 +257,15 @@ class program(object):
 		if self.stderr is not None:
 			disable_nonblocking(self.stderr)
 			while True:
-				data = os.read(self.stderr, 4096)
+				signal.setitimer(signal.ITIMER_REAL, 0.2) # Set timeout for following operation
+				try:
+					data = os.read(self.stderr, 4096)
+				except OSError, e:
+					if e.errno == errno.EINTR:
+						L.warning("We have stall recovery situation on stderr socket of {0}".format(self))
+						# See comment above
+						break
+					raise
 				if len(data) == 0: break
 				self.__process_output(self.log_err, 1, data)
 			os.close(self.stderr)
@@ -286,7 +303,7 @@ class program(object):
 				self.state = program.state_enum.RUNNING
 
 		elif self.state == program.state_enum.STOPPING:
-			if now - self.start_time >= self.config['stoptimeout']:
+			if now - self.stop_time >= self.config['stoptimeout']:
 				L.warning("{0} is still terminating - sending another signal".format(self))
 				signal = self.get_next_stopsignal()
 				try:
