@@ -160,12 +160,15 @@ class program(object):
 			return pid
 
 		try:
+			# Launch in dedicated process group
+			os.setsid()
+
+			# Stdin/stdout/stderr
 			if self.config['stdin'] == '<null>':
 				stdin = os.open(os.devnull, os.O_RDONLY) # Open stdin
 			else:
 				# Default is to open /dev/null
 				stdin = os.open(os.devnull, os.O_RDONLY) # Open stdin
-
 			os.dup2(stdin, 0)
 			os.dup2(stdout, 1) # Prepare stdout
 			os.dup2(stderr, 2) # Prepare stderr
@@ -222,7 +225,7 @@ class program(object):
 		self.act_stopsignals = self.stopsignals[:]
 		signal = self.get_next_stopsignal()
 		try:
-			os.kill(self.pid, signal)
+			os.kill(-self.pid, signal) # Killing whole process group
 		except:
 			pass
 		self.state = program.state_enum.STOPPING
@@ -307,7 +310,7 @@ class program(object):
 				L.warning("{0} is still terminating - sending another signal".format(self))
 				signal = self.get_next_stopsignal()
 				try:
-					os.kill(self.pid, signal)
+					os.kill(-self.pid, signal) # Killing whole process group
 				except:
 					pass
 
