@@ -108,7 +108,7 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 				if qsIdent is not None and len(qsIdent) > 0:
 					params['pfilter'] = [qsIdent[0]]
 				else:
-					params['pfilter'] = "*"
+					params['pfilter'] = list(self.getAllPrograms(True))
 				
 				qsForce = qs.get('force')
 				if qsForce is not None and len(qsForce) > 0:
@@ -143,9 +143,7 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 					  {1}
 					</div>'''.format(level, msg)
 			with open(os.path.join(scriptdir, "index.tmpl.html")) as f:
-				conn = self.socket_connect()
-				status = cnscom.svrcall(conn, cnscom.callid_status, json.dumps({}))
-				sttable = self.buildStatusTable(json.loads(status))
+				sttable = self.buildStatusTable(json.loads(self.getStatuses()))
 				self.wfile.write(f.read().format(statuses=sttable, logmsg=logmsg))
 			
 	
@@ -189,16 +187,17 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			
 			actions = []
 			if pid != os.getpid():
-				if progState != program_state_enum.FATAL and progState != program_state_enum.RUNNING:
+				# TODO: Should there be some filtering for STOPPING ???
+				if progState not in (program_state_enum.FATAL, program_state_enum.RUNNING, program_state_enum.STARTING):
 					actions.append('<a class="btn btn-small btn-success" href="/?{0}">Start</a>'.format(urllib.urlencode([("action", "start"), ("ident", cgi.escape(ident))])))
 				
 				if progState == program_state_enum.RUNNING:
-					actions.append('<a class="btn btn-small btn-danged" href="/?{0}">Stop</a>'.format(urllib.urlencode([("action", "stop"), ("ident", cgi.escape(ident))])))
+					actions.append('<a class="btn btn-small btn-danger" href="/?{0}">Stop</a>'.format(urllib.urlencode([("action", "stop"), ("ident", cgi.escape(ident))])))
 					actions.append('<a class="btn btn-small btn-warning" href="/?{0}">Restart</a>'.format(urllib.urlencode([("action", "restart"), ("ident", cgi.escape(ident))])))
-				
 			
-			if progState == program_state_enum.FATAL:
-				actions.append('<a class="btn btn-small btn-danged" href="/?{0}">Start (force)</a>'.format(urllib.urlencode([("action", "start"), ("ident", cgi.escape(ident)), ("force", "1")])))
+				if progState == program_state_enum.FATAL:
+					actions.append('<a class="btn btn-small btn-inverse" href="/?{0}">Start (force)</a>'.format(urllib.urlencode([("action", "start"), ("ident", cgi.escape(ident)), ("force", "1")])))
+				
 			ret += '<td>{0}</td>'.format(" ".join(actions))
 			
 			ret += "</tr>"
@@ -224,6 +223,24 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 		
 		return urlparse.urlunparse(("http", self.headers['Host'], "/", None, urllib.urlencode(queryList), None))
 	
+	def getStatuses(self):
+		conn = self.socket_connect()
+		return cnscom.svrcall(conn, cnscom.callid_status, json.dumps({}))
+	
+	def getAllPrograms(self, withoutSelf=False):
+		'''
+		@param withoutSelf: If true, the process with the same pid will be ignored
+		@return iterator: Ident of all registered programs
+		'''
+		for st in json.loads(self.getStatuses()):
+			ident = st.get("ident")
+			pid = st.get("pid")
+			if ident is None:
+				continue
+			if (not withoutSelf) or (pid != os.getpid()):
+				yield ident
+		
+	
 	def socket_connect(self):
 		if hasattr(self, "socket_conn"): return self.socket_conn
 		try:
@@ -234,5 +251,3 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			if e.errno == errno.ENOENT and self.cnsconuri.protocol == 'unix': return None
 			raise
 
-
-	

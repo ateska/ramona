@@ -9,7 +9,13 @@
 	<div class="container">
 		<h1>Ramona web administration console</h1>
 		{logmsg}
-		
+		<p>
+		  <a href="/" class="btn btn-large btn-primary">Refresh</a>
+		  <a href="/?action=start" class="btn btn-large btn-success">Start all</a>
+		  <a href="/?action=stop" class="btn btn-large btn-danger">Stop all</a>
+		  <a href="/?action=restart" class="btn btn-large btn-warning">Restart all</a>
+		  <a href="/?action=start&amp;force=1" class="btn btn-large btn-inverse">Start all (force)</a>
+		</p>		
 		{statuses}
 	</div>
 
