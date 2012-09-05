@@ -174,13 +174,14 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 	
 	def buildStatusTable(self, statuses):
 		ret = '<table id="statusTable" class="table table-hover table-bordered"><thead>'
-		ret += '<tr><th>Name</th><th>Status</th><th>PID</th><th>Launches</th><th>Start time</th><th>Exit time</th><th>Log</th><th></th></tr>'
+		ret += '<tr><th>Process ident.</th><th>Status</th><th>PID</th><th><abbr title="Launch counter">L.cnt.</abbr></th><th>Start time</th><th>Exit time</th><th>Exit code</th><th></th></tr>'
 		ret += "</thead>"
 		ret += "<tbody>"
 		for sp in statuses:
 			ret += "<tr>"
 			ident = sp.pop('ident', '???')
-			ret += '<th>{0}</th>'.format(cgi.escape(ident))
+			#TODO: Log name can be different
+			ret += '<th><a href="/log/{0}.log">{0}</a></th>'.format(cgi.escape(ident))
 			labelCls = "label-inverse"
 			progState = sp.pop("state")
 			
@@ -195,19 +196,20 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			elif progState in (program_state_enum.FATAL, program_state_enum.CFGERROR):
 				labelCls = "label-important"
 			
-			ret += '<td><span class="label {0}">{1}</span></td>'.format(labelCls, cgi.escape(sp.pop('stlbl', '???')))
+			stlbl = cnscom.program_state_enum.labels.get(progState, "({0})".format(progState))
+			ret += '<td><span class="label {0}">{1}</span></td>'.format(labelCls, cgi.escape(stlbl))
 			pid = sp.pop('pid', "")
 			ret += '<td>{0}</td>'.format(pid)
 			ret += '<td>{0}</td>'.format(sp.pop('launch_cnt', ""))
-			t = sp.pop('start_time')
+			t = sp.pop('start_time', None)
 			tform = ""
 			if t is not None: tform = time.strftime("%d-%m-%Y %H:%M:%S",time.localtime(t))
 			ret += '<td>{0}</td>'.format(tform)
-			t = sp.pop('exit_time')
+			t = sp.pop('exit_time', None)
 			tform = ""
 			if t is not None: tform = time.strftime("%d-%m-%Y %H:%M:%S",time.localtime(t))
 			ret += '<td>{0}</td>'.format(tform)
-			ret += '<td><a href="/log/{0}.log">{0}.log</a></td>'.format(cgi.escape(ident))
+			ret += '<td>{0}</td>'.format(sp.pop('exit_status',''))
 			
 			actions = []
 			if pid != os.getpid():
@@ -221,7 +223,8 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			
 				if progState == program_state_enum.FATAL:
 					actions.append('<a class="btn btn-small btn-inverse" href="/?{0}">Start (force)</a>'.format(cgi.escape(urllib.urlencode([("action", "start"), ("ident", ident), ("force", "1")]))))
-				
+
+
 			ret += '<td>{0}</td>'.format(" ".join(actions))
 			
 			ret += "</tr>"

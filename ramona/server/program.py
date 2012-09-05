@@ -36,6 +36,7 @@ class program(object):
 		self.start_time = None
 		self.stop_time = None
 		self.exit_time = None
+		self.exit_status = None
 
 		self.stdout = None
 		self.stderr = None
@@ -211,6 +212,7 @@ class program(object):
 		self.start_time = time.time()
 		self.stop_time = None
 		self.exit_time = None
+		self.exit_status = None
 		self.launch_cnt += 1
 
 
@@ -234,6 +236,7 @@ class program(object):
 
 	def on_terminate(self, status):
 		self.exit_time = time.time()
+		self.exit_status = status
 		self.pid = None
 
 		# Close process stdout and stderr pipes (including vacuum of actual content)
