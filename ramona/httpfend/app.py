@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import sys, socket, errno, logging, mimetypes, json, signal
 from ..config import config, read_config
 from .. import cnscom
@@ -152,7 +150,7 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 					level, msg = m
 					
 					logmsg += '''<div class="alert alert-{0}">
-					  <button type="button" class="close" data-dismiss="alert">×</button>
+					  <button type="button" class="close" data-dismiss="alert">&times;</button>
 					  {1}
 					</div>'''.format(level, msg)
 			with open(os.path.join(scriptdir, "index.tmpl.html")) as f:
@@ -202,14 +200,14 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			if pid != os.getpid():
 				# TODO: Should there be some filtering for STOPPING ???
 				if progState not in (program_state_enum.FATAL, program_state_enum.RUNNING, program_state_enum.STARTING):
-					actions.append('<a class="btn btn-small btn-success" href="/?{0}">Start</a>'.format(urllib.urlencode([("action", "start"), ("ident", cgi.escape(ident))])))
+					actions.append('<a class="btn btn-small btn-success" href="/?{0}">Start</a>'.format(cgi.escape(urllib.urlencode([("action", "start"), ("ident", ident)]))))
 				
 				if progState == program_state_enum.RUNNING:
-					actions.append('<a class="btn btn-small btn-danger" href="/?{0}">Stop</a>'.format(urllib.urlencode([("action", "stop"), ("ident", cgi.escape(ident))])))
-					actions.append('<a class="btn btn-small btn-warning" href="/?{0}">Restart</a>'.format(urllib.urlencode([("action", "restart"), ("ident", cgi.escape(ident))])))
+					actions.append('<a class="btn btn-small btn-danger" href="/?{0}">Stop</a>'.format(cgi.escape(urllib.urlencode([("action", "stop"), ("ident", ident)]))))
+					actions.append('<a class="btn btn-small btn-warning" href="/?{0}">Restart</a>'.format(cgi.escape(urllib.urlencode([("action", "restart"), ("ident", ident)]))))
 			
 				if progState == program_state_enum.FATAL:
-					actions.append('<a class="btn btn-small btn-inverse" href="/?{0}">Start (force)</a>'.format(urllib.urlencode([("action", "start"), ("ident", cgi.escape(ident)), ("force", "1")])))
+					actions.append('<a class="btn btn-small btn-inverse" href="/?{0}">Start (force)</a>'.format(cgi.escape(urllib.urlencode([("action", "start"), ("ident", ident), ("force", "1")]))))
 				
 			ret += '<td>{0}</td>'.format(" ".join(actions))
 			

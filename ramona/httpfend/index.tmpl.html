@@ -18,6 +18,11 @@
 		  <img src="/static/img/ajax-loader.gif" style="display: none" id="loader" alt="Loading..." />
 		</p>		
 		{statuses}
+		<form id="raform" style="display: none">
+		  <label class="checkbox">
+		    <input type="checkbox" checked="checked" id="refreshAutomatically"> Refresh automatically
+		  </label>
+		  </form>
 	</div>
 
 	<script src="/static/jquery/jquery-1.8.1.min.js"></script>
@@ -33,14 +38,25 @@
 	  success: function() {{}}
 	}});
 	
-	$(document).ready(function() {{
-	  $("#refreshButton").click(function(event) {{
-		event.preventDefault();
+	function refreshStatuses() {{
 		$.get('/ajax/statusTable', function(data) {{
 		  $('#statusTable').html(data);
 		}});
+	}}
+	
+	setInterval(function() {{
+		if($("#refreshAutomatically").is(":checked")) {{
+			refreshStatuses();
+		}}
+	}}, 5000);
+	
+	
+	$(document).ready(function() {{
+	  $("#refreshButton").click(function(event) {{
+		event.preventDefault();
+		refreshStatuses();
 	  }});
-		
+	  $("#raform").show();
 		
 	}});
 	</script>
