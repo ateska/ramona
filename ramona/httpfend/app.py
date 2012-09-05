@@ -100,6 +100,21 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 				self.send_header("Content-Type", "text/html; charset=utf-8")
 				self.end_headers()
 				self.wfile.write(self.buildStatusTable(json.loads(self.getStatuses())))
+		elif self.path.startswith("/log/"):
+			parsed = urlparse.urlparse(self.path)
+			logname = parsed.path[5:]
+			logdir = config.get("general", "logdir")
+			logpath = os.path.abspath(os.path.join(".", logdir, logname))
+			try:
+				with open(logpath, "r") as f:
+					self.send_response(httplib.OK)
+					self.send_header("Content-Type", "text/plain; charset=utf-8")
+					self.end_headers()
+					self.wfile.write(f.read())
+			except Exception, e:
+				self.send_error(httplib.NOT_FOUND, str(e))
+				return
+				
 			
 		else:
 			parsed = urlparse.urlparse(self.path)
@@ -160,7 +175,7 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 	
 	def buildStatusTable(self, statuses):
 		ret = '<table id="statusTable" class="table table-hover table-bordered"><thead>'
-		ret += '<tr><th>Name</th><th>Status</th><th>PID</th><th>Launches</th><th>Start time</th><th>Terminate time</th><th></th></tr>'
+		ret += '<tr><th>Name</th><th>Status</th><th>PID</th><th>Launches</th><th>Start time</th><th>Terminate time</th><th>Log</th><th></th></tr>'
 		ret += "</thead>"
 		ret += "<tbody>"
 		for sp in statuses:
@@ -195,6 +210,8 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			tform = ""
 			if t is not None: tform = time.strftime("%d-%m-%Y %H:%M:%S",time.localtime(t))
 			ret += '<td>{0}</td>'.format(tform)
+			
+			ret += '<td><a href="/log/{0}.log">{0}.log</a></td>'.format(cgi.escape(ident))
 			
 			actions = []
 			if pid != os.getpid():
