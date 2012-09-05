@@ -53,6 +53,9 @@ class server_app(program_roaster, idlework_appmixin):
 		self.conns = weakref.WeakSet()
 		self.termstatus =  None
 
+		# Enable non-terminating SIGALARM handler
+		signal.signal(signal.SIGALRM, _SIGALARM_handler)
+
 		program_roaster.__init__(self)
 		idlework_appmixin.__init__(self)
 
@@ -176,3 +179,7 @@ class server_app(program_roaster, idlework_appmixin):
 
 		else:
 			L.error("Received unknown callid: {0}".format(callid))
+
+
+def _SIGALARM_handler(signum, frame):
+	pass
