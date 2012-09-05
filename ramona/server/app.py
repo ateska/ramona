@@ -1,10 +1,10 @@
 import sys, os, socket, signal, errno, weakref, logging, argparse
 import pyev
-
 from .. import cnscom
 from ..config import config, read_config, config_files
 from .cnscon import console_connection
 from .proaster import program_roaster
+from .idlework import idlework_appmixin
 
 from . import call_status
 
@@ -14,7 +14,7 @@ L = logging.getLogger("server")
 
 ###
 
-class server_app(program_roaster):
+class server_app(program_roaster, idlework_appmixin):
 
 	STOPSIGNALS = [signal.SIGINT, signal.SIGTERM]
 	NONBLOCKING = frozenset([errno.EAGAIN, errno.EWOULDBLOCK])
@@ -38,7 +38,6 @@ class server_app(program_roaster):
 		
 		socket_factory = cnscom.socket_uri(config.get("ramona:server", "consoleuri"))
 		try:
-			
 			self.sock = socket_factory.create_socket_listen()
 		except socket.error, e:
 			L.fatal("It looks like that server is already running: {0}".format(e))
@@ -46,16 +45,16 @@ class server_app(program_roaster):
 		self.sock.setblocking(0)
 
 		self.loop = pyev.default_loop()
-
 		self.watchers = [pyev.Signal(sig, self.loop, self.__terminal_signal_cb) for sig in self.STOPSIGNALS]
 		self.watchers.append(pyev.Child(0, False, self.loop, self.__child_signal_cb))
 		self.watchers.append(pyev.Io(self.sock._sock, pyev.EV_READ, self.loop, self.__accept_cb))
 		self.watchers.append(pyev.Periodic(0, 1.0, self.loop, self.__tick_cb))
-
+		
 		self.conns = weakref.WeakSet()
 		self.termstatus =  None
 
 		program_roaster.__init__(self)
+		idlework_appmixin.__init__(self)
 
 
 	def run(self):
@@ -77,7 +76,13 @@ class server_app(program_roaster):
 		try:
 			self.loop.start()
 		finally:
-			
+			# Close connections
+			for conn in self.conns:
+				conn.close()
+
+			# Finalize idle work queue
+			self.stop_idlework()
+
 			# Finally remove pid file
 			if pidfile !='':
 				try:
@@ -117,20 +122,18 @@ class server_app(program_roaster):
 
 		if self.termstatus is None:
 			self.termstatus =  1 # Soft
-			try:
-				self.stop_program(force=True)
-			except:
-				L.exception("Exception during stop_program()")
+			self.add_idlework(self.stop_program, force=True)
 			return
 
 		elif self.termstatus ==  1:
 			self.termstatus =  2 # Hard
-			self.stop()
+			self.add_idlework(self.stop)
 
 
 	def __child_signal_cb(self, watcher, _revents):
 		try:
 			self.on_terminate_program(watcher.rpid, watcher.rstatus)
+			self.add_idlework(self.on_tick) # Schedule extra periodic check 
 		except:
 			L.exception("Exception during SIGCHLD callback")
 
@@ -150,9 +153,6 @@ class server_app(program_roaster):
 		self.sock.close()
 		while self.watchers:
 			self.watchers.pop().stop()
-
-		for conn in self.conns:
-			conn.close()
 
 
 	def dispatch_ctrl(self, callid, params):

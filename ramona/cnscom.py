@@ -146,16 +146,26 @@ It is basically used only on server side of UNIX socket.
 
 
 	def __del__(self):
+		self.__delsockfile()
+
+
+	def close(self):
+		socket.socket.close(self)
+		self.__delsockfile()
+
+
+	def bind(self, fname):
+		socket.socket.bind(self, fname)
+		self.__sockfile = fname
+
+
+	def __delsockfile(self):
 		if self.__sockfile is not None:
 			fname = self.__sockfile
 			self.__sockfile = None
 			os.unlink(fname)
 			assert not os.path.isfile(fname)
 
-
-	def bind(self, fname):
-		socket.socket.bind(self, fname)
-		self.__sockfile = fname
 
 ###
 
