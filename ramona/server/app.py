@@ -160,7 +160,7 @@ class server_app(program_roaster, idlework_appmixin):
 			self.watchers.pop().stop()
 
 
-	def dispatch_ctrl(self, callid, params):
+	def dispatch_svrcall(self, callid, params):
 		if self.termstatus is not None:
 			raise cnscom.svrcall_error('Ramona server is exiting - no further commands will be accepted')
 
