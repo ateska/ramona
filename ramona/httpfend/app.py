@@ -92,6 +92,7 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 				self.send_header("Content-Type", mimetypes.guess_type(self.path)[0])
 				self.end_headers()
 				self.wfile.write(f.read())
+		
 		elif self.path.startswith("/ajax/"):
 			parsed = urlparse.urlparse(self.path)
 			action = parsed.path[6:]
@@ -100,6 +101,7 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 				self.send_header("Content-Type", "text/html; charset=utf-8")
 				self.end_headers()
 				self.wfile.write(self.buildStatusTable(json.loads(self.getStatuses())))
+		
 		elif self.path.startswith("/log/"):
 			parsed = urlparse.urlparse(self.path)
 			logname = parsed.path[5:]
@@ -114,8 +116,7 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			except Exception, e:
 				self.send_error(httplib.NOT_FOUND, str(e))
 				return
-				
-			
+
 		else:
 			parsed = urlparse.urlparse(self.path)
 			if parsed.path != "/":
@@ -151,14 +152,12 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 				self.send_header("Location", self.getAbsPath(msgid=msgid))
 				self.end_headers()
 				return
-								
 			
 			self.send_response(httplib.OK)
 			self.send_header("Content-Type", "text/html; charset=utf-8")
 			self.end_headers()
 			
 			logmsg = ""
-			
 			for msgid in qs.get('msgid', []):
 				m = httpfend_app.instance.logmsgs.pop(int(msgid), None)
 				if m is not None:
@@ -179,7 +178,6 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 		ret += "</thead>"
 		ret += "<tbody>"
 		for sp in statuses:
-
 			ret += "<tr>"
 			ident = sp.pop('ident', '???')
 			ret += '<th>{0}</th>'.format(cgi.escape(ident))
@@ -197,7 +195,6 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			elif progState in (program_state_enum.FATAL, program_state_enum.CFGERROR):
 				labelCls = "label-important"
 			
-			
 			ret += '<td><span class="label {0}">{1}</span></td>'.format(labelCls, cgi.escape(sp.pop('stlbl', '???')))
 			pid = sp.pop('pid', "")
 			ret += '<td>{0}</td>'.format(pid)
@@ -210,7 +207,6 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			tform = ""
 			if t is not None: tform = time.strftime("%d-%m-%Y %H:%M:%S",time.localtime(t))
 			ret += '<td>{0}</td>'.format(tform)
-			
 			ret += '<td><a href="/log/{0}.log">{0}.log</a></td>'.format(cgi.escape(ident))
 			
 			actions = []
