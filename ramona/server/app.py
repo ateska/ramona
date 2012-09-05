@@ -124,13 +124,15 @@ class server_app(program_roaster, idlework_appmixin):
 			print
 
 		if self.termstatus is None:
+			L.info("Exit request received (SIGNAL: {0})".format(watcher.signum))
 			self.termstatus =  1 # Soft
 			self.add_idlework(self.stop_program, force=True)
+			self.add_idlework(self.on_tick) # Schedule extra periodic check 
 			return
 
 		elif self.termstatus ==  1:
 			self.termstatus =  2 # Hard
-			self.add_idlework(self.stop)
+			self.add_idlework(self.stop_loop)
 
 
 	def __child_signal_cb(self, watcher, _revents):
@@ -148,7 +150,7 @@ class server_app(program_roaster, idlework_appmixin):
 			L.exception("Exception during periodic internal check")
 
 
-	def stop(self):
+	def stop_loop(self):
 		'''
 		Stop internal loop and exit.
 		'''
@@ -161,6 +163,8 @@ class server_app(program_roaster, idlework_appmixin):
 	def dispatch_ctrl(self, callid, params):
 		if self.termstatus is not None:
 			raise cnscom.svrcall_error('Ramona server is exiting - no further commands will be accepted')
+
+		self.add_idlework(self.on_tick) # Schedule extra periodic check (to provide swift server background response to to user action)
 
 		if callid == cnscom.callid_start:
 			return self.start_program(**cnscom.parse_json_kwargs(params))
