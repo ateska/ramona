@@ -64,5 +64,7 @@ Mailing to admin
 
 HTTP frontend
 -------------
+- View log file
+- Tail log
 - (medium prio): Basic authentication
 - (low prio): HTTPS
