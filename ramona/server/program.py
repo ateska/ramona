@@ -17,7 +17,7 @@ class program(object):
 		'command': None,
 		'starttimeout': 0.5,
 		'stoptimeout': 3,
-		'stopsignal': 'INT,TERM,KILL',
+		'stopsignal': 'TERM,TERM,INT,TERM,KILL',
 		'stdin': '<null>',
 		'stdout': '<stderr>',
 		'stderr': '<logdir>',
