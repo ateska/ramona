@@ -41,8 +41,8 @@ def main(cnsapp, args):
 		t = sp.get('start_time')
 		if t is not None: details.append("start_time:{0}".format(time.strftime("%d-%m-%Y %H:%M:%S",time.localtime(t))))
 
-		t = sp.get('term_time')
-		if t is not None: details.append("term_time:{0}".format(time.strftime("%d-%m-%Y %H:%M:%S",time.localtime(t))))
+		t = sp.get('exit_time')
+		if t is not None: details.append("exit_time:{0}".format(time.strftime("%d-%m-%Y %H:%M:%S",time.localtime(t))))
 
 		print "{0:<16} {1:<10} {2}".format(
 			sp.get('ident', '???'), 

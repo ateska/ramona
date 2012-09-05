@@ -10,6 +10,6 @@ def main(svrapp, pfilter=None):
 		'pid'  : p.pid,
 		'launch_cnt': p.launch_cnt,
 		'start_time': p.start_time,
-		'term_time': p.term_time,
+		'exit_time': p.exit_time,
 		} for p in l
 	])

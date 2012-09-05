@@ -174,7 +174,7 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 	
 	def buildStatusTable(self, statuses):
 		ret = '<table id="statusTable" class="table table-hover table-bordered"><thead>'
-		ret += '<tr><th>Name</th><th>Status</th><th>PID</th><th>Launches</th><th>Start time</th><th>Terminate time</th><th>Log</th><th></th></tr>'
+		ret += '<tr><th>Name</th><th>Status</th><th>PID</th><th>Launches</th><th>Start time</th><th>Exit time</th><th>Log</th><th></th></tr>'
 		ret += "</thead>"
 		ret += "<tbody>"
 		for sp in statuses:
@@ -203,7 +203,7 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			tform = ""
 			if t is not None: tform = time.strftime("%d-%m-%Y %H:%M:%S",time.localtime(t))
 			ret += '<td>{0}</td>'.format(tform)
-			t = sp.pop('term_time')
+			t = sp.pop('exit_time')
 			tform = ""
 			if t is not None: tform = time.strftime("%d-%m-%Y %H:%M:%S",time.localtime(t))
 			ret += '<td>{0}</td>'.format(tform)
