@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+# TODO: Signal handling
 
 import sys, socket, errno, struct, logging, mimetypes, json
 from ..config import config, read_config
@@ -90,6 +91,15 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 				self.send_header("Content-Type", mimetypes.guess_type(self.path)[0])
 				self.end_headers()
 				self.wfile.write(f.read())
+		elif self.path.startswith("/ajax/"):
+			parsed = urlparse.urlparse(self.path)
+			action = parsed.path[6:]
+			if action == "statusTable":
+				self.send_response(httplib.OK)
+				self.send_header("Content-Type", "text/html; charset=utf-8")
+				self.end_headers()
+				self.wfile.write(self.buildStatusTable(json.loads(self.getStatuses())))
+			
 		else:
 			parsed = urlparse.urlparse(self.path)
 			if parsed.path != "/":
@@ -148,7 +158,7 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			
 	
 	def buildStatusTable(self, statuses):
-		ret = '<table class="table table-hover table-bordered"><thead>'
+		ret = '<table id="statusTable" class="table table-hover table-bordered"><thead>'
 		ret += '<tr><th>Name</th><th>Status</th><th>PID</th><th>Launches</th><th>Start time</th><th>Terminate time</th><th></th></tr>'
 		ret += "</thead>"
 		ret += "<tbody>"
