@@ -54,7 +54,7 @@ class program(object):
 			sys.exit(2)
 
 		if cmd == '<httpfend>':
-			cmd = '{0} -m ramona.httpfend'.format(sys.executable)
+			cmd = '{0} -u -m ramona.httpfend'.format(sys.executable)
 		elif cmd == '<':
 			L.error("Unknown command option '{1}' in {0} -> CFGERROR".format(config_section, cmd))
 			self.state = program.state_enum.CFGERROR

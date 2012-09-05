@@ -35,4 +35,4 @@ log
 # Eclipse/PyDev
 .project
 .pydevproject
-
+.settings
