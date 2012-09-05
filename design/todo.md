@@ -10,7 +10,7 @@ Generic
 - SSL (optional) for protecting console-server channel
 - core dump enabled launch/kill
 - Unify & document sys.exit codes 
-- Reload command
+- Reload/reset command (restarting ramona server)
 - [program:x] disabled=true options + console command enable/disable to allow change status during runtime
 
 Windows
@@ -31,7 +31,7 @@ class MyConsoleApp(ramona.console_app):
 
 Logging
 -------
-- Support for SIGHUP (reopen log files)
+- Support for SIGHUP (reopen log files OR reset fully)
 - log rotate
 - log rotate of Ramona server log (stdout/stderr redirection)
 
