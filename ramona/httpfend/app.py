@@ -117,9 +117,9 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 				
 				try:
 					cnscom.svrcall(conn, self.ActionToCallid[action], json.dumps(params))
-					msgid = self.addLogMessage("success", "Program start initiated.")
+					msgid = self.addLogMessage("success", "Command successfully triggered.")
 				except Exception, e:
-					msgid = self.addLogMessage("error", "Failed to start the program: {0}".format(e))
+					msgid = self.addLogMessage("error", "Failed to trigger the command: {0}".format(e))
 				
 				self.send_response(httplib.SEE_OTHER)
 				self.send_header("Location", self.getAbsPath(msgid=msgid))
@@ -209,8 +209,8 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 				ret += '</pre></td></tr>'
 		
 		ret += "</tbody></table>"
-		
 		return ret
+	
 	
 	def addLogMessage(self, level, msg):
 		msgid = httpfend_app.instance.logmsgcnt.next()
