@@ -61,7 +61,7 @@ def svrcall(cnssocket, callid, params=""):
 		raise RuntimeError("Transmitted parameters are too long.")
 
 	cnssocket.send(struct.pack(call_struct_fmt, call_magic, callid, paramlen)+params)
-	
+
 	x = time.time()
 	resp = ""
 	while len(resp) < 4:
@@ -73,8 +73,12 @@ def svrcall(cnssocket, callid, params=""):
 
 	magic, retype, paramlen = struct.unpack(resp_struct_fmt, resp)
 	assert magic == resp_magic
-	params = cnssocket.recv(paramlen)
-	
+
+	if paramlen > 0: #This is here because Linux blocks when socket.recv(0) is called (even if data are available) 
+		params = cnssocket.recv(paramlen)
+	else:
+		params = ""
+		
 	if retype == resp_ret:
 		# Remote server call returned normally
 		return params

@@ -64,10 +64,16 @@ Program roaster is object that control all configured programs, their start/stop
 		self.__startstop_pad_next(True)
 
 
-	def stop_program(self, pfilter=None):
+	def stop_program(self, pfilter=None, force=True):
 		'''Stop processes that are RUNNING and STARTING'''
-		if self.start_seq is not None or self.stop_seq is not None or self.restart_seq is not None:
-			raise svrcall_error("There is already start/stop sequence running - please wait and try again later.")
+		if force:
+			self.start_seq = None
+			self.restart_seq = None
+			self.stop_seq = None
+
+		else:
+			if self.start_seq is not None or self.stop_seq is not None or self.restart_seq is not None:
+				raise svrcall_error("There is already start/stop sequence running - please wait and try again later.")
 
 		l = self.filter_roaster_iter(pfilter)
 
@@ -116,13 +122,22 @@ Program roaster is object that control all configured programs, their start/stop
 				L.debug("Start sequence completed.")
 			else:
 				self.stop_seq = None
+				if self.termstatus is not None:
+					L.debug("Stop sequence completed - quiting.")
+					self.stop()
+					return
+
 				if self.restart_seq is None:
 					L.debug("Stop sequence completed.")
+					return
+
 				else:
 					L.debug("Restart sequence enters starting phase")
 					self.start_seq = self.restart_seq
 					self.restart_seq = None
 					self.__startstop_pad_next(True)
+					return
+
 		else:
 			# Start/stop all programs in the active set
 			map(program.start if start else program.stop, pg)
