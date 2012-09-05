@@ -295,7 +295,7 @@ class program(object):
 				self.state = program.state_enum.RUNNING
 
 		elif self.state == program.state_enum.STOPPING:
-			if now - self.start_time >= self.config['stoptimeout']:
+			if now - self.stop_time >= self.config['stoptimeout']:
 				L.warning("{0} is still terminating - sending another signal".format(self))
 				signal = self.get_next_stopsignal()
 				try:
