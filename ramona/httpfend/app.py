@@ -161,10 +161,8 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 				sttable = self.buildStatusTable(json.loads(self.getStatuses()))
 				self.wfile.write(f.read().format(statuses=sttable, logmsg=logmsg))
 				
-	def log_message(self, format, *args):
-		L.debug("{0} -- [{1}]: {2}".format(self.address_string(),
-self.log_date_time_string(), format % args))
-#		BaseHTTPServer.BaseHTTPRequestHandler.log_message(self, format, *args)
+	def log_message(self, fmt, *args):
+		L.debug("{0} -- [{1}]: {2}".format(self.address_string(), self.log_date_time_string(), fmt % args))
 			
 	
 	def buildStatusTable(self, statuses):
