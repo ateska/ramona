@@ -69,6 +69,7 @@ Empty variable (e.g. CLASSPATH in previous example) will explicitly remove menti
 	- [general]include has also 'magic' option <siteconf> that delivers platform specific locations of the config:
 		- ./site.conf
 		- [prefix]/etc/[appname].conf (Linux|MacOSX)
+- Application name in configuration ([general] appname)
 - Some options uses 'magic' values (&lt;magic>)
 
 HTTP frontend

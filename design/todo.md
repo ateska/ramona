@@ -39,7 +39,6 @@ Logging
 
 Configuration
 -------------
-- Application name in configuration (general)
 - optional alterative configuration for environment variables: https://github.com/ateska/ramona/issues/2
 - environment variables expansion in configuration
 
