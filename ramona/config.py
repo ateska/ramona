@@ -11,6 +11,7 @@ config_defaults = {
 		'consoleuri': 'tcp://localhost:9876',
 		'pidfile': '',
 		'log': '<logdir>',
+		'loglevel': 'INFO',
 	},
 	'ramona:console' : {
 		'serveruri': 'tcp://localhost:9876',
