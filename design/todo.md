@@ -7,7 +7,7 @@ Design questions
 
 Generic
 -------
-- SSL (optional) for protecting console-server channel
+- (low prio): SSL (optional) for protecting console-server channel
 - core dump enabled launch/kill
 - Unify & document sys.exit codes 
 - Reload/reset command (restarting ramona server)
