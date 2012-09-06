@@ -34,6 +34,8 @@ class httpfend_app(object):
 		# Read config
 		read_config()
 
+
+#		loglvl = get_numeric_loglevel(config.get(os.environ['RAMONA_SECTION'], 'loglevel'))
 		# Configure logging
 		logging.basicConfig(
 			level=logging.DEBUG,
@@ -170,6 +172,11 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			with open(os.path.join(scriptdir, "index.tmpl.html")) as f:
 				sttable = self.buildStatusTable(json.loads(self.getStatuses()))
 				self.wfile.write(f.read().format(statuses=sttable, logmsg=logmsg))
+				
+	def log_message(self, format, *args):
+		L.debug("{0} -- [{1}]: {2}".format(self.address_string(),
+self.log_date_time_string(), format % args))
+#		BaseHTTPServer.BaseHTTPRequestHandler.log_message(self, format, *args)
 			
 	
 	def buildStatusTable(self, statuses):
