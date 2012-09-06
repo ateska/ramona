@@ -1,4 +1,4 @@
-import logging, time, itertools
+import logging, time
 from ..config import config
 from ..cnscom import svrcall_error
 from .program import program

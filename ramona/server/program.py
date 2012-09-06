@@ -1,4 +1,4 @@
-import sys, os, time, logging, shlex, signal, resource, errno
+import sys, os, time, logging, shlex, signal, errno
 import pyev
 from ..config import config
 from ..utils import parse_signals, MAXFD, enable_nonblocking, disable_nonblocking

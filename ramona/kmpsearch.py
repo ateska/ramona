@@ -5,10 +5,10 @@ class kmp_search(object):
 	Basically this is useful for searching pattern (string) in the non-persistent stream of data.
 	'''
 
-   	def __init__(self, pattern):
-   		# allow indexing into pattern and protect against change during yield
-   		self.pattern = list(pattern)
-   		self.patternlen = len(self.pattern)
+	def __init__(self, pattern):
+		# allow indexing into pattern and protect against change during yield
+		self.pattern = list(pattern)
+		self.patternlen = len(self.pattern)
 
 		# build table of shift amounts
 		self.shifts = [1] * (self.patternlen + 1)

@@ -1,7 +1,6 @@
 import json, time, itertools, collections, logging
 from ... import cnscom
-from .. import exception
-from ... import cnscom
+
 ###
 
 name = 'status'
