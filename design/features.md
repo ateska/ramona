@@ -61,3 +61,10 @@ CLASSPATH=
 ```
 
 Empty variable (e.g. CLASSPATH in previous example) will explicitly remove mentioned environment variable
+- Some options uses 'magic' values (&lt;magic>)
+
+HTTP frontend
+-------------
+- standalone process
+- displays states of programs 
+- allows to start/stop/restart each or all of them

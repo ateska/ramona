@@ -12,6 +12,8 @@ Generic
 - Unify & document sys.exit codes 
 - Reload/reset command (restarting ramona server)
 - [program:x] disabled=true options + console command enable/disable to allow change status during runtime
+- [tool:x] support
+- Restart of failed program (configurable)
 
 Windows
 -------
@@ -37,8 +39,15 @@ Logging
 
 Configuration
 -------------
-- configuration files - app.conf & site.conf - describe differences, implement
-- includes in config files
+- Application name in configuration (general)
+- includes in config files:
+	- primary file is given by -C switch (app. level config) + user application class - both part of user application distribution
+	- secondary (optional) files is given by -c switch (site level config) + [general]include configuration option 
+	- [general]include format is: =file1.conf:file2.conf:<siteconf>:... (default is <siteconf> only)
+	- [general]include has also 'magic' option <siteconf> that delivers platform specific locations of the config:
+		- ./site.conf
+		- [prefix]/etc/[appname].conf (Linux|MacOSX)
+
 - optional alterative configuration for environment variables: https://github.com/ateska/ramona/issues/2
 - environment variables expansion in configuration
 
@@ -61,6 +70,7 @@ Mailing to admin
 
 HTTP frontend
 -------------
+- Use application name from configuration in page title (title tag and h1 tag too)
 - Tail log
 - Store static files in a way that setuptools and py2exe will work correctly. See: http://stackoverflow.com/questions/1395593/managing-resources-in-a-python-project
 - (medium prio): Basic authentication

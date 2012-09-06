@@ -1,7 +1,7 @@
 import sys, os, socket, signal, errno, weakref, logging, argparse
 import pyev
 from .. import cnscom
-from ..config import config, read_config, config_files
+from ..config import config, read_config, config_files, get_numeric_loglevel
 from .cnscon import console_connection
 from .proaster import program_roaster
 from .idlework import idlework_appmixin
@@ -32,7 +32,8 @@ class server_app(program_roaster, idlework_appmixin):
 		read_config(self.args.config)
 
 		# Configure logging
-		logging.basicConfig(level=logging.DEBUG) #TODO: Improve this ...
+		loglvl = get_numeric_loglevel(config.get('ramona:server','loglevel'))
+		logging.basicConfig(level=loglvl)
 
 		L.debug("Configuration loaded from: {0}".format(':'.join(config_files)))
 		

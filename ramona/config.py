@@ -1,14 +1,17 @@
-import os, sys, ConfigParser
+import os, sys, logging, ConfigParser
 ###
 
 config_defaults = {
 	'general' : {
-		'logdir': '<none>',
+		'appname' : 'ramona-driven-app',
+		'logdir' : '<none>',
+		'include' : '<siteconf>',
 	},
 	'ramona:server' : {
 		'consoleuri': 'tcp://localhost:9876',
 		'pidfile': '',
 		'log': '<logdir>',
+		'loglevel': 'INFO',
 	},
 	'ramona:console' : {
 		'serveruri': 'tcp://localhost:9876',
@@ -73,3 +76,13 @@ def read_config(configs=None, use_env=True):
 		logdir = os.environ.get('LOGDIR')
 		if logdir is None: logdir = '.'
 		config.set('general','logdir',logdir)
+
+###
+
+def get_numeric_loglevel(loglevelstring):
+	'''
+	Translates log level given in string into numeric value.
+	'''
+	numeric_level = getattr(logging, loglevelstring.upper(), None)
+	if not isinstance(numeric_level, int): raise ValueError('Invalid log level: {0}'.format(loglevelstring))
+	return numeric_level
