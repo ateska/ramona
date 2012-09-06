@@ -33,7 +33,11 @@ class server_app(program_roaster, idlework_appmixin):
 
 		# Configure logging
 		loglvl = get_numeric_loglevel(config.get('ramona:server','loglevel'))
-		logging.basicConfig(level=loglvl)
+		logging.basicConfig(
+			level=loglvl,
+			stream=sys.stderr,
+			format="%(levelname)s: %(message)s"
+			)
 
 		L.debug("Configuration loaded from: {0}".format(':'.join(config_files)))
 		
@@ -125,7 +129,7 @@ class server_app(program_roaster, idlework_appmixin):
 			print
 
 		if self.termstatus is None:
-			L.info("Exit request received (SIGNAL: {0})".format(watcher.signum))
+			L.info("Exit request received (by signal {0})".format(watcher.signum))
 			self.__init_soft_exit() # Soft
 			return
 
