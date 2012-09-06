@@ -61,7 +61,7 @@ class argparser(_parser_base):
 		_parser_base.__init__(self)
 
 		# Add config file option
-		self.add_argument('-c', '--config', metavar="CONFIGFILE", action='append', help='Specify config file(s) to read (this option can be given more times).')
+		self.add_argument('-c', '--config', metavar="CONFIGFILE", action='append', help='Specify configuration file(s) to read (this option can be given more times). This will override build-in application level configuration.')
 
 		# Add debug log level option
 		self.add_argument('-d', '--debug', action='store_true', help='Enable debug (verbose) output.')

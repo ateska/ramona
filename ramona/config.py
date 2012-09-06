@@ -58,18 +58,33 @@ def read_config(configs=None, use_env=True):
 				configs.append(config_file)
 
 
-	if len(configs) == 0: 	
-		# Use platform defaults
-		configs = [
-			os.path.splitext(sys.argv[0])[0] + '.conf',
-			os.path.join('/', 'etc', os.path.basename(os.path.splitext(sys.argv[0])[0] + '.conf'))
-		]
-
 	for cfile in  configs:
 		if os.path.isfile(cfile):
 			config_files.append(cfile)
-	
-	config.read(config_files)
+		config.read([cfile])
+
+	# Handle includes ...
+	for _ in range(100):
+		includes = config.get('general','include')
+		if includes == '': break
+		config.set('general','include','')
+		includes = includes.split(':')
+		for i in xrange(len(includes)-1,-1,-1):
+			include = includes[i] = includes[i].strip()
+			if include == '<siteconf>':
+				# These are platform specific
+				siteconfs = ['./site.conf', '/etc/{0}.conf'.format(config.get('general','appname'))]
+				includes[i:i+1] = siteconfs
+			elif include[:1] == '<':
+				L.warning('Unknown include fragment: {0}'.format(include))
+				continue
+
+		for include in includes:
+			if os.path.isfile(include):
+				config_files.append(include)
+			config.read([include])
+	else:
+		raise RuntimeError("FATAL: It looks like we have loop in configuration includes!")
 
 	# Special treatment of some values
 	if config.get('general', 'logdir') == '<none>':

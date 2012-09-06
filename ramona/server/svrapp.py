@@ -25,11 +25,10 @@ class server_app(program_roaster, idlework_appmixin):
 
 		# Parse command line arguments
 		parser = argparse.ArgumentParser()
-		parser.add_argument('-c', '--config', metavar="CONFIGFILE", action='append', help='Specify config file(s) to read (this option can be given more times).')
 		self.args = parser.parse_args()
 
 		# Read configuration
-		read_config(self.args.config)
+		read_config()
 
 		# Configure logging
 		loglvl = get_numeric_loglevel(config.get('ramona:server','loglevel'))

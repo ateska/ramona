@@ -61,6 +61,14 @@ CLASSPATH=
 ```
 
 Empty variable (e.g. CLASSPATH in previous example) will explicitly remove mentioned environment variable
+
+- includes in config files:
+	- primary file is given by -C switch (app. level config) + user application class - both part of user application distribution
+	- secondary (optional) files is given by -c switch (site level config) + [general]include configuration option 
+	- [general]include format is: =file1.conf:file2.conf:<siteconf>:... (default is <siteconf> only)
+	- [general]include has also 'magic' option <siteconf> that delivers platform specific locations of the config:
+		- ./site.conf
+		- [prefix]/etc/[appname].conf (Linux|MacOSX)
 - Some options uses 'magic' values (&lt;magic>)
 
 HTTP frontend

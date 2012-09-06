@@ -1,5 +1,5 @@
-import sys, socket, errno, logging, time
-from ..config import config, read_config
+import sys, os, socket, errno, logging, time
+from ..config import config, read_config, config_files
 from ..utils import launch_server_daemonized
 from .. import cnscom
 from .parser import argparser
@@ -16,7 +16,10 @@ class console_app(object):
 Console application (base for custom implementations)
 	'''
 
-	def __init__(self):
+	def __init__(self, configuration):
+		'''
+		@param configuration: string or list of configuration files that will be used by Ramona. This is application level configuration.
+		'''
 		self.argparser = argparser()
 
 		if (len(sys.argv) < 2):
@@ -28,7 +31,24 @@ Console application (base for custom implementations)
 		self.argparser.parse(argv)
 
 		# Read config
-		read_config(self.argparser.args.config)
+		if self.argparser.args.config is None:
+			if isinstance(configuration, basestring):
+				configuration = [configuration]
+			else:
+				pass
+		else:
+			configuration = self.argparser.args.config
+		for config_file in configuration:
+			config_file = config_file.strip()
+			if not os.path.isfile(config_file):
+				print("Cannot find configuration file {0}".format(config_file))
+				sys.exit(exception.configuration_error.exitcode)
+		
+		try:
+			read_config(configuration, use_env=False)
+		except Exception, e:
+			print("{0}".format(e))
+			sys.exit(exception.configuration_error.exitcode)
 
 		# Configure logging
 		llvl = logging.INFO
@@ -41,6 +61,8 @@ Console application (base for custom implementations)
 		)
 		if self.argparser.args.debug:
 			L.debug("Debug output is enabled.")
+
+		L.debug("Configuration read from: {0}".format(', '.join(config_files)))
 
 		self.is_interactive = False # Is in interactive console mode
 
