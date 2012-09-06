@@ -39,6 +39,7 @@ Logging
 
 Configuration
 -------------
+- Application name in configuration (general)
 - configuration files - app.conf & site.conf - describe differences, implement
 - includes in config files
 - optional alterative configuration for environment variables: https://github.com/ateska/ramona/issues/2
@@ -63,6 +64,7 @@ Mailing to admin
 
 HTTP frontend
 -------------
+- Use application name from configuration in page title (title tag and h1 tag too)
 - Tail log
 - Store static files in a way that setuptools and py2exe will work correctly. See: http://stackoverflow.com/questions/1395593/managing-resources-in-a-python-project
 - (medium prio): Basic authentication
