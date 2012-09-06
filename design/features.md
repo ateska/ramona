@@ -19,7 +19,7 @@ Features
 - Console is able to re-establish connection when server goes down during console run-time
 - When ramona server is exiting, it has to try to terminate all childs (using stop command)
 - Ramona server terminates after stopping all child programs if console stop command is issued in non-interactive mode
-
+- start command has option -S to launch server only (no program is started ... usable during development)
 
 Logging
 -------

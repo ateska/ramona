@@ -14,7 +14,6 @@ Generic
 - [program:x] disabled=true options + console command enable/disable to allow change status during runtime
 - [tool:x] support
 - Restart of failed program (configurable)
-- start -e to launch server only (no program is launched)
 
 Windows
 -------

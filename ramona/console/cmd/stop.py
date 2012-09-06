@@ -10,17 +10,17 @@ cmdhelp = 'Terminate subprocess(es)'
 
 def init_parser(parser):
 	parser.add_argument('program', nargs='*', help='Optionally specify program(s) in scope of the command')
-	parser.add_argument('-e','--stop-and-exit', action='store_true', help='Stop all programs and exit Ramona server. Command-line default for:\n%(prog)s')
-	parser.add_argument('-t','--stop-and-stay', action='store_true', help='Stop all programs and keep server running.')
+	parser.add_argument('-E','--stop-and-exit', action='store_true', help='Stop all programs and exit Ramona server. Command-line default for:\n%(prog)s')
+	parser.add_argument('-T','--stop-and-stay', action='store_true', help='Stop all programs and keep server running.')
 
 ###
 
 def main(cnsapp, args):
 	if args.stop_and_exit and len(args.program) > 0:
-		raise exception.parameters_error('Cannot specify programs and -e option at once.')
+		raise exception.parameters_error('Cannot specify programs and -E option at once.')
 
 	if args.stop_and_exit and args.stop_and_stay:
-		raise exception.parameters_error('Cannot specify -t and -e option at once.')
+		raise exception.parameters_error('Cannot specify -T and -E option at once.')
 
 	if len(args.program) == 0 and not args.stop_and_stay and not cnsapp.is_interactive:
 		args.stop_and_exit = True

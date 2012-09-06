@@ -87,19 +87,7 @@ Console application (base for custom implementations)
 
 		elif auto_server_start:
 			# Fist check if ramona server is running and if not, launch that
-			s = self.connect()
-			if s is None:
-				L.debug("It looks like Ramona server is not running - launching server")
-				launch_server_daemonized()
-
-				for _ in range(100): # Check server availability for next 10 seconds 
-					# TODO: Also improve 'crash-start' detection (to reduce lag when server fails to start)
-					time.sleep(0.1)
-					s = self.connect()
-					if s is not None: break
-
-			if s is None:
-				raise exception.server_start_error("Ramona server process start failed")
+			s = self.auto_server_start()
 
 		else:
 			assert self.ctlconsock is not None
@@ -118,3 +106,21 @@ Console application (base for custom implementations)
 				raise exception.server_not_responding_error("Server is not responding - maybe it isn't running.")
 
 			return cnscom.svrcall(self.ctlconsock, callid, params)
+
+
+	def auto_server_start(self):
+		s = self.connect()
+		if s is None:
+			L.debug("It looks like Ramona server is not running - launching server")
+			launch_server_daemonized()
+
+			for _ in range(100): # Check server availability for next 10 seconds 
+				# TODO: Also improve 'crash-start' detection (to reduce lag when server fails to start)
+				time.sleep(0.1)
+				s = self.connect()
+				if s is not None: break
+
+		if s is None:
+			raise exception.server_start_error("Ramona server process start failed")
+
+		return s
