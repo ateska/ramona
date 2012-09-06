@@ -1,17 +1,7 @@
-import sys, socket, errno, logging, mimetypes, json, signal
+import sys, os, socket, ConfigParser, errno, logging, httplib, BaseHTTPServer, mimetypes, json, signal
+import time, cgi, pprint, urllib, urlparse, itertools
 from ..config import config, read_config, get_numeric_loglevel
 from .. import cnscom
-import BaseHTTPServer
-import httplib
-import os
-import ConfigParser
-import time
-from ..cnscom import program_state_enum
-import cgi
-import pprint
-import urllib
-import urlparse
-import itertools
 
 ###
 
@@ -190,15 +180,15 @@ self.log_date_time_string(), format % args))
 			labelCls = "label-inverse"
 			progState = sp.pop("state")
 			
-			if progState == program_state_enum.RUNNING:
+			if progState == cnscom.program_state_enum.RUNNING:
 				labelCls = "label-success"
-			elif progState == program_state_enum.STOPPED:
+			elif progState == cnscom.program_state_enum.STOPPED:
 				labelCls = ""
-			elif progState in (program_state_enum.STOPPING, program_state_enum.STARTING):
+			elif progState in (cnscom.program_state_enum.STOPPING, cnscom.program_state_enum.STARTING):
 				labelCls = "label-info"
-			elif progState == program_state_enum.STOPPED:
+			elif progState == cnscom.program_state_enum.STOPPED:
 				labelCls = ""
-			elif progState in (program_state_enum.FATAL, program_state_enum.CFGERROR):
+			elif progState in (cnscom.program_state_enum.FATAL, cnscom.program_state_enum.CFGERROR):
 				labelCls = "label-important"
 			
 			stlbl = cnscom.program_state_enum.labels.get(progState, "({0})".format(progState))
@@ -219,14 +209,14 @@ self.log_date_time_string(), format % args))
 			actions = []
 			if pid != os.getpid():
 				# TODO: Should there be some filtering for STOPPING ???
-				if progState not in (program_state_enum.FATAL, program_state_enum.RUNNING, program_state_enum.STARTING):
+				if progState not in (cnscom.program_state_enum.FATAL, cnscom.program_state_enum.RUNNING, cnscom.program_state_enum.STARTING):
 					actions.append('<a class="btn btn-small btn-success" href="/?{0}">Start</a>'.format(cgi.escape(urllib.urlencode([("action", "start"), ("ident", ident)]))))
 				
-				if progState == program_state_enum.RUNNING:
+				if progState == cnscom.program_state_enum.RUNNING:
 					actions.append('<a class="btn btn-small btn-danger" href="/?{0}">Stop</a>'.format(cgi.escape(urllib.urlencode([("action", "stop"), ("ident", ident)]))))
 					actions.append('<a class="btn btn-small btn-warning" href="/?{0}">Restart</a>'.format(cgi.escape(urllib.urlencode([("action", "restart"), ("ident", ident)]))))
 			
-				if progState == program_state_enum.FATAL:
+				if progState == cnscom.program_state_enum.FATAL:
 					actions.append('<a class="btn btn-small btn-inverse" href="/?{0}">Start (force)</a>'.format(cgi.escape(urllib.urlencode([("action", "start"), ("ident", ident), ("force", "1")]))))
 
 
