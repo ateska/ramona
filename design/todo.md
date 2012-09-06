@@ -61,7 +61,6 @@ Mailing to admin
 
 HTTP frontend
 -------------
-- Find nice favicon.ico
 - Tail log
 - Store static files in a way that setuptools and py2exe will work correctly. See: http://stackoverflow.com/questions/1395593/managing-resources-in-a-python-project
 - (medium prio): Basic authentication
