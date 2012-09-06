@@ -159,7 +159,11 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 					</div>'''.format(level, msg)
 			with open(os.path.join(scriptdir, "index.tmpl.html")) as f:
 				sttable = self.buildStatusTable(json.loads(self.getStatuses()))
-				self.wfile.write(f.read().format(statuses=sttable, logmsg=logmsg))
+				self.wfile.write(f.read().format(
+					statuses=sttable,
+					logmsg=logmsg,
+					appname=config.get('general','appname')
+				))
 				
 	def log_message(self, fmt, *args):
 		L.debug("{0} -- [{1}]: {2}".format(self.address_string(), self.log_date_time_string(), fmt % args))
