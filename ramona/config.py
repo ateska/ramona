@@ -3,7 +3,9 @@ import os, sys, ConfigParser
 
 config_defaults = {
 	'general' : {
-		'logdir': '<none>',
+		'appname' : 'ramona-driven-app',
+		'logdir' : '<none>',
+		'include' : '<siteconf>',
 	},
 	'ramona:server' : {
 		'consoleuri': 'tcp://localhost:9876',

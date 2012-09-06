@@ -61,6 +61,7 @@ CLASSPATH=
 ```
 
 Empty variable (e.g. CLASSPATH in previous example) will explicitly remove mentioned environment variable
+- Some options uses 'magic' values (&lt;magic>)
 
 HTTP frontend
 -------------
