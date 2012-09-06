@@ -70,6 +70,7 @@ Mailing to admin
 
 HTTP frontend
 -------------
+- Find nice favicon.ico
 - Use application name from configuration in page title (title tag and h1 tag too)
 - Tail log
 - Store static files in a way that setuptools and py2exe will work correctly. See: http://stackoverflow.com/questions/1395593/managing-resources-in-a-python-project

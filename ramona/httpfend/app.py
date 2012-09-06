@@ -1,5 +1,5 @@
 import sys, socket, errno, logging, mimetypes, json, signal
-from ..config import config, read_config
+from ..config import config, read_config, get_numeric_loglevel
 from .. import cnscom
 import BaseHTTPServer
 import httplib
@@ -33,13 +33,13 @@ class httpfend_app(object):
 		
 		# Read config
 		read_config()
-
+		
 		# Configure logging
-		logging.basicConfig(
-			level=logging.DEBUG,
-			stream=sys.stderr,
-			format="%(levelname)s: %(message)s"
-		)
+		try:
+			loglvl = get_numeric_loglevel(config.get(os.environ['RAMONA_SECTION'], 'loglevel'))
+		except:
+			loglvl = logging.INFO
+		logging.basicConfig(level=loglvl)
 
 		try:
 			host = config.get(os.environ['RAMONA_SECTION'], 'host')
@@ -170,6 +170,11 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			with open(os.path.join(scriptdir, "index.tmpl.html")) as f:
 				sttable = self.buildStatusTable(json.loads(self.getStatuses()))
 				self.wfile.write(f.read().format(statuses=sttable, logmsg=logmsg))
+				
+	def log_message(self, format, *args):
+		L.debug("{0} -- [{1}]: {2}".format(self.address_string(),
+self.log_date_time_string(), format % args))
+#		BaseHTTPServer.BaseHTTPRequestHandler.log_message(self, format, *args)
 			
 	
 	def buildStatusTable(self, statuses):
