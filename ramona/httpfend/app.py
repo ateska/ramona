@@ -1,5 +1,5 @@
 import sys, socket, errno, logging, mimetypes, json, signal
-from ..config import config, read_config
+from ..config import config, read_config, get_numeric_loglevel
 from .. import cnscom
 import BaseHTTPServer
 import httplib
@@ -33,15 +33,13 @@ class httpfend_app(object):
 		
 		# Read config
 		read_config()
-
-
-#		loglvl = get_numeric_loglevel(config.get(os.environ['RAMONA_SECTION'], 'loglevel'))
+		
 		# Configure logging
-		logging.basicConfig(
-			level=logging.DEBUG,
-			stream=sys.stderr,
-			format="%(levelname)s: %(message)s"
-		)
+		try:
+			loglvl = get_numeric_loglevel(config.get(os.environ['RAMONA_SECTION'], 'loglevel'))
+		except:
+			loglvl = logging.INFO
+		logging.basicConfig(level=loglvl)
 
 		try:
 			host = config.get(os.environ['RAMONA_SECTION'], 'host')
