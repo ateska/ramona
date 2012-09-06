@@ -56,7 +56,7 @@ class program(object):
 
 		if cmd == '<httpfend>':
 			cmd = '{0} -u -m ramona.httpfend'.format(sys.executable)
-		elif cmd == '<':
+		elif cmd[:1] == '<':
 			L.error("Unknown command option '{1}' in {0} -> CFGERROR".format(config_section, cmd))
 			self.state = program.state_enum.CFGERROR
 			return
