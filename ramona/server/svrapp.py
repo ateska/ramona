@@ -1,7 +1,7 @@
-import sys, os, socket, signal, errno, weakref, logging, argparse
+import sys, os, socket, signal, errno, weakref, logging, argparse, itertools
 import pyev
 from .. import cnscom
-from ..config import config, read_config, config_files, get_numeric_loglevel
+from ..config import config, read_config, config_files, config_includes, get_numeric_loglevel
 from .cnscon import console_connection
 from .proaster import program_roaster
 from .idlework import idlework_appmixin
@@ -38,7 +38,7 @@ class server_app(program_roaster, idlework_appmixin):
 			format="%(levelname)s: %(message)s"
 			)
 
-		L.debug("Configuration loaded from: {0}".format(':'.join(config_files)))
+		L.debug("Configuration loaded from: {0}".format(', '.join(itertools.chain(config_files,config_includes))))
 		
 		socket_factory = cnscom.socket_uri(config.get("ramona:server", "consoleuri"))
 		try:

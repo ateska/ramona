@@ -29,6 +29,7 @@ config_defaults = {
 config = ConfigParser.SafeConfigParser()
 config.optionxform = str # Disable default 'lowecasing' behavior of ConfigParser
 config_files = []
+config_includes = []
 
 ###
 
@@ -57,7 +58,6 @@ def read_config(configs=None, use_env=True):
 			for config_file in config_envs.split(':'):
 				configs.append(config_file)
 
-
 	for cfile in  configs:
 		if os.path.isfile(cfile):
 			config_files.append(cfile)
@@ -81,8 +81,9 @@ def read_config(configs=None, use_env=True):
 
 		for include in includes:
 			if os.path.isfile(include):
-				config_files.append(include)
-			config.read([include])
+				config_includes.append(include)
+				config.read([include])
+
 	else:
 		raise RuntimeError("FATAL: It looks like we have loop in configuration includes!")
 
