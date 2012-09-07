@@ -21,7 +21,9 @@ class MyDemoConsoleApp(ramona.console_app):
 		ts = tl.discover('.', '*.py')
 
 		tr = unittest.runner.TextTestRunner(verbosity=2)
-		return tr.run(ts)
+		res = tr.run(ts)
+
+		return 0 if res.wasSuccessful() else 1
 
 
 if __name__ == '__main__':
