@@ -7,10 +7,10 @@ class _parser_base(argparse.ArgumentParser):
 	argparser_kwargs = {}
 	subparser_kwargs = {}
 
-	def __init__(self):
+	def __init__(self, cnsapp):
 		argparse.ArgumentParser.__init__(self, **self.argparser_kwargs)
 
-		subparsers = self.add_subparsers(
+		self.subparsers = self.add_subparsers(
 			dest='subcommand',
 			title='subcommands',
 			parser_class=argparse.ArgumentParser,
@@ -19,9 +19,16 @@ class _parser_base(argparse.ArgumentParser):
 		# Adding sub-commands ...
 		self.subcommands = {}
 		for cmd in self.build_cmdlist():
-			subparser = subparsers.add_parser(cmd.name, help=cmd.cmdhelp, **self.subparser_kwargs)
+			subparser = self.subparsers.add_parser(cmd.name, help=cmd.cmdhelp, **self.subparser_kwargs)
 			cmd.init_parser(subparser)
 			self.subcommands[cmd.name] = cmd
+
+		#Iterate via application object to find 'tool' (decorated method)
+		for mn in dir(cnsapp):
+			fn = getattr(cnsapp, mn)
+			if not hasattr(fn, 'tool'): continue
+			self.subparsers.add_parser(mn, help=fn.__doc__)
+			self.subcommands[mn] = fn.im_func # Unbound method
 
 
 	def build_cmdlist(self):
@@ -51,14 +58,19 @@ class _parser_base(argparse.ArgumentParser):
 			self.print_help()
 			return
 
-		return self.subcommands[self.args.subcommand].main(cnsapp, self.args)
+		cmdobj = self.subcommands[self.args.subcommand]
+
+		if hasattr(cmdobj,'__call__'):
+			return cmdobj(cnsapp)
+		else:
+			return cmdobj.main(cnsapp, self.args)
 
 #
 
 class argparser(_parser_base):
 
-	def __init__(self):
-		_parser_base.__init__(self)
+	def __init__(self, cnsapp):
+		_parser_base.__init__(self, cnsapp)
 
 		# Add config file option
 		self.add_argument('-c', '--config', metavar="CONFIGFILE", action='append', help='Specify configuration file(s) to read (this option can be given more times). This will override build-in application level configuration.')

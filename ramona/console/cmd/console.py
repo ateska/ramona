@@ -47,7 +47,7 @@ class _console_cmd(cmd.Cmd):
 
 		from ..parser import consoleparser
 		
-		parser = consoleparser()
+		parser = consoleparser(self.cnsapp)
 		
 		try:
 			parser.parse(line.split())

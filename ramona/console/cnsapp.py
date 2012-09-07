@@ -20,7 +20,7 @@ Console application (base for custom implementations)
 		'''
 		@param configuration: string or list of configuration files that will be used by Ramona. This is application level configuration.
 		'''
-		self.argparser = argparser()
+		self.argparser = argparser(self)
 
 		if (len(sys.argv) < 2):
 			# Default command
@@ -146,3 +146,12 @@ Console application (base for custom implementations)
 			raise exception.server_start_error("Ramona server process start failed")
 
 		return s
+
+###
+
+def tool(fn):
+	'''
+	Tool decorator foc console_app
+	'''
+	fn.tool = fn.func_name
+	return fn
