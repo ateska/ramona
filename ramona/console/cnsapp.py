@@ -20,6 +20,10 @@ Console application (base for custom implementations)
 		'''
 		@param configuration: string or list of configuration files that will be used by Ramona. This is application level configuration.
 		'''
+		# Change directory to location of user console script
+		os.chdir(os.path.dirname(sys.argv[0]))
+
+		# Parse command line arguments
 		self.argparser = argparser(self)
 
 		if (len(sys.argv) < 2):

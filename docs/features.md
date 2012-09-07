@@ -21,6 +21,7 @@ Features
 - Ramona server terminates after stopping all child programs if console stop command is issued in non-interactive mode
 - start command has option -S to launch server only (no program is started ... usable during development)
 - @tool support (in methods in console_app class)
+- working directory is changed during console start to the location of console app script (should be root of the app)
 
 Logging
 -------
