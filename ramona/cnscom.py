@@ -26,6 +26,7 @@ resp_exc = 'E'
 
 class program_state_enum(object):
 	'''Enum'''
+	DISABLED = -1
 	STOPPED = 0
 	STARTING = 10
 	RUNNING = 20
@@ -34,6 +35,7 @@ class program_state_enum(object):
 	CFGERROR=201
 
 	labels = {
+		DISABLED: 'DISABLED',
 		STOPPED: 'STOPPED',
 		STARTING: 'STARTING',
 		RUNNING: 'RUNNING',

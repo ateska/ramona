@@ -1,6 +1,6 @@
 import sys, os, time, logging, shlex, signal, errno
 import pyev
-from ..config import config
+from ..config import config, get_boolean
 from ..utils import parse_signals, MAXFD, enable_nonblocking, disable_nonblocking
 from ..kmpsearch import kmp_search
 from ..cnscom import program_state_enum
@@ -22,6 +22,7 @@ class program(object):
 		'stdout': '<stderr>',
 		'stderr': '<logdir>',
 		'priority': 100,
+		'disabled': False,
 	}
 
 	# TODO: Remove this alias
@@ -76,7 +77,17 @@ class program(object):
 		except:
 			L.error("Invalid priority option '{0}' in {1} -> CFGERROR".format(self.config['priority'], config_section))
 			self.state = program.state_enum.CFGERROR
-			return			
+			return		
+		
+		try:
+			dis = get_boolean(self.config.get('disabled'))
+		except ValueError:
+			L.error("Unknown 'disabled' option '{0}' in {1} -> CFGERROR".format(dis, config_section))
+			self.state = program.state_enum.CFGERROR
+			return
+		if dis:
+			self.state = program_state_enum.DISABLED
+
 
 		# Prepare log files
 		stdout_cnf = self.config['stdout']

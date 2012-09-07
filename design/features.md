@@ -52,6 +52,7 @@ stderr=<logdir>
 
 Configuration
 -------------
+- [program:x] disabled=true options
 - section [env] in config defines environment variables (blends them with actual environment vars)
 
 ```ini

@@ -13,8 +13,9 @@ Generic
 - Reload/reset command (restarting ramona server)
 - [tool:x] support
 - Restart of failed program (configurable)
-- [program:x] disabled=true options + console command enable/disable to allow change status during runtime
-	- also implement some 'magic' options - e.g. <on linux:mac>
+- console command enable/disable to allow change status during runtime
+- [program:x] disabled 'magic' options:
+	 - e.g. <on-platform linux:mac>
 
 Windows
 -------
