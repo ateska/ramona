@@ -99,9 +99,9 @@ def get_boolean(value):
 	if value is False: return False
 
 	if value.upper() in ('TRUE','ON','YES'):
-		self.config['disabled'] = True
+		return True
 	elif value.upper() in ('FALSE','OFF','NO'):
-		self.config['disabled'] = False
+		return False
 	else:
 		raise ValueError("Invalid boolean string '{0}'' (use one of true, on, yes, false, off or no).".format(value))
 
