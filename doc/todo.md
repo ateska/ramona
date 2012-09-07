@@ -12,7 +12,7 @@ Generic
 - core dump enabled launch/kill
 - Unify & document sys.exit codes 
 - Reload/reset command (restarting ramona server)
-- [tool:x] support
+- [tool:x] support (how to do this properly - config is read __after__ arguments are parsed)
 - Restart of failed program (configurable)
 - console command enable/disable to allow change status during runtime
 - [program:x] disabled 'magic' options:
