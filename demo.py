@@ -1,13 +1,30 @@
 #!/usr/bin/env python
+import os, fnmatch
 import ramona
 
 class MyDemoConsoleApp(ramona.console_app):
-	pass
+
+	@ramona.tool
+	def clean(self):
+		'Clean project directory from intermediate files (*.pyc)'
+		for root, dirnames, filenames in os.walk('.'):
+			for filename in fnmatch.filter(filenames, '*.pyc'):
+				filename = os.path.join(root, filename)
+				if not os.path.isfile(filename): continue
+				os.unlink(filename)
+
+	@ramona.tool
+	def unittests(self):
+		'Seek for all unit tests and execute them'
+		import unittest
+		tl = unittest.TestLoader()
+		ts = tl.discover('.', '*.py')
+
+		tr = unittest.runner.TextTestRunner(verbosity=2)
+		return tr.run(ts)
+
 
 if __name__ == '__main__':
 	app = MyDemoConsoleApp(configuration='./demo.conf')
 	app.run()
- 
-
- #TODO: clean -> find . -name "*.pyc" -or -name "*.pyo" | xargs rm
  
