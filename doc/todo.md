@@ -7,6 +7,7 @@ Design questions
 
 Generic
 -------
+- working directory (change during start?)
 - (low prio): SSL (optional) for protecting console-server channel
 - core dump enabled launch/kill
 - Unify & document sys.exit codes 
