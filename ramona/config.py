@@ -94,6 +94,19 @@ def read_config(configs=None, use_env=True):
 
 ###
 
+def get_boolean(value):
+	if value is True: return True
+	if value is False: return False
+
+	if value.upper() in ('TRUE','ON','YES'):
+		self.config['disabled'] = True
+	elif value.upper() in ('FALSE','OFF','NO'):
+		self.config['disabled'] = False
+	else:
+		raise ValueError("Invalid boolean string '{0}'' (use one of true, on, yes, false, off or no).".format(value))
+
+###
+
 def get_numeric_loglevel(loglevelstring):
 	'''
 	Translates log level given in string into numeric value.
