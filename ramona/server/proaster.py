@@ -184,7 +184,7 @@ Program roaster is object that control all configured programs, their start/stop
 
 		if (self.termstatus is not None) and (self.stop_seq is None):
 			# Special care for server terminating condition 
-			not_running_states=frozenset([program.state_enum.STOPPED, program.state_enum.FATAL, program.state_enum.CFGERROR])
+			not_running_states=frozenset([program.state_enum.STOPPED, program.state_enum.FATAL, program.state_enum.CFGERROR, program.state_enum.DISABLED])
 			ready_to_stop = True
 			for p in self.roaster: # Seek for running programs
 				if p.state not in not_running_states:
