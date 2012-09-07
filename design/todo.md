@@ -11,9 +11,10 @@ Generic
 - core dump enabled launch/kill
 - Unify & document sys.exit codes 
 - Reload/reset command (restarting ramona server)
-- [program:x] disabled=true options + console command enable/disable to allow change status during runtime
 - [tool:x] support
 - Restart of failed program (configurable)
+- [program:x] disabled=true options + console command enable/disable to allow change status during runtime
+	- also implement some 'magic' options - e.g. <on linux:mac>
 
 Windows
 -------
