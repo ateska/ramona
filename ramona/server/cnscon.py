@@ -147,7 +147,8 @@ class console_connection(object):
 class message_yield_loghandler(logging.Handler):
 	'''
 	Message yield(ing) log handler provides functionality to propagate log messages to connected consoles.
-	It automatically emits all log records that are submitted into relevant logger (e.g. Lmy = logging.getLogger("my") )
+	It automatically emits all log records that are submitted into relevant logger (e.g. Lmy = logging.getLogger("my") ) and forwards them
+	as resp_yield_message to connected consoles.
 	'''
 
 
