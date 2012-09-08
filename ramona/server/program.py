@@ -8,6 +8,7 @@ from ..cnscom import program_state_enum
 #
 
 L = logging.getLogger("subproc")
+Lmy = logging.getLogger("my") # Message yielding logger
 
 #
 
@@ -300,14 +301,17 @@ class program(object):
 
 		# Handle state change properly
 		if self.state == program.state_enum.STARTING:
+			Lmy.error("{0} exited too quickly (now in FATAL state)".format(self.ident))
 			L.warning("{0} exited too quickly (-> FATAL)".format(self))
 			self.state = program.state_enum.FATAL
 
 		elif self.state == program.state_enum.STOPPING:
+			Lmy.info("{0} is now STOPPED".format(self.ident))
 			L.debug("{0} -> STOPPED".format(self))
 			self.state = program.state_enum.STOPPED
 
 		else:
+			Lmy.info("{0} exited unexpectedly (now in FATAL state)".format(self.ident))
 			L.warning("{0} exited unexpectedly (-> FATAL)".format(self))
 			self.state = program.state_enum.FATAL
 
@@ -316,6 +320,7 @@ class program(object):
 		# Switch starting programs into running state
 		if self.state == program.state_enum.STARTING:
 			if now - self.start_time >= self.config['starttimeout']:
+				Lmy.info("{0} is now RUNNING".format(self.ident))
 				L.debug("{0} -> RUNNING".format(self))
 				self.state = program.state_enum.RUNNING
 

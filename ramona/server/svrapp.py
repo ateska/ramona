@@ -11,7 +11,6 @@ from . import call_status
 ###
 
 L = logging.getLogger("server")
-Lmy = logging.getLogger("my") # Message yielding logger
 
 ###
 
@@ -43,6 +42,7 @@ class server_app(program_roaster, idlework_appmixin):
 		my_logger = logging.getLogger('my')
 		my_logger.setLevel(logging.DEBUG) 
 		my_logger.addHandler(message_yield_loghandler(self))
+		my_logger.propagate = False
 
 		L.debug("Configuration loaded from: {0}".format(', '.join(itertools.chain(config_files,config_includes))))
 		
@@ -169,8 +169,6 @@ class server_app(program_roaster, idlework_appmixin):
 
 
 	def dispatch_svrcall(self, callid, params):
-		Lmy.info("Received svrcall ...")
-
 		if self.termstatus is not None:
 			raise cnscom.svrcall_error('Ramona server is exiting - no further commands will be accepted')
 
