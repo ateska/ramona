@@ -81,6 +81,8 @@ Console application (base for custom implementations)
 		except exception.ramona_runtime_errorbase, e:
 			L.error("{0}".format(e))
 			ec = e.exitcode
+		except KeyboardInterrupt, e:
+			ec = 0
 		except Exception, e:
 			L.error("{0}".format(e))
 			ec = 100 # Generic error exit code
