@@ -185,11 +185,25 @@ class server_app(program_roaster, idlework_appmixin):
 		elif callid == cnscom.callid_stop:
 			self.add_idlework(self.on_tick) # Schedule extra periodic check (to provide swift server background response to to user action)
 			kwargs = cnscom.parse_json_kwargs(params)
+			immediate = kwargs.pop('immediate', False)
 			mode = kwargs.pop('mode',None)
+
 			if mode is None or mode == 'stay':
-				return self.stop_program(**kwargs)
+				if immediate:
+					return self.stop_program(cnscon=None, **kwargs)
+				else:
+					cnscon.yield_enabled=True
+					self.stop_program(cnscon=cnscon, **kwargs)
+					return deffered_return
+
 			elif mode == 'exit':
-				return self.__init_soft_exit()
+				if immediate:
+					return self.__init_soft_exit()
+				else:
+					cnscon.yield_enabled=True
+					self.__init_soft_exit(cnscon=cnscon)
+					return deffered_return
+
 			else:
 				L.warning("Unknown exit mode issued: {0}".format(mode))
 
@@ -207,11 +221,11 @@ class server_app(program_roaster, idlework_appmixin):
 			L.error("Received unknown callid: {0}".format(callid))
 
 
-	def __init_soft_exit(self):
+	def __init_soft_exit(self, cnscon=None):
 		if self.termstatus > 1: return
 
 		self.termstatus =  1
-		self.stop_program(force=True)
+		self.stop_program(cnscon=None, force=True)
 		self.add_idlework(self.on_tick) # Schedule extra periodic check 
 
 

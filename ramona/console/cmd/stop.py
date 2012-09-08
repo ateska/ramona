@@ -10,6 +10,7 @@ cmdhelp = 'Terminate subprocess(es)'
 
 def init_parser(parser):
 	parser.add_argument('program', nargs='*', help='Optionally specify program(s) in scope of the command')
+	parser.add_argument('-i','--immediate-return', action='store_true', help='Dont wait for start of subprocesses and return ASAP')
 	parser.add_argument('-E','--stop-and-exit', action='store_true', help='Stop all programs and exit Ramona server. Command-line default for:\n%(prog)s')
 	parser.add_argument('-T','--stop-and-stay', action='store_true', help='Stop all programs and keep server running.')
 
@@ -25,11 +26,13 @@ def main(cnsapp, args):
 	if len(args.program) == 0 and not args.stop_and_stay and not cnsapp.is_interactive:
 		args.stop_and_exit = True
 
-	params={}
+	params={
+		'immediate': args.immediate_return,
+	}
 	if args.stop_and_exit: params['mode'] = 'exit'
 	elif args.stop_and_stay: params['mode'] = 'stay'
-
 	if len(args.program) > 0: params['pfilter'] = args.program
+
 	cnsapp.svrcall(
 		cnscom.callid_stop,
 		json.dumps(params),

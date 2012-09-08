@@ -28,6 +28,7 @@ def main(cnsapp, args):
 		'immediate': args.immediate_return,
 	}
 	if len(args.program) > 0: params['pfilter'] = args.program
+
 	cnsapp.svrcall(
 		cnscom.callid_start,
 		json.dumps(params),
