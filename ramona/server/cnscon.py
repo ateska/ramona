@@ -1,4 +1,4 @@
-import socket, errno, struct, weakref, json, logging
+import socket, errno, struct, weakref, json, select, logging
 import pyev
 from .. import cnscom
 ###
@@ -100,7 +100,7 @@ class console_connection(object):
 
 	def handle_write(self):
 		try:
-			sent = self.sock.send(self.write_buf)
+			sent = self.sock.send(self.write_buf[:select.PIPE_BUF])
 		except socket.error as err:
 			if err.args[0] not in self.NONBLOCKING:
 				#TODO: Log "error writing to {0}".format(self.sock)
