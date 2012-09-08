@@ -120,7 +120,9 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 				action = actionList[0]
 			if action in ("start", "stop", "restart"):
 				conn = self.socket_connect()
-				params = {}
+				params = {
+					'immediate': True,
+				}
 				qsIdent = qs.get('ident')
 				if qsIdent is not None and len(qsIdent) > 0:
 					params['pfilter'] = [qsIdent[0]]
