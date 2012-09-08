@@ -136,7 +136,7 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 				
 				try:
 					cnscom.svrcall(conn, self.ActionToCallid[action], json.dumps(params))
-					msgid = self.addLogMessage("success", "Command successfully triggered.")
+					msgid = self.addLogMessage("success", "Command '{0}' successfully triggered.".format(action))
 				except Exception, e:
 					msgid = self.addLogMessage("error", "Failed to trigger the command: {0}".format(e))
 				
