@@ -16,12 +16,42 @@ Quick introduction
 ------------------
 
 Let's assume your project (named _foo_) directory looks as follow:
-```
+```shell
 foo/
 	bin/
 	share/
 	src/
 	docs/
 	foo.py <--- this is Ramona console
+	foo.conf
 ```
 
+Ramona system will the provide you with following command-line API:
+```shell
+$ ./foo.py --help
+usage: foo.py [-h] [-c CONFIGFILE] [-d] [-s]
+               {start,stop,restart,status,help,console,server,clean,unittests}
+               ...
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -c CONFIGFILE, --config CONFIGFILE
+                        Specify configuration file(s) to read (this option can
+                        be given more times). This will override build-in
+                        application level configuration.
+  -d, --debug           Enable debug (verbose) output.
+  -s, --silent          Enable silent mode of operation (only errors are
+                        printed).
+
+subcommands:
+  {start,stop,restart,status,help,console,server,clean,unittests}
+    start               Launch subprocess(es)
+    stop                Terminate subprocess(es)
+    restart             Restart subprocess(es)
+    status              Show status of subprocess(es)
+    help                Display help
+    console             Enter interactive console mode
+    server              Launch server in the foreground
+    clean               Clean project directory from intermediate files
+    unittests           Seek for all unit tests and execute them
+```
