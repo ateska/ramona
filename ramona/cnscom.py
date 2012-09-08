@@ -1,4 +1,4 @@
-import os, urlparse, socket, struct, time, json, logging
+import os, urlparse, socket, struct, time, json, select, logging
 ###
 
 L = logging.getLogger("cnscom")
@@ -70,11 +70,16 @@ def svrcall(cnssocket, callid, params=""):
 		x = time.time()
 		resp = ""
 		while len(resp) < 4:
-			resp += cnssocket.recv(4 - len(resp))
-			if len(resp) == 0:
-				if time.time() - x > 2:
-					L.error("Looping detected")
-					time.sleep(5)
+			rlist, _, _ = select.select([cnssocket],[],[], 5)
+			if len(rlist) == 0:
+				if time.time() - x > 2: L.error("Looping detected")
+				continue
+			ndata = cnssocket.recv(4 - len(resp))
+			if len(ndata) == 0:
+				raise EOFError("It looks like server closed connection")
+
+			resp += ndata
+
 
 		magic, retype, paramlen = struct.unpack(resp_struct_fmt, resp)
 		assert magic == resp_magic
