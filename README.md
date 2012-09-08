@@ -59,5 +59,5 @@ subcommands:
 Links
 -----
 
-[Ramona @ GitHub](https://github.com/ateska/ramona)
-[Ramona @ Ohloh](https://www.ohloh.net/p/ateska_ramona)
+* [Ramona @ GitHub](https://github.com/ateska/ramona)
+* [Ramona @ Ohloh](https://www.ohloh.net/p/ateska_ramona)
