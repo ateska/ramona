@@ -60,4 +60,5 @@ Links
 -----
 
 * [Ramona @ GitHub](https://github.com/ateska/ramona)
+* [Ramona @ PyPi](http://pypi.python.org/pypi/Ramona)
 * [Ramona @ Ohloh](https://www.ohloh.net/p/ateska_ramona)
