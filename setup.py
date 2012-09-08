@@ -1,6 +1,7 @@
 from distutils.core import setup
 
 #TODO: A lot ...
+# See http://guide.python-distribute.org/
 
 setup(
 	name='ramona',
