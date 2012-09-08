@@ -1,4 +1,4 @@
-ramona
+Ramona
 ======
 
 Your next favorite supervisor component.
@@ -22,7 +22,7 @@ foo/
 	share/
 	src/
 	docs/
-	foo.py <--- this is Ramona console
+	foo.py <--- this is Ramona
 	foo.conf
 ```
 
