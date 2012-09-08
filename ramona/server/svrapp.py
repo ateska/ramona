@@ -2,7 +2,7 @@ import sys, os, socket, signal, errno, weakref, logging, argparse, itertools
 import pyev
 from .. import cnscom
 from ..config import config, read_config, config_files, config_includes, get_numeric_loglevel
-from .cnscon import console_connection
+from .cnscon import console_connection, message_yield_loghandler
 from .proaster import program_roaster
 from .idlework import idlework_appmixin
 
@@ -11,6 +11,7 @@ from . import call_status
 ###
 
 L = logging.getLogger("server")
+Lmy = logging.getLogger("my") # Message yielding logger
 
 ###
 
@@ -20,6 +21,7 @@ class server_app(program_roaster, idlework_appmixin):
 	NONBLOCKING = frozenset([errno.EAGAIN, errno.EWOULDBLOCK])
 
 	def __init__(self):
+
 		# Create own process group
 		os.setpgrp()
 
@@ -37,6 +39,10 @@ class server_app(program_roaster, idlework_appmixin):
 			stream=sys.stderr,
 			format="%(levelname)s: %(message)s"
 			)
+		# Prepare message yield logger
+		my_logger = logging.getLogger('my')
+		my_logger.setLevel(logging.DEBUG) 
+		my_logger.addHandler(message_yield_loghandler(self))
 
 		L.debug("Configuration loaded from: {0}".format(', '.join(itertools.chain(config_files,config_includes))))
 		
@@ -163,6 +169,8 @@ class server_app(program_roaster, idlework_appmixin):
 
 
 	def dispatch_svrcall(self, callid, params):
+		Lmy.info("Received svrcall ...")
+
 		if self.termstatus is not None:
 			raise cnscom.svrcall_error('Ramona server is exiting - no further commands will be accepted')
 

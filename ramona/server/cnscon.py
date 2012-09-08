@@ -1,4 +1,4 @@
-import socket, errno, struct, logging
+import socket, errno, struct, weakref, json, logging
 import pyev
 from .. import cnscom
 ###
@@ -84,14 +84,14 @@ class console_connection(object):
 						if lenret >= 0x7fff:
 							self.handle_error()
 							raise RuntimeError("Transmitted parameters are too long.")
-						self.write(struct.pack(cnscom.resp_struct_fmt, cnscom.resp_magic, cnscom.resp_exc, lenret) + ret)						
+						self.write(struct.pack(cnscom.resp_struct_fmt, cnscom.resp_magic, cnscom.resp_exception, lenret) + ret)
 					else:
 						ret = str(ret)
 						lenret = len(ret)
 						if lenret >= 0x7fff:
 							self.handle_error()
 							raise RuntimeError("Transmitted parameters are too long.")
-						self.write(struct.pack(cnscom.resp_struct_fmt, cnscom.resp_magic, cnscom.resp_ret, lenret) + ret)
+						self.write(struct.pack(cnscom.resp_struct_fmt, cnscom.resp_magic, cnscom.resp_return, lenret) + ret)
 
 		else:
 			L.debug("Connection closed by peer")
@@ -133,3 +133,43 @@ class console_connection(object):
 	def handle_error(self):
 		L.debug("Console connection closed.")
 		self.close()
+
+
+	def yield_message(self, message):
+		messagelen = len(message)
+		if messagelen >= 0x7fff:
+			raise RuntimeError("Transmitted message is too long.")
+
+		self.write(struct.pack(cnscom.resp_struct_fmt, cnscom.resp_magic, cnscom.resp_yield_message, messagelen) + message)
+
+###
+
+class message_yield_loghandler(logging.Handler):
+	'''
+	Message yield(ing) log handler provides functionality to propagate log messages to connected consoles.
+	It automatically emits all log records that are submitted into relevant logger (e.g. Lmy = logging.getLogger("my") )
+	'''
+
+
+	def __init__(self, serverapp):
+		logging.Handler.__init__(self)
+		self.serverapp = weakref.ref(serverapp)
+
+
+	def emit(self, record):
+		serverapp = self.serverapp()
+		if serverapp is None: return
+
+		msg = json.dumps({
+			'msg': record.msg,
+			'args': record.args,
+			'funcName': record.funcName,
+			'lineno': record.lineno,
+			'levelno': record.levelno,
+			'levelname': record.levelname,
+			'name': record.name,
+			'pathname': record.pathname,
+		})
+
+		for conn in serverapp.conns:
+			conn.yield_message(msg)

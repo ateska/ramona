@@ -19,8 +19,9 @@ resp_magic = '<'
 call_struct_fmt = '!cBH'
 resp_struct_fmt = '!ccH'
 
-resp_ret = 'R'
-resp_exc = 'E'
+resp_return = 'R'
+resp_exception = 'E'
+resp_yield_message = 'M' # Used to propagate message from server to console
 
 ###
 
@@ -64,33 +65,41 @@ def svrcall(cnssocket, callid, params=""):
 
 	cnssocket.send(struct.pack(call_struct_fmt, call_magic, callid, paramlen)+params)
 
-	x = time.time()
-	resp = ""
-	while len(resp) < 4:
-		resp += cnssocket.recv(4 - len(resp))
-		if len(resp) == 0:
-			if time.time() - x > 2:
-				L.error("Looping detected")
-				time.sleep(5)
+	while 1:
+		x = time.time()
+		resp = ""
+		while len(resp) < 4:
+			resp += cnssocket.recv(4 - len(resp))
+			if len(resp) == 0:
+				if time.time() - x > 2:
+					L.error("Looping detected")
+					time.sleep(5)
 
-	magic, retype, paramlen = struct.unpack(resp_struct_fmt, resp)
-	assert magic == resp_magic
+		magic, retype, paramlen = struct.unpack(resp_struct_fmt, resp)
+		assert magic == resp_magic
 
-	if paramlen > 0: #This is here because Linux blocks when socket.recv(0) is called (even if data are available) 
-		params = cnssocket.recv(paramlen)
-	else:
-		params = ""
+		if paramlen > 0: #This is here because Linux blocks when socket.recv(0) is called (even if data are available) 
+			params = cnssocket.recv(paramlen)
+		else:
+			params = ""
+			
+		if retype == resp_return:
+			# Remote server call returned normally
+			return params
 		
-	if retype == resp_ret:
-		# Remote server call returned normally
-		return params
-	
-	elif retype == resp_exc:
-		# Remove server call returned exception
-		raise RuntimeError(params)
-	
-	else:
-		raise RuntimeError("Unknown server response: {0}".format(retype))
+		elif retype == resp_exception:
+			# Remove server call returned exception
+			raise RuntimeError(params)
+		
+		elif retype == resp_yield_message:
+			# Remote server call returned yielded message -> we will continue receiving
+			obj = json.loads(params)
+			obj = logging.makeLogRecord(obj)
+			L.handle(obj)
+			continue
+
+		else:
+			raise RuntimeError("Unknown server response: {0}".format(retype))
 
 ###
 
