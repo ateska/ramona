@@ -7,8 +7,8 @@ Features
 ./console start program-name1 program-name2 ...
 ```
 
-- Console can be started without start of subprocesses
-- Creates it's own progress group (Unix)
+- Console can be started without start of server and also server can be started without launch of any program
+- Each program is launched in dedicated process group
 - configuration is ConfigParser compatible
 - priority (order) in which programs are started/stopped
 - Following environment variables are available:
