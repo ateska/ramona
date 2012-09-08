@@ -26,12 +26,9 @@ class program(object):
 		'disabled': False,
 	}
 
-	# TODO: Remove this alias
-	state_enum = program_state_enum
-
 	def __init__(self, loop, config_section):
 		_, self.ident = config_section.split(':', 2)
-		self.state = program.state_enum.STOPPED
+		self.state = program_state_enum.STOPPED
 		self.pid = None
 
 		self.launch_cnt = 0
@@ -60,7 +57,7 @@ class program(object):
 			cmd = '{0} -u -m ramona.httpfend'.format(sys.executable)
 		elif cmd[:1] == '<':
 			L.error("Unknown command option '{1}' in {0} -> CFGERROR".format(config_section, cmd))
-			self.state = program.state_enum.CFGERROR
+			self.state = program_state_enum.CFGERROR
 			return
 
 		self.cmdline = shlex.split(cmd)
@@ -70,21 +67,21 @@ class program(object):
 
 		if self.config['stdin'] != '<null>':
 			L.error("Unknown stdin option '{0}' in {1} -> CFGERROR".format(self.config['stdin'], config_section))
-			self.state = program.state_enum.CFGERROR
+			self.state = program_state_enum.CFGERROR
 			return
 
 		try:
 			self.priority = int(self.config.get('priority'))
 		except:
 			L.error("Invalid priority option '{0}' in {1} -> CFGERROR".format(self.config['priority'], config_section))
-			self.state = program.state_enum.CFGERROR
+			self.state = program_state_enum.CFGERROR
 			return		
 		
 		try:
 			dis = get_boolean(self.config.get('disabled'))
 		except ValueError:
 			L.error("Unknown 'disabled' option '{0}' in {1} -> CFGERROR".format(dis, config_section))
-			self.state = program.state_enum.CFGERROR
+			self.state = program_state_enum.CFGERROR
 			return
 		if dis:
 			self.state = program_state_enum.DISABLED
@@ -96,7 +93,7 @@ class program(object):
 
 		if (stdout_cnf == '<stderr>') and (stderr_cnf == '<stdout>'):
 			L.error("Invalid stdout and stderr combination in {0} -> CFGERROR".format(config_section))
-			self.state = program.state_enum.CFGERROR
+			self.state = program_state_enum.CFGERROR
 			return			
 
 		# Stdout settings
@@ -112,7 +109,7 @@ class program(object):
 			self.log_out_fname = None
 		elif stdout_cnf[:1] == '<':
 			L.error("Unknown stdout option in {0} -> CFGERROR".format(config_section))
-			self.state = program.state_enum.CFGERROR
+			self.state = program_state_enum.CFGERROR
 			return			
 		else:
 			self.log_out_fname = stdout_cnf
@@ -130,7 +127,7 @@ class program(object):
 			self.log_err_fname = None
 		elif stderr_cnf[:1] == '<':
 			L.error("Unknown stderr option in {0} -> CFGERROR".format(config_section))
-			self.state = program.state_enum.CFGERROR
+			self.state = program_state_enum.CFGERROR
 			return
 		else:
 			self.log_err_fname = stderr_cnf
@@ -150,7 +147,7 @@ class program(object):
 
 
 	def __repr__(self):
-		return "<{0} {1} state={2} pid={3}>".format(self.__class__.__name__, self.ident, program.state_enum.labels[self.state],self.pid if self.pid is not None else '?')
+		return "<{0} {1} state={2} pid={3}>".format(self.__class__.__name__, self.ident, program_state_enum.labels[self.state],self.pid if self.pid is not None else '?')
 
 
 	def spawn(self, cmd, args):
@@ -204,7 +201,7 @@ class program(object):
 
 	def start(self):
 		'''Transition to state STARTING'''
-		assert self.state in (program.state_enum.STOPPED, program.state_enum.FATAL)
+		assert self.state in (program_state_enum.STOPPED, program_state_enum.FATAL)
 
 		L.debug("{0} -> STARTING".format(self))
 
@@ -220,7 +217,7 @@ class program(object):
 			self.log_err = self.log_out
 
 		self.pid = self.spawn(self.cmdline[0], self.cmdline) #TODO: self.cmdline[0] can be substituted by self.ident or any arbitrary string
-		self.state = program.state_enum.STARTING
+		self.state = program_state_enum.STARTING
 		self.start_time = time.time()
 		self.stop_time = None
 		self.exit_time = None
@@ -230,10 +227,10 @@ class program(object):
 
 	def stop(self):
 		'''Transition to state STOPPING'''
-		if self.state == program.state_enum.FATAL: return # This can happen and it is probably OK
+		if self.state == program_state_enum.FATAL: return # This can happen and it is probably OK
 
 		assert self.pid is not None, "Stopping: {0}".format(self)
-		assert self.state in (program.state_enum.RUNNING, program.state_enum.STARTING)
+		assert self.state in (program_state_enum.RUNNING, program_state_enum.STARTING)
 
 		L.debug("{0} -> STOPPING".format(self))
 		self.act_stopsignals = self.stopsignals[:]
@@ -242,7 +239,7 @@ class program(object):
 			os.kill(-self.pid, signal) # Killing whole process group
 		except:
 			pass
-		self.state = program.state_enum.STOPPING
+		self.state = program_state_enum.STOPPING
 		self.stop_time = time.time()
 
 
@@ -300,31 +297,31 @@ class program(object):
 		self.log_err = None
 
 		# Handle state change properly
-		if self.state == program.state_enum.STARTING:
+		if self.state == program_state_enum.STARTING:
 			Lmy.error("{0} exited too quickly (now in FATAL state)".format(self.ident))
 			L.warning("{0} exited too quickly (-> FATAL)".format(self))
-			self.state = program.state_enum.FATAL
+			self.state = program_state_enum.FATAL
 
-		elif self.state == program.state_enum.STOPPING:
+		elif self.state == program_state_enum.STOPPING:
 			Lmy.info("{0} is now STOPPED".format(self.ident))
 			L.debug("{0} -> STOPPED".format(self))
-			self.state = program.state_enum.STOPPED
+			self.state = program_state_enum.STOPPED
 
 		else:
 			Lmy.info("{0} exited unexpectedly (now in FATAL state)".format(self.ident))
 			L.warning("{0} exited unexpectedly (-> FATAL)".format(self))
-			self.state = program.state_enum.FATAL
+			self.state = program_state_enum.FATAL
 
 
 	def on_tick(self, now):
 		# Switch starting programs into running state
-		if self.state == program.state_enum.STARTING:
+		if self.state == program_state_enum.STARTING:
 			if now - self.start_time >= self.config['starttimeout']:
 				Lmy.info("{0} is now RUNNING".format(self.ident))
 				L.debug("{0} -> RUNNING".format(self))
-				self.state = program.state_enum.RUNNING
+				self.state = program_state_enum.RUNNING
 
-		elif self.state == program.state_enum.STOPPING:
+		elif self.state == program_state_enum.STOPPING:
 			if now - self.stop_time >= self.config['stoptimeout']:
 				L.warning("{0} is still terminating - sending another signal".format(self))
 				signal = self.get_next_stopsignal()

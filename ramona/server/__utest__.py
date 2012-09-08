@@ -1,6 +1,6 @@
 import unittest
 from .seqctrl import sequence_controller
-from .program import program
+from ..cnscom import program_state_enum
 ###
 '''
 To launch unit test:
@@ -16,7 +16,7 @@ class TestSequenceController(unittest.TestCase):
 		def __init__(self, ident, prio):
 			self.ident = ident
 			self.priority = prio
-			self.state = program.state_enum.STOPPED
+			self.state = program_state_enum.STOPPED
 
 
 	def test_HappyFlow(self):
@@ -39,24 +39,24 @@ class TestSequenceController(unittest.TestCase):
 		self.assertRaises(AssertionError, sc.next)
 
 		# Simulate start of active set and check that
-		for p in actps: p.state = program.state_enum.STARTING
-		r = sc.check(program.state_enum.STARTING, program.state_enum.RUNNING)
+		for p in actps: p.state = program_state_enum.STARTING
+		r = sc.check(program_state_enum.STARTING, program_state_enum.RUNNING)
 		self.assertFalse(r)
 		self.assertRaises(AssertionError, sc.next)
 
 		# Simulate sequential start of programs
-		actps[0].state = program.state_enum.RUNNING
-		r = sc.check(program.state_enum.STARTING, program.state_enum.RUNNING)
+		actps[0].state = program_state_enum.RUNNING
+		r = sc.check(program_state_enum.STARTING, program_state_enum.RUNNING)
 		self.assertFalse(r)
 		self.assertRaises(AssertionError, sc.next)
 
-		actps[1].state = program.state_enum.RUNNING
-		r = sc.check(program.state_enum.STARTING, program.state_enum.RUNNING)
+		actps[1].state = program_state_enum.RUNNING
+		r = sc.check(program_state_enum.STARTING, program_state_enum.RUNNING)
 		self.assertFalse(r)
 		self.assertRaises(AssertionError, sc.next)
 
-		actps[2].state = program.state_enum.RUNNING
-		r = sc.check(program.state_enum.STARTING, program.state_enum.RUNNING)
+		actps[2].state = program_state_enum.RUNNING
+		r = sc.check(program_state_enum.STARTING, program_state_enum.RUNNING)
 		self.assertTrue(r)
 
 		# Now advancing to the next set
@@ -65,13 +65,13 @@ class TestSequenceController(unittest.TestCase):
 		self.assertSetEqual(pset,{'b','d'})
 
 		# Simulate sequential start of programs
-		actps[0].state = program.state_enum.RUNNING
-		r = sc.check(program.state_enum.STARTING, program.state_enum.RUNNING)
+		actps[0].state = program_state_enum.RUNNING
+		r = sc.check(program_state_enum.STARTING, program_state_enum.RUNNING)
 		self.assertFalse(r)
 		self.assertRaises(AssertionError, sc.next)
 
-		actps[1].state = program.state_enum.RUNNING
-		r = sc.check(program.state_enum.STARTING, program.state_enum.RUNNING)
+		actps[1].state = program_state_enum.RUNNING
+		r = sc.check(program_state_enum.STARTING, program_state_enum.RUNNING)
 		self.assertTrue(r)
 
 		# Third step
@@ -79,8 +79,8 @@ class TestSequenceController(unittest.TestCase):
 		pset = set(p.ident for p in actps)
 		self.assertSetEqual(pset,{'f'})
 
-		actps[0].state = program.state_enum.RUNNING
-		r = sc.check(program.state_enum.STARTING, program.state_enum.RUNNING)
+		actps[0].state = program_state_enum.RUNNING
+		r = sc.check(program_state_enum.STARTING, program_state_enum.RUNNING)
 		self.assertTrue(r)
 
 		actps = sc.next()
@@ -101,14 +101,14 @@ class TestSequenceController(unittest.TestCase):
 		self.assertSetEqual(pset,{'a','c'})
 
 		# Simulate start of active set and check that
-		for p in actps: p.state = program.state_enum.STARTING
-		r = sc.check(program.state_enum.STARTING, program.state_enum.RUNNING)
+		for p in actps: p.state = program_state_enum.STARTING
+		r = sc.check(program_state_enum.STARTING, program_state_enum.RUNNING)
 		self.assertFalse(r)
 		self.assertRaises(AssertionError, sc.next)
 
 		# Simulate sequential start of programs
-		actps[0].state = program.state_enum.FATAL
-		r = sc.check(program.state_enum.STARTING, program.state_enum.RUNNING)
+		actps[0].state = program_state_enum.FATAL
+		r = sc.check(program_state_enum.STARTING, program_state_enum.RUNNING)
 
 		self.assertIsNone(r)
 

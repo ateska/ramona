@@ -1,6 +1,6 @@
 import logging, time
 from ..config import config
-from ..cnscom import svrcall_error
+from ..cnscom import svrcall_error, program_state_enum
 from .program import program
 from .seqctrl import sequence_controller
 
@@ -54,8 +54,8 @@ Program roaster is object that control all configured programs, their start/stop
 		self.start_seq = sequence_controller()
 
 		# If 'force' is used, include as programs in FATAL state
-		if force: states = (program.state_enum.STOPPED,program.state_enum.FATAL)
-		else: states = (program.state_enum.STOPPED,)
+		if force: states = (program_state_enum.STOPPED,program_state_enum.FATAL)
+		else: states = (program_state_enum.STOPPED,)
 
 		for p in l:
 			if p.state not in states: continue
@@ -84,7 +84,7 @@ Program roaster is object that control all configured programs, their start/stop
 		self.stop_seq = sequence_controller()
 
 		for p in l:
-			if p.state not in (program.state_enum.RUNNING, program.state_enum.STARTING): continue
+			if p.state not in (program_state_enum.RUNNING, program_state_enum.STARTING): continue
 			self.stop_seq.add(p)		
 
 		self.__startstop_pad_next(False)
@@ -103,11 +103,11 @@ Program roaster is object that control all configured programs, their start/stop
 		self.restart_seq = sequence_controller()
 
 		# If 'force' is used, include as programs in FATAL state
-		if force: start_states = (program.state_enum.STOPPED,program.state_enum.FATAL)
-		else: start_states = (program.state_enum.STOPPED,)
+		if force: start_states = (program_state_enum.STOPPED,program_state_enum.FATAL)
+		else: start_states = (program_state_enum.STOPPED,)
 
 		for p in l:
-			if p.state in (program.state_enum.RUNNING, program.state_enum.STARTING):
+			if p.state in (program_state_enum.RUNNING, program_state_enum.STARTING):
 				self.stop_seq.add(p)
 				self.restart_seq.add(p)
 			elif p.state in start_states:
@@ -157,7 +157,7 @@ Program roaster is object that control all configured programs, their start/stop
 			p.on_tick(now)
 
 		if self.start_seq is not None:
-			r = self.start_seq.check(program.state_enum.STARTING, program.state_enum.RUNNING)
+			r = self.start_seq.check(program_state_enum.STARTING, program_state_enum.RUNNING)
 			if r is None:
 				L.warning("Start sequence aborted due to program error")
 				self.start_seq = None
@@ -166,7 +166,7 @@ Program roaster is object that control all configured programs, their start/stop
 				self.__startstop_pad_next(True)
 
 		if self.stop_seq is not None:
-			r = self.stop_seq.check(program.state_enum.STOPPING, program.state_enum.STOPPED)
+			r = self.stop_seq.check(program_state_enum.STOPPING, program_state_enum.STOPPED)
 			if r is None:
 				if self.restart_seq is None:
 					L.warning("Stop sequence aborted due to program error")
@@ -184,7 +184,7 @@ Program roaster is object that control all configured programs, their start/stop
 
 		if (self.termstatus is not None) and (self.stop_seq is None):
 			# Special care for server terminating condition 
-			not_running_states=frozenset([program.state_enum.STOPPED, program.state_enum.FATAL, program.state_enum.CFGERROR, program.state_enum.DISABLED])
+			not_running_states=frozenset([program_state_enum.STOPPED, program_state_enum.FATAL, program_state_enum.CFGERROR, program_state_enum.DISABLED])
 			ready_to_stop = True
 			for p in self.roaster: # Seek for running programs
 				if p.state not in not_running_states:
@@ -193,7 +193,7 @@ Program roaster is object that control all configured programs, their start/stop
 
 			if ready_to_stop: # Happy-flow (stop sequence finished and there is no program running - we can stop looping and exit)
 				for p in self.roaster:
-					if p.state in (program.state_enum.FATAL, program.state_enum.CFGERROR):
+					if p.state in (program_state_enum.FATAL, program_state_enum.CFGERROR):
 						L.warning("Process in error condition during exit: {0}".format(p))
 				self.stop_loop()
 			else:
