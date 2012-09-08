@@ -8,7 +8,7 @@ setup(
 	author_email='ales.teska+ramona@gmail.com',
 	version='0.1',
 	packages=['ramona',],
-   	license='LICENSE',
+   	license='BSD 2-clause "Simplified" License',
    	long_description=open('README.md').read(),
    	url='https://github.com/ateska/ramona',
 )
