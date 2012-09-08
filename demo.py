@@ -18,7 +18,7 @@ class MyDemoConsoleApp(ramona.console_app):
 		'Seek for all unit tests and execute them'
 		import unittest
 		tl = unittest.TestLoader()
-		ts = tl.discover('.', '*.py')
+		ts = tl.discover('.', '__utest__.py')
 
 		tr = unittest.runner.TextTestRunner(verbosity=2)
 		res = tr.run(ts)
