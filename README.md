@@ -27,7 +27,7 @@ foo/
 ```
 
 Ramona system will the provide you with following command-line API:
-```shell
+```
 $ ./foo.py --help
 usage: foo.py [-h] [-c CONFIGFILE] [-d] [-s]
                {start,stop,restart,status,help,console,server,clean,unittests}
