@@ -55,3 +55,9 @@ subcommands:
     clean               Clean project directory from intermediate files
     unittests           Seek for all unit tests and execute them
 ```
+
+Links
+-----
+
+[Ramona @ GitHub](https://github.com/ateska/ramona)
+[Ramona @ Ohloh](https://www.ohloh.net/p/ateska_ramona)
