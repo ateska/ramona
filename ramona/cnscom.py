@@ -2,6 +2,7 @@ import os, urlparse, socket, struct, time, json, logging
 ###
 
 L = logging.getLogger("cnscom")
+Lmy = logging.getLogger("my")
 
 ###
 
@@ -95,7 +96,7 @@ def svrcall(cnssocket, callid, params=""):
 			# Remote server call returned yielded message -> we will continue receiving
 			obj = json.loads(params)
 			obj = logging.makeLogRecord(obj)
-			L.handle(obj)
+			Lmy.handle(obj)
 			continue
 
 		else:
