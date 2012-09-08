@@ -9,6 +9,7 @@ cmdhelp = 'Launch subprocess(es)'
 
 def init_parser(parser):
 	parser.add_argument('-n','--no-server-start', action='store_true', help='Avoid eventual automatic server start')
+	parser.add_argument('-i','--immediate-return', action='store_true', help='Dont wait for start of subprocesses and return ASAP')
 	parser.add_argument('-f','--force-start', action='store_true', help='Force start of processes in FATAL state')
 	parser.add_argument('-S','--server-only', action='store_true', help='Start only server, programs are not launched')
 	parser.add_argument('program', nargs='*', help='Optionally specify program(s) in scope of the command')
@@ -22,7 +23,10 @@ def main(cnsapp, args):
 		cnsapp.auto_server_start()
 		return
 
-	params={'force':args.force_start}
+	params={
+		'force': args.force_start,
+		'immediate': args.immediate_return,
+	}
 	if len(args.program) > 0: params['pfilter'] = args.program
 	cnsapp.svrcall(
 		cnscom.callid_start,

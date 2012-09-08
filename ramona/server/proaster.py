@@ -43,7 +43,7 @@ Program roaster is object that control all configured programs, their start/stop
 			if ident in filter_set: yield p
 
 
-	def start_program(self, pfilter=None, force=False):
+	def start_program(self, cnscon, pfilter=None, force=False):
 		'''Start processes that are STOPPED and (forced) FATAL'''
 		if self.start_seq is not None or self.stop_seq is not None or self.restart_seq is not None:
 			raise svrcall_error("There is already start/stop sequence running - please wait and try again later.")
@@ -51,7 +51,7 @@ Program roaster is object that control all configured programs, their start/stop
 		l = self.filter_roaster_iter(pfilter)
 
 		L.debug("Initializing start sequence")
-		self.start_seq = sequence_controller()
+		self.start_seq = sequence_controller(cnscon)
 
 		# If 'force' is used, include as programs in FATAL state
 		if force: states = (program_state_enum.STOPPED,program_state_enum.FATAL)
@@ -121,6 +121,10 @@ Program roaster is object that control all configured programs, their start/stop
 		pg = self.start_seq.next() if start else self.stop_seq.next()
 		if pg is None:
 			if start:
+				cnscon = self.start_seq.cnscon
+				if cnscon is not None:
+					self.start_seq.cnscon = None
+					cnscon.send_return(True)
 				self.start_seq = None
 				L.debug("Start sequence completed.")
 			else:

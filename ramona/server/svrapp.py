@@ -2,7 +2,7 @@ import sys, os, socket, signal, errno, weakref, logging, argparse, itertools
 import pyev
 from .. import cnscom
 from ..config import config, read_config, config_files, config_includes, get_numeric_loglevel
-from .cnscon import console_connection, message_yield_loghandler
+from .cnscon import console_connection, message_yield_loghandler, deffered_return
 from .proaster import program_roaster
 from .idlework import idlework_appmixin
 
@@ -168,16 +168,22 @@ class server_app(program_roaster, idlework_appmixin):
 			self.watchers.pop().stop()
 
 
-	def dispatch_svrcall(self, callid, params):
+	def dispatch_svrcall(self, cnscon, callid, params):
 		if self.termstatus is not None:
 			raise cnscom.svrcall_error('Ramona server is exiting - no further commands will be accepted')
 
-		self.add_idlework(self.on_tick) # Schedule extra periodic check (to provide swift server background response to to user action)
-
 		if callid == cnscom.callid_start:
-			return self.start_program(**cnscom.parse_json_kwargs(params))
+			kwargs = cnscom.parse_json_kwargs(params)
+			immediate = kwargs.pop('immediate', False)
+			if immediate:
+				return self.start_program(cnscon=None, **kwargs)
+			else:
+				cnscon.yield_enabled=True
+				self.start_program(cnscon=cnscon, **kwargs)
+				return deffered_return
 
 		elif callid == cnscom.callid_stop:
+			self.add_idlework(self.on_tick) # Schedule extra periodic check (to provide swift server background response to to user action)
 			kwargs = cnscom.parse_json_kwargs(params)
 			mode = kwargs.pop('mode',None)
 			if mode is None or mode == 'stay':
@@ -188,6 +194,7 @@ class server_app(program_roaster, idlework_appmixin):
 				L.warning("Unknown exit mode issued: {0}".format(mode))
 
 		elif callid == cnscom.callid_restart:
+			self.add_idlework(self.on_tick) # Schedule extra periodic check (to provide swift server background response to to user action)
 			return self.restart_program(**cnscom.parse_json_kwargs(params))
 
 		elif callid == cnscom.callid_status:

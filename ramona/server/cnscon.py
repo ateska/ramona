@@ -22,6 +22,8 @@ class console_connection(object):
 		self.read_buf = ""
 		self.write_buf = None
 		
+		self.yield_enabled = False
+
 		self.watcher = pyev.Io(self.sock._sock, pyev.EV_READ, serverapp.loop, self.io_cb)
 		self.watcher.start()
 
@@ -75,23 +77,14 @@ class console_connection(object):
 					self.read_buf = self.read_buf[4+paramlen:]
 					
 					try:
-						ret = self.serverapp.dispatch_svrcall(callid, params)
+						ret = self.serverapp.dispatch_svrcall(self, callid, params)
 					except Exception, e:
 						if not isinstance(e, cnscom.svrcall_error):
 							L.exception("Exception during dispatching console call")
-						ret = str(e)
-						lenret = len(ret)
-						if lenret >= 0x7fff:
-							self.handle_error()
-							raise RuntimeError("Transmitted parameters are too long.")
-						self.write(struct.pack(cnscom.resp_struct_fmt, cnscom.resp_magic, cnscom.resp_exception, lenret) + ret)
+						self.send_exception(e)
 					else:
-						ret = str(ret)
-						lenret = len(ret)
-						if lenret >= 0x7fff:
-							self.handle_error()
-							raise RuntimeError("Transmitted parameters are too long.")
-						self.write(struct.pack(cnscom.resp_struct_fmt, cnscom.resp_magic, cnscom.resp_return, lenret) + ret)
+						if ret == deffered_return: return
+						self.send_return(ret)
 
 		else:
 			L.debug("Connection closed by peer")
@@ -114,6 +107,10 @@ class console_connection(object):
 
 
 	def write(self, data):
+		if self.sock is None:
+			L.warning("Socket is closed - write operation is ignored")
+			return
+
 		if self.write_buf is None:
 			self.write_buf = data
 			self.reset(pyev.EV_READ | pyev.EV_WRITE)
@@ -135,7 +132,35 @@ class console_connection(object):
 		self.close()
 
 
+	def send_return(self, ret):
+		'''
+		Internal function that manages communication of response (type return) to the console (client).
+		'''
+		self.yield_enabled = False
+		ret = str(ret)
+		lenret = len(ret)
+		if lenret >= 0x7fff:
+			self.handle_error()
+			raise RuntimeError("Transmitted parameters are too long.")
+		self.write(struct.pack(cnscom.resp_struct_fmt, cnscom.resp_magic, cnscom.resp_return, lenret) + ret)
+
+
+	def send_exception(self, e):
+		'''
+		Internal function that manages communication of response (type exception) to the console (client).
+		'''
+		self.yield_enabled = False
+		ret = str(e)
+		lenret = len(ret)
+		if lenret >= 0x7fff:
+			self.handle_error()
+			raise RuntimeError("Transmitted parameters are too long.")
+		self.write(struct.pack(cnscom.resp_struct_fmt, cnscom.resp_magic, cnscom.resp_exception, lenret) + ret)
+
+
 	def yield_message(self, message):
+		if not self.yield_enabled: return
+
 		messagelen = len(message)
 		if messagelen >= 0x7fff:
 			raise RuntimeError("Transmitted message is too long.")
@@ -148,7 +173,7 @@ class message_yield_loghandler(logging.Handler):
 	'''
 	Message yield(ing) log handler provides functionality to propagate log messages to connected consoles.
 	It automatically emits all log records that are submitted into relevant logger (e.g. Lmy = logging.getLogger("my") ) and forwards them
-	as resp_yield_message to connected consoles.
+	as resp_yield_message to connected consoles (yield has to be enabled on particular connection see yield_enabled).
 	'''
 
 
@@ -174,3 +199,7 @@ class message_yield_loghandler(logging.Handler):
 
 		for conn in serverapp.conns:
 			conn.yield_message(msg)
+
+###
+
+class deffered_return(object): pass # This is just a symbol definition

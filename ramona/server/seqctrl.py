@@ -5,10 +5,20 @@ Start/Stop program sequence controller.
 It is implementation of "SELECT * FROM programs GROUP BY priority" with a little bit of logic on top of that
 	'''
 
-	def __init__(self):
+	def __init__(self, cnscon = None):
+		'''
+		@param cnscon: Eventual console connection.
+		'''
 		super(sequence_controller, self).__init__()
 		self.sequence = {}
 		self.active = None
+		self.cnscon = cnscon
+
+
+	def __del__(self):
+		if self.cnscon is not None:
+			self.cnscon.send_exception(RuntimeError('Start/stop sequence terminated prematurely'))
+			self.cnscon = None
 
 
 	def add(self, program):
