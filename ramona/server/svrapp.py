@@ -183,12 +183,12 @@ class server_app(program_roaster, idlework_appmixin):
 				return deffered_return
 
 		elif callid == cnscom.callid_stop:
-			self.add_idlework(self.on_tick) # Schedule extra periodic check (to provide swift server background response to to user action)
 			kwargs = cnscom.parse_json_kwargs(params)
 			immediate = kwargs.pop('immediate', False)
 			mode = kwargs.pop('mode',None)
 
 			if mode is None or mode == 'stay':
+				self.add_idlework(self.on_tick) # Schedule extra periodic check (to provide swift server background response to to user action)
 				if immediate:
 					return self.stop_program(cnscon=None, **kwargs)
 				else:
@@ -209,7 +209,14 @@ class server_app(program_roaster, idlework_appmixin):
 
 		elif callid == cnscom.callid_restart:
 			self.add_idlework(self.on_tick) # Schedule extra periodic check (to provide swift server background response to to user action)
-			return self.restart_program(**cnscom.parse_json_kwargs(params))
+			kwargs = cnscom.parse_json_kwargs(params)
+			immediate = kwargs.pop('immediate', False)
+			if immediate:
+				return self.restart_program(cnscon=None, **kwargs)
+			else:
+				cnscon.yield_enabled=True
+				self.restart_program(cnscon=cnscon, **kwargs)
+				return deffered_return
 
 		elif callid == cnscom.callid_status:
 			return call_status.main(self, **cnscom.parse_json_kwargs(params))

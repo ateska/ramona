@@ -7,6 +7,7 @@ from .seqctrl import sequence_controller
 ###
 
 L = logging.getLogger('proaster')
+Lmy = logging.getLogger('my')
 
 ###
 
@@ -90,7 +91,7 @@ Program roaster is object that control all configured programs, their start/stop
 		self.__startstop_pad_next(False)
 
 
-	def restart_program(self, pfilter=None, force=False):
+	def restart_program(self, cnscon, pfilter=None, force=False):
 		'''Restart processes that are RUNNING, STARTING, STOPPED and (forced) FATAL'''
 		if self.start_seq is not None or self.stop_seq is not None or self.restart_seq is not None:
 			raise svrcall_error("There is already start/stop sequence running - please wait and try again later.")
@@ -99,8 +100,8 @@ Program roaster is object that control all configured programs, their start/stop
 		
 		l = self.filter_roaster_iter(pfilter)
 
-		self.stop_seq = sequence_controller()
-		self.restart_seq = sequence_controller()
+		self.stop_seq = sequence_controller() # Don't need to have cnscon connected with stop_seq (there is no return)
+		self.restart_seq = sequence_controller(cnscon)
 
 		# If 'force' is used, include as programs in FATAL state
 		if force: start_states = (program_state_enum.STOPPED,program_state_enum.FATAL)
@@ -139,6 +140,7 @@ Program roaster is object that control all configured programs, their start/stop
 					return
 
 				else:
+					Lmy.info("Restart finished stop phase and entering start phase")
 					L.debug("Restart sequence enters starting phase")
 					self.stop_seq = None
 					self.start_seq = self.restart_seq
