@@ -1,3 +1,6 @@
+import collections
+
+###
 
 class logmediator(object):
 	'''
@@ -6,7 +9,10 @@ class logmediator(object):
 	It provides following functionality:
 		- log rotation (TODO)
 		- tail buffer (TODO)
+		- seek for patterns in log stream and eventually trigger error mail
 	'''
+
+	maxtailbuflen = 64*1024 # 64Kb is max len. of tail buffer
 
 	def __init__(self, fname):
 		'''
@@ -17,6 +23,9 @@ class logmediator(object):
 			self.outf = open(self.fname,'a')
 		else:
 			self.outf = None
+
+		self.tailbuf = collections.deque()
+		self.tailbuflen = 0
 
 
 	def close(self):
@@ -29,6 +38,22 @@ class logmediator(object):
 		if self.outf is not None:
 			self.outf.write(data)
 			self.outf.flush() #TODO: Maybe something more clever here can be better (check logging.StreamHandler)
+
+		# Add data to tail buffer
+		datalen = len(data)
+		self.tailbuf.append((data, datalen))
+		self.tailbuflen += datalen
+
+		# Clean tail buffer - data that exceeds max. length
+		while self.tailbuflen > self.maxtailbuflen:
+			try:
+				_, odatalen = self.tailbuf.popleft()
+			except IndexError:
+				self.tailbuflen = 0
+				break
+
+			self.tailbuflen -= odatalen
+
 
 # # Following code is just example
 #
