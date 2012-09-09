@@ -237,7 +237,11 @@ class server_app(program_roaster, idlework_appmixin):
 		# If termination status take too long - do hard kill
 		if self.termstatus_change is not None:
 			if (now - self.termstatus_change) > 5:
-				self.__init_real_exit()
+				if self.termstatus != 3:
+					self.__init_real_exit()
+				else:
+					L.fatal("It looks like server shutdown is taking way too much time - taking nasty exit")
+					os._exit(10) 
 
 		if (self.termstatus == 1) and (self.stop_seq is None):
 			# Special care for server terminating condition 
