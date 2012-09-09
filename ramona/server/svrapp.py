@@ -1,7 +1,8 @@
-import sys, os, socket, signal, errno, weakref, logging, argparse, itertools
+import sys, os, socket, signal, errno, weakref, logging, argparse, itertools, time
 import pyev
 from .. import cnscom
 from ..config import config, read_config, config_files, config_includes, get_numeric_loglevel
+from ..cnscom import program_state_enum
 from .cnscon import console_connection, message_yield_loghandler, deffered_return
 from .proaster import program_roaster
 from .idlework import idlework_appmixin
@@ -62,6 +63,7 @@ class server_app(program_roaster, idlework_appmixin):
 		
 		self.conns = weakref.WeakSet()
 		self.termstatus =  None
+		self.termstatus_change = None
 
 		# Enable non-terminating SIGALARM handler
 		signal.signal(signal.SIGALRM, _SIGALARM_handler)
@@ -135,12 +137,12 @@ class server_app(program_roaster, idlework_appmixin):
 
 		if self.termstatus is None:
 			L.info("Exit request received (by signal {0})".format(watcher.signum))
-			self.__init_soft_exit() # Soft
+			self.__init_soft_exit()
 			return
 
-		elif self.termstatus ==  1:
-			self.termstatus =  2 # Hard
-			self.stop_loop()
+		else:
+			self.__init_real_exit()
+			return
 
 
 	def __child_signal_cb(self, watcher, _revents):
@@ -228,13 +230,59 @@ class server_app(program_roaster, idlework_appmixin):
 			L.error("Received unknown callid: {0}".format(callid))
 
 
+	def on_tick(self):
+		now = time.time()
+		program_roaster.on_tick(self, now)
+
+		# If termination status take too long - do hard kill
+		if self.termstatus_change is not None:
+			if (now - self.termstatus_change) > 5:
+				self.__init_real_exit()
+
+		if (self.termstatus == 1) and (self.stop_seq is None):
+			# Special care for server terminating condition 
+			not_running_states=frozenset([program_state_enum.STOPPED, program_state_enum.FATAL, program_state_enum.CFGERROR, program_state_enum.DISABLED])
+			ready_to_stop = True
+			for p in self.roaster: # Seek for running programs
+				if p.state not in not_running_states:
+					ready_to_stop = False
+					break
+
+			if ready_to_stop: # Happy-flow (stop sequence finished and there is no program running - we can stop looping and exit)
+				for p in self.roaster:
+					if p.state in (program_state_enum.FATAL, program_state_enum.CFGERROR):
+						L.warning("Process in error condition during exit: {0}".format(p))
+
+				self.__init_soft2_exit(self)
+			else:
+				L.warning("Restarting stop sequence due to exit request.")
+				self.stop_program(force=True)
+
+		if (self.termstatus == 2):
+			if len(self.conns) == 0:
+				self.__init_real_exit()
+
+
 	def __init_soft_exit(self, cnscon=None):
 		if self.termstatus > 1: return
 
 		self.termstatus =  1
-		self.stop_program(cnscon=None, force=True)
+		self.termstatus_change = time.time()
+		self.stop_program(cnscon=cnscon, force=True)
 		self.add_idlework(self.on_tick) # Schedule extra periodic check 
 
+
+	def __init_soft2_exit(self, cnscon=None):
+		'''Term status 2 is simple - just waiting for all console connections to close'''
+		if self.termstatus > 2: return
+		self.termstatus = 2
+		self.termstatus_change = time.time()
+
+
+	def __init_real_exit(self):
+		self.termstatus = 3
+		self.termstatus_change = time.time()
+		self.stop_loop()
 
 
 def _SIGALARM_handler(signum, frame):

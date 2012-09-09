@@ -161,9 +161,8 @@ Program roaster is object that control all configured programs, their start/stop
 			L.warning("Unknown program died (pid={0}, status={1})".format(pid, status))
 
 
-	def on_tick(self):
+	def on_tick(self, now):
 		'''Periodic check of program states'''
-		now = time.time()
 		for p in self.roaster:
 			p.on_tick(now)
 
@@ -192,21 +191,3 @@ Program roaster is object that control all configured programs, their start/stop
 
 			elif r:
 				self.__startstop_pad_next(False)
-
-		if (self.termstatus is not None) and (self.stop_seq is None):
-			# Special care for server terminating condition 
-			not_running_states=frozenset([program_state_enum.STOPPED, program_state_enum.FATAL, program_state_enum.CFGERROR, program_state_enum.DISABLED])
-			ready_to_stop = True
-			for p in self.roaster: # Seek for running programs
-				if p.state not in not_running_states:
-					ready_to_stop = False
-					break
-
-			if ready_to_stop: # Happy-flow (stop sequence finished and there is no program running - we can stop looping and exit)
-				for p in self.roaster:
-					if p.state in (program_state_enum.FATAL, program_state_enum.CFGERROR):
-						L.warning("Process in error condition during exit: {0}".format(p))
-				self.stop_loop()
-			else:
-				L.warning("Restarting stop sequence due to exit request.")
-				self.stop_program(force=True)
