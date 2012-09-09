@@ -11,6 +11,7 @@ callid_start = 1
 callid_stop = 2
 callid_restart = 3
 callid_status = 4
+callid_tail = 5
 
 #
 

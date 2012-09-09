@@ -52,6 +52,8 @@ stderr=<logdir>
 	2. environment variable LOGDIR
 
 - (-s/--silent and -d/--debug) command-line options
+- tail command
+	- it works even when output is redirected or null
 
 Configuration
 -------------

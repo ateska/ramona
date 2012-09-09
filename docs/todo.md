@@ -1,10 +1,6 @@
 TODO list
 =========
 
-Design questions
-----------------
-- tail of log ... how to do that
-
 Generic
 -------
 - (low prio): SSL (optional) for protecting console-server channel

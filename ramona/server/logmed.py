@@ -55,6 +55,10 @@ class logmediator(object):
 			self.tailbuflen -= odatalen
 
 
+	def tail(self):
+		ret = "".join(d for d,_ in self.tailbuf)
+		return ret
+
 # # Following code is just example
 #
 # Init:

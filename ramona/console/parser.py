@@ -47,6 +47,9 @@ class _parser_base(argparse.ArgumentParser):
 		from .cmd import help
 		yield help
 
+		from .cmd import tail
+		yield tail
+
 
 	def parse(self, argv):
 		self.args = self.parse_args(argv)

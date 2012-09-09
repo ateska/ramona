@@ -2,7 +2,7 @@ import sys, os, socket, signal, errno, weakref, logging, argparse, itertools, ti
 import pyev
 from .. import cnscom
 from ..config import config, read_config, config_files, config_includes, get_numeric_loglevel
-from ..cnscom import program_state_enum
+from ..cnscom import program_state_enum, svrcall_error
 from .cnscon import console_connection, message_yield_loghandler, deffered_return
 from .proaster import program_roaster
 from .idlework import idlework_appmixin
@@ -225,6 +225,16 @@ class server_app(program_roaster, idlework_appmixin):
 
 		elif callid == cnscom.callid_ping:
 			return params
+
+		elif callid == cnscom.callid_tail:
+			kwargs = cnscom.parse_json_kwargs(params)
+			program = kwargs.pop('program')
+			try:
+				program = self.get_program(program)
+			except KeyError, e:
+				raise svrcall_error("{0}".format(e.message))
+			
+			return program.tail(**kwargs)
 
 		else:
 			L.error("Received unknown callid: {0}".format(callid))

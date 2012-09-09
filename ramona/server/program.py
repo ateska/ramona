@@ -337,3 +337,11 @@ class program(object):
 			if watcher.data == 0: self.log_out.write(data)
 			elif watcher.data == 1: self.log_err.write(data)
 
+
+	def tail(self, stream):
+		if stream == 'stdout':
+			return self.log_out.tail()
+		elif stream == 'stderr':
+			return self.log_err.tail()
+		else:
+			raise ValueError("Unknown stream '{0}'".format(stream))

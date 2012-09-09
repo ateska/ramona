@@ -28,6 +28,12 @@ Program roaster is object that control all configured programs, their start/stop
 			self.roaster.append(sp)
 
 
+	def get_program(self, ident):
+		for p in self.roaster:
+			if p.ident == ident: return p
+		raise KeyError("Unknown program '{0}' requested".format(ident))
+
+
 	def filter_roaster_iter(self, pfilter=None):
 		if pfilter is None:
 			for p in self.roaster: yield p
