@@ -2,8 +2,8 @@ import sys, os, time, logging, shlex, signal, errno
 import pyev
 from ..config import config, get_boolean
 from ..utils import parse_signals, MAXFD, enable_nonblocking, disable_nonblocking
-from ..kmpsearch import kmp_search
 from ..cnscom import program_state_enum
+from .tailbuf import tailbuf
 
 #
 
@@ -97,40 +97,43 @@ class program(object):
 			return			
 
 		# Stdout settings
-		self.log_out = None
 		if stdout_cnf == '<logdir>':
 			if stderr_cnf  in ('<stderr>','<null>') :
-				self.log_out_fname = os.path.join(config.get('general','logdir'), self.ident + '.log')
+				fname = os.path.join(config.get('general','logdir'), self.ident + '.log')
 			else:
-				self.log_out_fname = os.path.join(config.get('general','logdir'), self.ident + '-out.log')
+				fname = os.path.join(config.get('general','logdir'), self.ident + '-out.log')
+			self.log_out = tailbuf(fname)
 		elif stdout_cnf == '<stderr>':
-			self.log_out_fname = None
+			pass
 		elif stdout_cnf == '<null>':
-			self.log_out_fname = None
+			self.log_out = tailbuf(None)
 		elif stdout_cnf[:1] == '<':
 			L.error("Unknown stdout option in {0} -> CFGERROR".format(config_section))
 			self.state = program_state_enum.CFGERROR
 			return			
 		else:
-			self.log_out_fname = stdout_cnf
+			self.log_out = tailbuf(stdout_cnf)
 
 		# Stderr settings
-		self.log_err = None
 		if stderr_cnf == '<logdir>':
 			if stdout_cnf in ('<stderr>','<null>') :
-				self.log_err_fname = os.path.join(config.get('general','logdir'), self.ident + '.log')
+				fname = os.path.join(config.get('general','logdir'), self.ident + '.log')
 			else:
-				self.log_err_fname = os.path.join(config.get('general','logdir'), self.ident + '-err.log')
+				fname = os.path.join(config.get('general','logdir'), self.ident + '-err.log')
+			self.log_err = tailbuf(fname)
 		elif stderr_cnf == '<stdout>':
-			self.log_err_fname = None
+			self.log_err = self.log_out
 		elif stderr_cnf == '<null>':
-			self.log_err_fname = None
+			self.log_err = tailbuf(None)
 		elif stderr_cnf[:1] == '<':
 			L.error("Unknown stderr option in {0} -> CFGERROR".format(config_section))
 			self.state = program_state_enum.CFGERROR
 			return
 		else:
-			self.log_err_fname = stderr_cnf
+			self.log_err = tailbuf(stderr_cnf)
+
+		if stdout_cnf == '<stderr>':
+			self.log_out = self.log_err
 
 		# Environment variables
 		self.env = os.environ.copy()
@@ -141,9 +144,6 @@ class program(object):
 				else:
 					self.env.pop(name, 0)
 		self.env['RAMONA_SECTION'] = config_section
-
-		# Log searching (just example)
-		self.kmp = kmp_search('error')
 
 
 	def __repr__(self):
@@ -205,17 +205,6 @@ class program(object):
 
 		L.debug("{0} -> STARTING".format(self))
 
-		if self.log_out_fname is not None:
-			self.log_out = open(self.log_out_fname,'a')
-
-		if self.log_err_fname is not None:
-			self.log_err = open(self.log_err_fname,'a')
-
-		if self.config['stdout'] == '<stderr>':
-			self.log_out = self.log_err
-		elif self.config['stderr'] == '<stdout>':
-			self.log_err = self.log_out
-
 		self.pid = self.spawn(self.cmdline[0], self.cmdline) #TODO: self.cmdline[0] can be substituted by self.ident or any arbitrary string
 		self.state = program_state_enum.STARTING
 		self.start_time = time.time()
@@ -264,7 +253,7 @@ class program(object):
 						break
 					raise
 				if len(data) == 0: break
-				self.__process_output(self.log_out, 0, data)
+				self.log_out.write(data)
 			os.close(self.stdout)
 			self.stdout = None
 
@@ -282,19 +271,13 @@ class program(object):
 						break
 					raise
 				if len(data) == 0: break
-				self.__process_output(self.log_err, 1, data)
+				self.log_err.write(data)
 			os.close(self.stderr)
 			self.stderr = None
 
 		# Close log files
-		if self.log_out is not None:
-			self.log_out.close()
-
-		if self.log_err is not None and self.log_out != self.log_err:
-			self.log_err.close()
-
-		self.log_out = None
-		self.log_err = None
+		self.log_out.close()
+		if self.log_out != self.log_err: self.log_err.close()
 
 		# Handle state change properly
 		if self.state == program_state_enum.STARTING:
@@ -351,19 +334,7 @@ class program(object):
 				elif watcher.data == 1: self.stderr = None
 				return 
 			
-			if watcher.data == 0: self.__process_output(self.log_out, 0, data)
-			elif watcher.data == 1: self.__process_output(self.log_err, 1, data)
+			if watcher.data == 0: self.log_out.write(data)
+			elif watcher.data == 1: self.log_err.write(data)
 
-
-	def __process_output(self, logf, sourceid, data):
-			if logf is not None:
-				logf.write(data)
-				logf.flush() #TODO: Maybe something more clever here can be better (check logging.StreamHandler)
-
-			# Following code is just example
-			if sourceid == 1:
-				i = self.kmp.search(data)
-				if i >= 0:
-					# Pattern detected in the data
-					pass
 
