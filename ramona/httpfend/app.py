@@ -303,10 +303,10 @@ def natural_relative_time(diff_sec):
 	elif diff_sec < 60:
 		return '{:0.1f} sec(s) ago'.format(diff_sec)
 	elif diff_sec < 120:
-		return '1 minute ago'
+		return '1 min ago'
 	elif diff_sec < 3600:
-		return '{} minutes ago'.format(diff_sec/60)
+		return '{:0.0f} min(s) ago'.format(diff_sec/60)
 	elif diff_sec < 7200:
 		return '1 hour ago'
 	else:
-		return '{} hours ago'.format(diff_sec/3600)
+		return '{:0.0f} hours ago'.format(diff_sec/3600)
