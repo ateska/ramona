@@ -9,9 +9,15 @@ L = logging.getLogger("httpfendapp")
 
 ###
 
+STRFTIME_FMT = "%d-%b-%Y %H:%M:%S"
+
+###
+
 # Initialize mimetypes
 if not mimetypes.inited:
 		mimetypes.init()
+
+###
 
 class httpfend_app(object):
 
@@ -200,13 +206,20 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			pid = sp.pop('pid', "")
 			ret += '<td>{0}</td>'.format(pid)
 			ret += '<td>{0}</td>'.format(sp.pop('launch_cnt', ""))
-			t = sp.pop('start_time', None)
-			tform = ""
-			if t is not None: tform = time.strftime("%d-%m-%Y %H:%M:%S",time.localtime(t))
-			ret += '<td>{0}</td>'.format(tform)
+
+			u = sp.pop('uptime', None)
+			if u is not None:
+				t = sp.pop('start_time', '?')
+				ret += '<td title="Started at {1}">{0}</td>'.format(natural_relative_time(u), time.strftime(STRFTIME_FMT,time.localtime(t)))
+			else:
+				t = sp.pop('start_time', None)
+				tform = ""
+				if t is not None: tform = time.strftime(STRFTIME_FMT,time.localtime(t))
+				ret += '<td>{0}</td>'.format(tform)
+
 			t = sp.pop('exit_time', None)
 			tform = ""
-			if t is not None: tform = time.strftime("%d-%m-%Y %H:%M:%S",time.localtime(t))
+			if t is not None: tform = time.strftime(STRFTIME_FMT,time.localtime(t))
 			ret += '<td>{0}</td>'.format(tform)
 			ret += '<td>{0}</td>'.format(sp.pop('exit_status',''))
 			
@@ -277,3 +290,23 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			if e.errno == errno.ENOENT and self.cnsconuri.protocol == 'unix': return None
 			raise
 
+
+def natural_relative_time(diff_sec):
+	#TODO: Improve this significantly - maybe even add unit test
+	#if diff.days > 7 or diff.days < 0: return d.strftime('%d %b %y')
+#	elif diff.days == 1:
+#	    return '1 day ago'
+#	elif diff.days > 1:
+#	    return '{} days ago'.format(diff.days)
+	if diff_sec <= 1:
+		return 'just now'
+	elif diff_sec < 60:
+		return '{:0.1f} sec(s) ago'.format(diff_sec)
+	elif diff_sec < 120:
+		return '1 minute ago'
+	elif diff_sec < 3600:
+		return '{} minutes ago'.format(diff_sec/60)
+	elif diff_sec < 7200:
+		return '1 hour ago'
+	else:
+		return '{} hours ago'.format(diff_sec/3600)
