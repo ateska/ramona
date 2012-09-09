@@ -33,7 +33,7 @@ class MyConsoleApp(ramona.console_app):
 Logging
 -------
 - Support for SIGHUP (reopen log files OR reset fully)
-- log rotate
+- log rotate (in log mediator)
 - log rotate of Ramona server log (stdout/stderr redirection)
 
 Configuration
