@@ -70,4 +70,6 @@ HTTP frontend
 
 Manual
 ------
+- Wiki-like
 - Example of init.d script (and modern alternatives like init) for ramona-based app
+- Quick fact sheet
