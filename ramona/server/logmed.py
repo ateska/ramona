@@ -1,5 +1,12 @@
 
-class tailbuf(object):
+class logmediator(object):
+	'''
+	This object serves as mediator between program and its log files.
+
+	It provides following functionality:
+		- log rotation (TODO)
+		- tail buffer (TODO)
+	'''
 
 	def __init__(self, fname):
 		'''
