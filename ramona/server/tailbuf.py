@@ -18,7 +18,7 @@ class tailbuf(object):
 			self.outf = None
 
 
-	def write(self, data, sourceid):
+	def write(self, data):
 		if self.outf is not None:
 			self.outf.write(data)
 			self.outf.flush() #TODO: Maybe something more clever here can be better (check logging.StreamHandler)
