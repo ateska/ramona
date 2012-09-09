@@ -229,7 +229,7 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			ret += "</tr>"
 			
 			if len(sp) > 0:
-				ret += '<tr class="info"><td colspan="2"></td><td colspan="5"><pre class="pre-scrollable">'
+				ret += '<tr class="info"><td colspan="2"></td><td colspan="6"><pre class="pre-scrollable">'
 				ret += cgi.escape(pprint.pformat(sp, width=3))
 				ret += '</pre></td></tr>'
 		
