@@ -18,7 +18,7 @@ class RamonaDevConsoleApp(ramona.console_app):
 		except:
 			pass
 
-		for f in ['MANIFEST', 'demo_history']:
+		for f in ['MANIFEST', 'demo_history', 'ramonadev_history']:
 			try:
 				os.unlink(f)
 			except:
