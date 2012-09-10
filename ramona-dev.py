@@ -37,15 +37,22 @@ class RamonaDevConsoleApp(ramona.console_app):
 
 		return 0 if res.wasSuccessful() else 1
 
+
 	@ramona.tool
 	def sdist(self):
 		'Prepare distribution package'
 		os.execl(sys.executable, sys.executable, 'setup.py', 'sdist', '--formats=gztar,zip', '--owner=root', '--group=root')
 
+
 	@ramona.tool
 	def register(self):
 		'Upload (register) new version to PyPi'
 		os.execl(sys.executable, sys.executable, 'setup.py', 'register', '-r', 'http://testpypi.python.org/pypi')
+
+
+	@ramona.tool
+	def version(self):
+		print ramona.version
 
 
 if __name__ == '__main__':
