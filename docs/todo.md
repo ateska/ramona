@@ -3,12 +3,12 @@ TODO list
 
 Generic
 -------
+- (!HIGH PRIO!): Automatic restart of failed program (configurable)
 - (low prio): SSL (optional) for protecting console-server channel
 - ulimit/resources (similar to core dump)
 - Unify & document sys.exit codes 
 - Reload/reset command (restarting ramona server)
 - [tool:x] support (how to do this properly - config is read __after__ arguments are parsed)
-- Restart of failed program (configurable)
 - console command enable/disable to allow change status during runtime
 - [program:x] disabled 'magic' options:
 	 - e.g. <on-platform linux:mac>
@@ -18,21 +18,10 @@ Windows
 - working on Windows (based on pyev / libev?)
 - daemonizing is not available on Windows - provide Windows Service option instead
 
-Console
--------
-- ramonactl is embeddable in custom python app + it is extendable to provide similar functionality as 'pan.sh':
-
-```python
-class MyConsoleApp(ramona.console_app):
-	pass
-	# Add 'unittest' option ...
-	# Add 'floader' option ...
-```
-
 Logging
 -------
+- (!HIGH PRIO!): log rotate (in log mediator)
 - Support for SIGHUP (reopen log files OR reset fully)
-- log rotate (in log mediator)
 - log rotate of Ramona server log (stdout/stderr redirection)
 - tail '-f' (forever) mode 
 

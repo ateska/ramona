@@ -25,6 +25,25 @@ Features
 - immediate/yield modes of start/stop/restart commands
 - core dump enabled stop of program
 
+Console
+-------
+- ramona console is embeddable in custom python app + it is extendable to provide similar functionality as 'pan.sh':
+```python
+class MyConsoleApp(ramona.console_app):
+
+	@ramona.tool
+	def unittests(self):
+		'Seek for all unit tests and execute them'
+		import unittest
+		tl = unittest.TestLoader()
+		ts = tl.discover('.', '__utest__.py')
+
+		tr = unittest.runner.TextTestRunner(verbosity=2)
+		res = tr.run(ts)
+
+		return 0 if res.wasSuccessful() else 1
+```
+
 Logging
 -------
 - logging configuration:
