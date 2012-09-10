@@ -35,6 +35,7 @@ Logging
 - Support for SIGHUP (reopen log files OR reset fully)
 - log rotate (in log mediator)
 - log rotate of Ramona server log (stdout/stderr redirection)
+- tail '-f' (forever) mode 
 
 Configuration
 -------------
