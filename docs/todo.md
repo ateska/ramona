@@ -12,7 +12,6 @@ Generic
 - console command enable/disable to allow change status during runtime
 - [program:x] disabled 'magic' options:
 	 - e.g. <on-platform linux:mac>
-- silent mode: ./demo.py -s start is still producing some INFO level output (fix it)
 
 Windows
 -------

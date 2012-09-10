@@ -102,7 +102,8 @@ def svrcall(cnssocket, callid, params=""):
 			# Remote server call returned yielded message -> we will continue receiving
 			obj = json.loads(params)
 			obj = logging.makeLogRecord(obj)
-			Lmy.handle(obj)
+			if Lmy.getEffectiveLevel() <= obj.levelno: # Print only if log level allows that
+				Lmy.handle(obj)
 			continue
 
 		else:
