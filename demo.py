@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import os, fnmatch
+import os, sys, fnmatch
 import ramona
 
 class MyDemoConsoleApp(ramona.console_app):
@@ -24,6 +24,16 @@ class MyDemoConsoleApp(ramona.console_app):
 		res = tr.run(ts)
 
 		return 0 if res.wasSuccessful() else 1
+
+	@ramona.tool
+	def sdist(self):
+		'Prepare distribution package'
+		os.execl(sys.executable, sys.executable, 'setup.py', 'sdist', '--formats=gztar,zip', '--owner=root', '--group=root')
+
+	@ramona.tool
+	def register(self):
+		'Prepare distribution package'
+		os.execl(sys.executable, sys.executable, 'setup.py', 'register', '-r', 'http://testpypi.python.org/pypi')
 
 
 if __name__ == '__main__':

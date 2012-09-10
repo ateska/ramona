@@ -1,0 +1,13 @@
+include AUTHORS
+include LICENSE.txt
+include README.md
+
+recursive-include ramona *.py
+
+include ramona/httpfend/index.tmpl.html
+recursive-include ramona/httpfend/static/bootstrap *.css *.js *.png
+recursive-include ramona/httpfend/static/jquery *.js
+recursive-include ramona/httpfend/static/img *.ico *.gif
+
+exclude ramona/server/__utest__.py
+exclude ramona/__utest__.py

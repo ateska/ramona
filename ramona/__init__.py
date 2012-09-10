@@ -16,3 +16,5 @@ License
 -------
 BSD 2-clause "Simplified" License
 '''
+
+version = '0.2.dev2' # Also in setup.py
