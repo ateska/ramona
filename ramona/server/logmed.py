@@ -56,8 +56,14 @@ class log_mediator(object):
 
 
 	def tail(self):
-		ret = "".join(d for d,_ in self.tailbuf)
-		return ret
+		d = collections.deque()
+		dlen = 0
+		for data, datalen in reversed(self.tailbuf):
+			dlen += datalen
+			if dlen >= 0x7fff: break #Protect maximum IPC data len
+			d.appendleft(data)
+
+		return "".join(d)
 
 # # Following code is just example
 #
