@@ -65,6 +65,10 @@ HTTP frontend
 - (medium prio): Basic authentication
 - (low prio): HTTPS
 
+Deployment
+----------
+- Consider https://help.github.com/articles/splitting-a-subpath-out-into-a-new-repo for embedded deployments (for released versions)
+
 Manual
 ------
 - Wiki-like
