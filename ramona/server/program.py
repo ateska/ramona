@@ -1,4 +1,4 @@
-import sys, os, time, logging, shlex, signal, errno
+import sys, os, time, logging, shlex, signal, errno, resource
 import pyev
 from ..config import config, get_boolean
 from ..utils import parse_signals, MAXFD, enable_nonblocking, disable_nonblocking
@@ -18,12 +18,13 @@ class program(object):
 		'command': None,
 		'starttimeout': 0.5,
 		'stoptimeout': 3,
-		'stopsignal': 'TERM,TERM,INT,TERM,KILL',
+		'stopsignal': 'TERM,TERM,TERM,QUIT,QUIT,INT,INT,KILL',
 		'stdin': '<null>',
 		'stdout': '<stderr>',
 		'stderr': '<logdir>',
 		'priority': 100,
 		'disabled': False,
+		'coredump': False,
 	}
 
 	def __init__(self, loop, config_section):
@@ -36,6 +37,7 @@ class program(object):
 		self.stop_time = None
 		self.exit_time = None
 		self.exit_status = None
+		self.coredump_enabled = None # If true, kill by SIGQUIT -> dump core
 
 		self.stdout = None
 		self.stderr = None
@@ -85,6 +87,16 @@ class program(object):
 			return
 		if dis:
 			self.state = program_state_enum.DISABLED
+
+		self.ulimits = {}
+		#TODO: Enable other ulimits to be specified 
+		try:
+			coredump = get_boolean(self.config.get('coredump',False))
+		except ValueError:
+			L.error("Unknown 'coredump' option '{0}' in {1} -> CFGERROR".format(self.config.get('coredump','?'), config_section))
+			self.state = program_state_enum.CFGERROR
+			return
+		if coredump: self.ulimits[resource.RLIMIT_CORE] = (-1,-1)
 
 
 		# Prepare log files
@@ -187,11 +199,18 @@ class program(object):
 			# open any file descriptors inherited from the parent.
 			os.closerange(3, MAXFD)
 
+			# Set ulimits
+			for k,v in self.ulimits.iteritems():
+				try:
+					resource.setrlimit(k,v)
+				except Exception, e:
+					os.write(2, "WARNING: Setting ulimit '{1}' failed: {0}\n".format(e, k))
+
 			try:
 				os.execvpe(cmd, args, self.env)
 			except Exception, e:
 				os.close(1)
-				os.write(2, "Execution of command '{1}' failed: {0}\n".format(e, cmd))
+				os.write(2, "FATAL: Execution of command '{1}' failed: {0}\n".format(e, cmd))
 				os.close(2)
 
 		finally:
@@ -211,6 +230,7 @@ class program(object):
 		self.stop_time = None
 		self.exit_time = None
 		self.exit_status = None
+		self.coredump_enabled = None
 		self.launch_cnt += 1
 
 
@@ -315,6 +335,9 @@ class program(object):
 
 
 	def get_next_stopsignal(self):
+		if self.coredump_enabled:
+			self.coredump_enabled = None
+			return signal.SIGQUIT
 		if len(self.act_stopsignals) == 0: return signal.SIGKILL
 		return self.act_stopsignals.pop(0)
 
@@ -345,3 +368,11 @@ class program(object):
 			return self.log_err.tail()
 		else:
 			raise ValueError("Unknown stream '{0}'".format(stream))
+
+
+	def charge_coredump(self):
+		l = self.ulimits.get(resource.RLIMIT_CORE, (0,0))
+		if l == (0,0):
+			Lmy.warning("Program {0} is not configured to dump code".format(self.ident))
+			return
+		self.coredump_enabled = True

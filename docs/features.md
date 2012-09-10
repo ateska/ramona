@@ -23,6 +23,7 @@ Features
 - @tool support (in methods in console_app class)
 - working directory is changed during console start to the location of console app script (should be root of the app)
 - immediate/yield modes of start/stop/restart commands
+- core dump enabled stop of program
 
 Logging
 -------

@@ -71,7 +71,7 @@ Program roaster is object that control all configured programs, their start/stop
 		self.__startstop_pad_next(True)
 
 
-	def stop_program(self, cnscon, pfilter=None, force=False):
+	def stop_program(self, cnscon, pfilter=None, force=False, coredump=False):
 		'''
 		Stop processes that are RUNNING and STARTING
 		@param force: If True then it interrupts any concurrently running start/stop sequence.
@@ -92,6 +92,7 @@ Program roaster is object that control all configured programs, their start/stop
 
 		for p in l:
 			if p.state not in (program_state_enum.RUNNING, program_state_enum.STARTING): continue
+			if coredump: p.charge_coredump()
 			self.stop_seq.add(p)		
 
 		self.__startstop_pad_next(False)

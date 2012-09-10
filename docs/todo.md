@@ -4,7 +4,6 @@ TODO list
 Generic
 -------
 - (low prio): SSL (optional) for protecting console-server channel
-- core dump enabled launch/kill
 - Unify & document sys.exit codes 
 - Reload/reset command (restarting ramona server)
 - [tool:x] support (how to do this properly - config is read __after__ arguments are parsed)

@@ -200,10 +200,10 @@ class server_app(program_roaster, idlework_appmixin):
 
 			elif mode == 'exit':
 				if immediate:
-					return self.__init_soft_exit()
+					return self.__init_soft_exit(cnscon=None, **kwargs)
 				else:
 					cnscon.yield_enabled=True
-					self.__init_soft_exit(cnscon=cnscon)
+					self.__init_soft_exit(cnscon=cnscon, **kwargs)
 					return deffered_return
 
 			else:
@@ -277,12 +277,12 @@ class server_app(program_roaster, idlework_appmixin):
 				self.__init_real_exit()
 
 
-	def __init_soft_exit(self, cnscon=None):
+	def __init_soft_exit(self, cnscon=None, **kwargs):
 		if self.termstatus > 1: return
 
 		self.termstatus =  1
 		self.termstatus_change = time.time()
-		self.stop_program(cnscon=cnscon, force=True)
+		self.stop_program(cnscon=cnscon, force=True, **kwargs)
 		self.add_idlework(self.on_tick) # Schedule extra periodic check 
 
 
