@@ -44,7 +44,7 @@ optional arguments:
                         printed).
 
 subcommands:
-  {start,stop,restart,status,help,console,server,clean,unittests}
+  {start,stop,restart,status,help,console,server}
     start               Launch subprocess(es)
     stop                Terminate subprocess(es)
     restart             Restart subprocess(es)
@@ -52,8 +52,6 @@ subcommands:
     help                Display help
     console             Enter interactive console mode
     server              Launch server in the foreground
-    clean               Clean project directory from intermediate files
-    unittests           Seek for all unit tests and execute them
 ```
 
 Links
