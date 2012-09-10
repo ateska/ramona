@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import os, sys, fnmatch
+import os, sys, fnmatch, shutil
 import ramona
 
 class MyDemoConsoleApp(ramona.console_app):
@@ -12,6 +12,18 @@ class MyDemoConsoleApp(ramona.console_app):
 				filename = os.path.join(root, filename)
 				if not os.path.isfile(filename): continue
 				os.unlink(filename)
+
+		try:
+			shutil.rmtree('dist')
+		except:
+			pass
+
+		for f in ['MANIFEST', 'demo_history']:
+			try:
+				os.unlink(f)
+			except:
+				pass
+
 
 	@ramona.tool
 	def unittests(self):
@@ -32,7 +44,7 @@ class MyDemoConsoleApp(ramona.console_app):
 
 	@ramona.tool
 	def register(self):
-		'Prepare distribution package'
+		'Upload (register) new version to PyPi'
 		os.execl(sys.executable, sys.executable, 'setup.py', 'register', '-r', 'http://testpypi.python.org/pypi')
 
 
