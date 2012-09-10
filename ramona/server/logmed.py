@@ -2,7 +2,7 @@ import collections
 
 ###
 
-class logmediator(object):
+class log_mediator(object):
 	'''
 	This object serves as mediator between program and its log files.
 

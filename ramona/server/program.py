@@ -3,7 +3,7 @@ import pyev
 from ..config import config, get_boolean
 from ..utils import parse_signals, MAXFD, enable_nonblocking, disable_nonblocking
 from ..cnscom import program_state_enum
-from .logmed import logmediator
+from .logmed import log_mediator
 
 #
 
@@ -102,17 +102,17 @@ class program(object):
 				fname = os.path.join(config.get('general','logdir'), self.ident + '.log')
 			else:
 				fname = os.path.join(config.get('general','logdir'), self.ident + '-out.log')
-			self.log_out = logmediator(fname)
+			self.log_out = log_mediator(fname)
 		elif stdout_cnf == '<stderr>':
 			pass
 		elif stdout_cnf == '<null>':
-			self.log_out = logmediator(None)
+			self.log_out = log_mediator(None)
 		elif stdout_cnf[:1] == '<':
 			L.error("Unknown stdout option in {0} -> CFGERROR".format(config_section))
 			self.state = program_state_enum.CFGERROR
 			return			
 		else:
-			self.log_out = logmediator(stdout_cnf)
+			self.log_out = log_mediator(stdout_cnf)
 
 		# Stderr settings
 		if stderr_cnf == '<logdir>':
@@ -120,17 +120,17 @@ class program(object):
 				fname = os.path.join(config.get('general','logdir'), self.ident + '.log')
 			else:
 				fname = os.path.join(config.get('general','logdir'), self.ident + '-err.log')
-			self.log_err = logmediator(fname)
+			self.log_err = log_mediator(fname)
 		elif stderr_cnf == '<stdout>':
 			self.log_err = self.log_out
 		elif stderr_cnf == '<null>':
-			self.log_err = logmediator(None)
+			self.log_err = log_mediator(None)
 		elif stderr_cnf[:1] == '<':
 			L.error("Unknown stderr option in {0} -> CFGERROR".format(config_section))
 			self.state = program_state_enum.CFGERROR
 			return
 		else:
-			self.log_err = logmediator(stderr_cnf)
+			self.log_err = log_mediator(stderr_cnf)
 
 		if stdout_cnf == '<stderr>':
 			self.log_out = self.log_err
