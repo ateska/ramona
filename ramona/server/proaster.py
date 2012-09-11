@@ -24,7 +24,7 @@ Program roaster is object that control all configured programs, their start/stop
 		self.roaster = []
 		for config_section in config.sections():
 			if config_section.find('program:') != 0: continue
-			sp = program(self.loop, config_section)
+			sp = program(self, config_section)
 			self.roaster.append(sp)
 
 

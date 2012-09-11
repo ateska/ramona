@@ -27,7 +27,7 @@ class program(object):
 		'coredump': False,
 	}
 
-	def __init__(self, loop, config_section):
+	def __init__(self, svrapp, config_section):
 		_, self.ident = config_section.split(':', 2)
 		self.state = program_state_enum.STOPPED
 		self.pid = None
@@ -42,8 +42,8 @@ class program(object):
 		self.stdout = None
 		self.stderr = None
 		self.watchers = [
-			pyev.Io(0, 0, loop, self.__read_stdfd, 0),
-			pyev.Io(0, 0, loop, self.__read_stdfd, 1),
+			pyev.Io(0, 0, svrapp.loop, self.__read_stdfd, 0),
+			pyev.Io(0, 0, svrapp.loop, self.__read_stdfd, 1),
 		]
 
 		# Build configuration
