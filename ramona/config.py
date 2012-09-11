@@ -6,6 +6,8 @@ config_defaults = {
 		'appname' : 'ramona-driven-app',
 		'logdir' : '<none>',
 		'include' : '<siteconf>',
+		'logmaxsize': '{0}'.format(512*1024*1024), # 512Mb
+		'logbackups': '3',
 	},
 	'ramona:server' : {
 		'consoleuri': 'tcp://localhost:9876',

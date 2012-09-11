@@ -74,6 +74,7 @@ stderr=<logdir>
 - (-s/--silent and -d/--debug) command-line options
 - tail command
 	- it works even when output is redirected or null
+- log rotate (options logmaxsize and logbackups) [logmaxsize is not hard limit just a trigger for rotate]
 
 Configuration
 -------------

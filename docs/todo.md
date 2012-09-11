@@ -27,10 +27,10 @@ Windows
 
 Logging
 -------
-- (!HIGH PRIO!): log rotate (in log mediator)
 - Support for SIGHUP (reopen log files OR reset fully)
 - log rotate of Ramona server log (stdout/stderr redirection)
 - tail '-f' (forever) mode 
+- compress older (xxxx.log.2+) log rotated files
 
 Configuration
 -------------
