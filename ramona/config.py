@@ -91,6 +91,7 @@ def read_config(configs=None, use_env=True):
 	if config.get('general', 'logdir') == '<none>':
 		logdir = os.environ.get('LOGDIR')
 		if logdir is None: logdir = '.'
+		logdir = os.path.expanduser(logdir)
 		config.set('general','logdir',logdir)
 
 ###
