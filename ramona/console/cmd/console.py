@@ -1,4 +1,4 @@
-import cmd, logging
+import os, cmd, logging
 import readline #TODO: optional
 from ...config import config
 from ... import cnscom
@@ -74,6 +74,7 @@ def main(cnsapp, args):
 
 		histfile = config.get('ramona:console', 'history')
 		if histfile != '':
+			histfile = os.path.expanduser(histfile)
 			try:
 				readline.read_history_file(histfile)
 			except IOError:
@@ -87,6 +88,10 @@ def main(cnsapp, args):
 			print ""
 		
 		finally:
-			if histfile != '': readline.write_history_file(histfile)
+			if histfile != '':
+				try:
+					readline.write_history_file(histfile)
+				except Exception, e:
+					L.warning("Cannot write console history file '{1}': {0}".format(e, histfile))
 	finally:
 		cnsapp.is_interactive = old_is_interactive

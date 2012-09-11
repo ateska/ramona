@@ -9,11 +9,22 @@ setup(
 	author='Ales Teska',
 	author_email='ales.teska+ramona@gmail.com',
 	version='0.2.dev2', # Also in ramona.__init__.py
-	packages=['ramona'],
+	packages=['ramona','ramona.server','ramona.console','ramona.console.cmd','ramona.httpfend'],
 	license='BSD 2-clause "Simplified" License',
 	long_description=open('README').read(),
 	url='https://github.com/ateska/ramona',
 	requires="pyev",
+	package_data={
+		'ramona.httpfend': [
+			'*.html',
+			'static/jquery/*.js',
+			'static/bootstrap/js/*.js',
+			'static/bootstrap/css/*.css',
+			'static/bootstrap/img/*.png',
+			'static/img/*.gif',
+			'static/img/*.ico',
+			]
+	},
 	classifiers=[
 		'Development Status :: 3 - Alpha',
 		'Environment :: Console',
