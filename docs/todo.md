@@ -1,6 +1,12 @@
 TODO list
 =========
 
+Issues
+------
+- site.conf in striga has different format than site.conf in ramona
+- striga (or maybe any program) ends 'too' quickly based on log files
+
+
 Generic
 -------
 - (!HIGH PRIO!): Automatic restart of failed program (configurable)
@@ -12,6 +18,7 @@ Generic
 - console command enable/disable to allow change status during runtime
 - [program:x] disabled 'magic' options:
 	 - e.g. <on-platform linux:mac>
+- [tool:x] - support floader case (hand-over to other executable)
 
 Windows
 -------
