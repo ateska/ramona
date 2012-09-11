@@ -23,46 +23,46 @@ class _console_cmd(cmd.Cmd):
 
 
 	def __init__(self, cnsapp):
-		cmd.Cmd.__init__(self)
 		self.prompt = '> '
 		self.cnsapp = cnsapp
+
 		from ..parser import consoleparser
 		self.parser = consoleparser(self.cnsapp)
+
+		# Build dummy method for each command in the parser
 		for m in self.parser.subcommands.keys():
-			exec "def do_{0}(self, s): print 'aaa'".format(m)
-			setattr(self.__class__, "do_{0}".format(m), locals()["do_{0}".format(m)])
-		
+			def do_cmd_template(self, _cmdline):
+				try:
+					self.parser.execute(self.cnsapp)
+				except Exception, e:
+					L.error("{0}".format(e))
+
+			setattr(self.__class__, "do_{0}".format(m), do_cmd_template)
+
+		cmd.Cmd.__init__(self)
 	
-	def onecmd(self, line):
-		if line == 'EOF':
-			print ""
-			return True
 
-		line = line.strip()
-		if line == '':
-			# Send 'ping' to server
-			try:
-				self.cnsapp.svrcall(cnscom.callid_ping, '', auto_connect=True)
-			except Exception, e:
-				L.error("{0}".format(e))
-			return False
-
-		if line == '?':
-			line = 'help'
-		
+	def precmd(self, line):
+		if line == '': return ''
 		try:
 			self.parser.parse(line.split())
 		except SyntaxError:
-			return False
+			return '__nothing'
 		except SystemExit:
-			return False
+			return '__nothing'
 
+		return line
+
+
+	def emptyline(self):
+		# Send 'ping' to server
 		try:
-			self.parser.execute(self.cnsapp)
+			self.cnsapp.svrcall(cnscom.callid_ping, '', auto_connect=True)
 		except Exception, e:
 			L.error("{0}".format(e))
-		
-		return False
+
+
+	def do___nothing(self, _): pass
 
 #
 
@@ -84,6 +84,9 @@ def main(cnsapp, args):
 		try:
 			c.cmdloop()
 		
+		except Exception, e:
+			L.exception("Exception during cmd loop:")
+
 		except KeyboardInterrupt:
 			print ""
 		

@@ -52,6 +52,7 @@ class _parser_base(argparse.ArgumentParser):
 
 
 	def parse(self, argv):
+		self.args = None # This is to allow re-entrant parsing
 		self.args = self.parse_args(argv)
 		
 
