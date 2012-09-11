@@ -1,4 +1,4 @@
-import collections
+import collections, io, os
 
 ###
 
@@ -24,6 +24,22 @@ class log_mediator(object):
 		self.tailbuf = collections.deque()
 		self.tailbuflen = 0
 
+		# Read last content of the file into tail buffer
+		if self.fname is not None:
+			if os.path.isfile(self.fname):
+				with io.open(self.fname, 'r') as logf:
+					if logf.seekable():
+						logf.seek(0,io.SEEK_END)
+						p = logf.tell()
+						d = p - self.maxtailbuflen
+						if d < 0: d = 0
+						logf.seek(d, io.SEEK_SET)
+						while True:
+							data = logf.readline(4096)
+							datalen = len(data)
+							if datalen == 0: break
+							self.__add_to_tailbuf(data)
+
 
 	def open(self):
 		if self.outf is None and self.fname is not None:
@@ -41,6 +57,10 @@ class log_mediator(object):
 			self.outf.write(data)
 			self.outf.flush() #TODO: Maybe something more clever here can be better (check logging.StreamHandler)
 
+		self.__add_to_tailbuf(data)
+
+
+	def __add_to_tailbuf(self, data):
 		# Add data to tail buffer
 		datalen = len(data)
 		self.tailbuf.append((data, datalen))
