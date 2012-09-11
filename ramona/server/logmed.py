@@ -25,20 +25,17 @@ class log_mediator(object):
 		self.tailbuflen = 0
 
 		# Read last content of the file into tail buffer
-		if self.fname is not None:
-			if os.path.isfile(self.fname):
-				with io.open(self.fname, 'r') as logf:
-					if logf.seekable():
-						logf.seek(0,io.SEEK_END)
-						p = logf.tell()
-						d = p - self.maxtailbuflen
-						if d < 0: d = 0
-						logf.seek(d, io.SEEK_SET)
-						while True:
-							data = logf.readline(4096)
-							datalen = len(data)
-							if datalen == 0: break
-							self.__add_to_tailbuf(data)
+		if self.fname is not None and os.path.isfile(self.fname):
+			with io.open(self.fname, 'r') as logf:
+				if logf.seekable(): 
+					logf.seek(0, io.SEEK_END)
+					d = max(logf.tell() - self.maxtailbuflen, 0)
+					logf.seek(d, io.SEEK_SET) # Seek to tail start position (end of file - maxtailbuflen)
+					while True: # Read line by line into tail buffer
+						data = logf.readline(4096)
+						datalen = len(data)
+						if datalen == 0: break
+						self.__add_to_tailbuf(data)
 
 
 	def open(self):
