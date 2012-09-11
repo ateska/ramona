@@ -81,15 +81,17 @@ def svrcall(cnssocket, callid, params=""):
 
 			resp += ndata
 
-
 		magic, retype, paramlen = struct.unpack(resp_struct_fmt, resp)
 		assert magic == resp_magic
 
-		if paramlen > 0: #This is here because Linux blocks when socket.recv(0) is called (even if data are available) 
-			params = cnssocket.recv(paramlen)
-		else:
-			params = ""
-			
+		# Read rest of the response (size given by paramlen)
+		params = ""
+		while paramlen > 0:
+			ndata = cnssocket.recv(paramlen)
+			params += ndata
+			paramlen -= len(ndata)
+
+
 		if retype == resp_return:
 			# Remote server call returned normally
 			return params
