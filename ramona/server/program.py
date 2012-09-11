@@ -225,6 +225,8 @@ class program(object):
 		L.debug("{0} -> STARTING".format(self))
 
 		self.pid = self.spawn(self.cmdline[0], self.cmdline) #TODO: self.cmdline[0] can be substituted by self.ident or any arbitrary string
+		self.log_out.open()
+		self.log_err.open()
 		self.state = program_state_enum.STARTING
 		self.start_time = time.time()
 		self.stop_time = None

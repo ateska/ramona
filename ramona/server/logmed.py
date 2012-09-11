@@ -19,14 +19,16 @@ class log_mediator(object):
 		@param fname: name of connected log file, can be None if no log is connected
 		'''
 		self.fname = fname
-		if self.fname is not None:
-			self.outf = open(self.fname,'a')
-		else:
-			self.outf = None
+		self.outf = None
 
 		self.tailbuf = collections.deque()
 		self.tailbuflen = 0
 
+
+	def open(self):
+		if self.outf is None and self.fname is not None:
+			self.outf = open(self.fname,'a')
+			
 
 	def close(self):
 		if self.outf is not None:
