@@ -26,8 +26,13 @@ class _console_cmd(cmd.Cmd):
 		cmd.Cmd.__init__(self)
 		self.prompt = '> '
 		self.cnsapp = cnsapp
-
-
+		from ..parser import consoleparser
+		self.parser = consoleparser(self.cnsapp)
+		for m in self.parser.subcommands.keys():
+			exec "def do_{0}(self, s): print 'aaa'".format(m)
+			setattr(self.__class__, "do_{0}".format(m), locals()["do_{0}".format(m)])
+		
+	
 	def onecmd(self, line):
 		if line == 'EOF':
 			print ""
@@ -44,23 +49,19 @@ class _console_cmd(cmd.Cmd):
 
 		if line == '?':
 			line = 'help'
-
-		from ..parser import consoleparser
-		
-		parser = consoleparser(self.cnsapp)
 		
 		try:
-			parser.parse(line.split())
+			self.parser.parse(line.split())
 		except SyntaxError:
 			return False
 		except SystemExit:
 			return False
 
 		try:
-			parser.execute(self.cnsapp)
+			self.parser.execute(self.cnsapp)
 		except Exception, e:
 			L.error("{0}".format(e))
-
+		
 		return False
 
 #
