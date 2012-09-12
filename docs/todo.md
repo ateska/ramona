@@ -1,11 +1,6 @@
 TODO list
 =========
 
-Issues
-------
-- site.conf in striga has different format than site.conf in ramona
-- striga (or maybe any program) ends 'too' quickly based on log files
-
 Generic
 -------
 - (!HIGH PRIO!): Automatic restart of failed program (configurable) - autorestart/exitcodes option
