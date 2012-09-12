@@ -6,12 +6,12 @@ Issues
 - site.conf in striga has different format than site.conf in ramona
 - striga (or maybe any program) ends 'too' quickly based on log files
 
-
 Generic
 -------
-- (!HIGH PRIO!): Automatic restart of failed program (configurable)
+- (!HIGH PRIO!): Automatic restart of failed program (configurable) - autorestart/exitcodes option
+- Switch for using process group approach (default is on)
 - (low prio): SSL (optional) for protecting console-server channel
-- ulimit/resources (similar to core dump)
+- ulimit/resources (similar to core dump) -> minfds, minprocs
 - Unify & document sys.exit codes 
 - Reload/reset command (restarting ramona server)
 - [tool:x] support (how to do this properly - config is read __after__ arguments are parsed)
@@ -19,6 +19,11 @@ Generic
 - [program:x] disabled 'magic' options:
 	 - e.g. <on-platform linux:mac>
 - [tool:x] - support floader case (hand-over to other executable)
+- test Ramona how it runs in out-of-diskspace conditions
+- 'user' option - If ramona runs as root, this UNIX user account will be used as the account which runs the program. If ramona is not running as root, this option has no effect.
+- 'directory' option
+- 'umask' option
+- platform=darwin option in [program:x] section to limit execution to particular platform
 
 Windows
 -------
