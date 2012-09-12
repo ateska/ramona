@@ -18,6 +18,11 @@ class RamonaDevConsoleApp(ramona.console_app):
 		except:
 			pass
 
+		try:
+			shutil.rmtree('build')
+		except:
+			pass
+
 		for f in ['MANIFEST', 'demo_history', 'ramonadev_history']:
 			try:
 				os.unlink(f)
