@@ -81,10 +81,10 @@ class console_connection(object):
 					except Exception, e:
 						if not isinstance(e, cnscom.svrcall_error):
 							L.exception("Exception during dispatching console call")
-						self.send_exception(e)
+						self.send_exception(e, callid)
 					else:
 						if ret == deffered_return: return
-						self.send_return(ret)
+						self.send_return(ret, callid)
 
 		else:
 			L.debug("Connection closed by peer")
@@ -132,7 +132,7 @@ class console_connection(object):
 		self.close()
 
 
-	def send_return(self, ret):
+	def send_return(self, ret, callid='-'):
 		'''
 		Internal function that manages communication of response (type return) to the console (client).
 		'''
@@ -141,11 +141,11 @@ class console_connection(object):
 		lenret = len(ret)
 		if lenret >= 0x7fff:
 			self.handle_error()
-			raise RuntimeError("Transmitted parameters are too long.")
+			raise RuntimeError("Transmitted return value is too long (callid={0})".format(callid))
 		self.write(struct.pack(cnscom.resp_struct_fmt, cnscom.resp_magic, cnscom.resp_return, lenret) + ret)
 
 
-	def send_exception(self, e):
+	def send_exception(self, e, callid='-'):
 		'''
 		Internal function that manages communication of response (type exception) to the console (client).
 		'''
@@ -154,7 +154,7 @@ class console_connection(object):
 		lenret = len(ret)
 		if lenret >= 0x7fff:
 			self.handle_error()
-			raise RuntimeError("Transmitted parameters are too long.")
+			raise RuntimeError("Transmitted exception is too long (callid={0})".format(callid))
 		self.write(struct.pack(cnscom.resp_struct_fmt, cnscom.resp_magic, cnscom.resp_exception, lenret) + ret)
 
 
@@ -163,7 +163,7 @@ class console_connection(object):
 
 		messagelen = len(message)
 		if messagelen >= 0x7fff:
-			raise RuntimeError("Transmitted message is too long.")
+			raise RuntimeError("Transmitted yield message is too long.")
 
 		self.write(struct.pack(cnscom.resp_struct_fmt, cnscom.resp_magic, cnscom.resp_yield_message, messagelen) + message)
 
