@@ -18,7 +18,7 @@ class program(object):
 		'command': None,
 		'starttimeout': 0.5,
 		'stoptimeout': 3,
-		'stopsignal': 'TERM,TERM,TERM,QUIT,QUIT,INT,INT,KILL',
+		'killby': 'TERM,TERM,TERM,QUIT,QUIT,INT,INT,KILL',
 		'stdin': '<null>',
 		'stdout': '<stderr>',
 		'stderr': '<logdir>',
@@ -63,7 +63,7 @@ class program(object):
 			return
 
 		self.cmdline = shlex.split(cmd)
-		self.stopsignals = parse_signals(self.config['stopsignal'])
+		self.stopsignals = parse_signals(self.config['killby'])
 		if len(self.stopsignals) == 0: self.stopsignals = [signal.SIGTERM]
 		self.act_stopsignals = None
 
