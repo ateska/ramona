@@ -16,6 +16,7 @@ def main(svrapp, pfilter=None):
 		if p.start_time is not None:
 			i['start_time'] = p.start_time
 			if p.exit_time is None:  i["uptime"] = time.time() - p.start_time
+		if p.autorestart_cnt > 0: i['autorestart_cnt'] = p.autorestart_cnt
 		ret.append(i)
 
 	return json.dumps(ret)
