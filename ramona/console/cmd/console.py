@@ -51,8 +51,8 @@ class _console_cmd(cmd.Cmd):
 		try:
 			self.parser.parse(line.split())
 		except SyntaxError:
-			return '__nothing'
-
+			self.parser.parse(['help'])
+			return 'help'
 		return line
 
 
@@ -62,14 +62,7 @@ class _console_cmd(cmd.Cmd):
 			self.cnsapp.svrcall(cnscom.callid_ping, '', auto_connect=True)
 		except Exception, e:
 			L.error("{0}".format(e))
-
-
-	def do___nothing(self, _): pass
 	
-#	def do_EOF(self, parameters):
-#		print
-#		sys.exit(0)
-
 #
 
 def main(cnsapp, args):
