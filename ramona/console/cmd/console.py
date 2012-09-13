@@ -1,5 +1,4 @@
 import os, cmd, logging, sys
-import readline #TODO: optional
 from ...config import config
 from ... import cnscom
 
@@ -16,6 +15,16 @@ L = logging.getLogger("console")
 
 def init_parser(parser):
 	return
+
+###
+
+import readline #TODO: optional
+
+# See http://stackoverflow.com/questions/7116038/python-tab-completion-mac-osx-10-7-lion
+if 'libedit' in readline.__doc__:
+	readline.parse_and_bind("bind ^I rl_complete")
+else:
+	readline.parse_and_bind("tab: complete")
 
 ###
 
