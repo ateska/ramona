@@ -61,7 +61,7 @@ Console application (base for custom implementations)
 		logging.basicConfig(
 			level=llvl,
 			stream=sys.stderr,
-			format="%(levelname)s: %(message)s"
+			format="%(asctime)s %(levelname)s: %(message)s",
 		)
 		if self.argparser.args.debug:
 			L.debug("Debug output is enabled.")

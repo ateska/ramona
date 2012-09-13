@@ -35,7 +35,11 @@ class httpfend_app(object):
 			loglvl = get_numeric_loglevel(config.get(os.environ['RAMONA_SECTION'], 'loglevel'))
 		except:
 			loglvl = logging.INFO
-		logging.basicConfig(level=loglvl)
+		logging.basicConfig(
+			level=loglvl,
+			stream=sys.stderr,
+			format="%(asctime)s %(levelname)s: %(message)s",
+		)
 
 		try:
 			host = config.get(os.environ['RAMONA_SECTION'], 'host')

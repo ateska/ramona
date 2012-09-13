@@ -37,7 +37,7 @@ class server_app(program_roaster, idlework_appmixin):
 		logging.basicConfig(
 			level=loglvl,
 			stream=sys.stderr,
-			format="%(levelname)s: %(message)s"
+			format="%(asctime)s %(levelname)s: %(message)s",
 			)
 		# Prepare message yield logger
 		my_logger = logging.getLogger('my')

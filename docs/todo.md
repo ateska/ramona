@@ -26,7 +26,6 @@ Windows
 
 Logging
 -------
-- Timestamps to logs
 - Support for SIGHUP (reopen log files OR reset fully)
 - log rotate of Ramona server log (stdout/stderr redirection)
 - tail '-f' (forever) mode 
