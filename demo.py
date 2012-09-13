@@ -8,4 +8,3 @@ class MyDemoConsoleApp(ramona.console_app):
 if __name__ == '__main__':
 	app = MyDemoConsoleApp(configuration='./demo.conf')
 	app.run()
- 

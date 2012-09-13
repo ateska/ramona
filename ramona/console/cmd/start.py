@@ -1,5 +1,6 @@
 import json
 from ... import cnscom
+from .. import exception
 ###
 
 name = 'start'

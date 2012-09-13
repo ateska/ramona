@@ -12,7 +12,7 @@ and instead of that, current process will be replaced by launched server.
 
 All file descriptors above 2 are closed.
 	'''
-	from .config import config, config_files
+	from .config import config_files
 
 	env = os.environ.copy()
 	env['RAMONA_CONFIG'] = ':'.join(config_files)
