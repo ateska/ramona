@@ -227,7 +227,7 @@ class program(object):
 			os._exit(3)
 
 
-	def start(self):
+	def start(self, reset_autorestart_cnt=True):
 		'''Transition to state STARTING'''
 		assert self.state in (program_state_enum.STOPPED, program_state_enum.FATAL)
 
@@ -243,6 +243,7 @@ class program(object):
 		self.exit_status = None
 		self.coredump_enabled = None
 		self.launch_cnt += 1
+		if reset_autorestart_cnt: self.autorestart_cnt = 0
 
 
 	def stop(self):
@@ -327,7 +328,7 @@ class program(object):
 				L.warning("{0} exited unexpectedly -> FATAL -> autorestart".format(self))
 				self.state = program_state_enum.FATAL
 				self.autorestart_cnt += 1
-				self.start()
+				self.start(reset_autorestart_cnt=False)
 			else:
 				Lmy.info("{0} exited unexpectedly (now in FATAL state)".format(self.ident))
 				L.warning("{0} exited unexpectedly -> FATAL".format(self))
