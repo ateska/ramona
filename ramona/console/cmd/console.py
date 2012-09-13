@@ -1,4 +1,4 @@
-import os, cmd, logging
+import os, cmd, logging, sys
 import readline #TODO: optional
 from ...config import config
 from ... import cnscom
@@ -44,11 +44,13 @@ class _console_cmd(cmd.Cmd):
 
 	def precmd(self, line):
 		if line == '': return ''
+		if line == "EOF":
+			print
+			sys.exit(0)
+			
 		try:
 			self.parser.parse(line.split())
 		except SyntaxError:
-			return '__nothing'
-		except SystemExit:
 			return '__nothing'
 
 		return line
@@ -63,6 +65,10 @@ class _console_cmd(cmd.Cmd):
 
 
 	def do___nothing(self, _): pass
+	
+#	def do_EOF(self, parameters):
+#		print
+#		sys.exit(0)
 
 #
 
