@@ -18,7 +18,6 @@ Generic
 - 'user' option - If ramona runs as root, this UNIX user account will be used as the account which runs the program. If ramona is not running as root, this option has no effect.
 - 'directory' option
 - 'umask' option
-- platform=darwin option in [program:x] section to limit execution to particular platform
 
 Windows
 -------
