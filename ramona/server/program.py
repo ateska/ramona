@@ -25,6 +25,7 @@ class program(object):
 		'priority': 100,
 		'disabled': False,
 		'coredump': False,
+		'autorestart': False,
 	}
 
 	def __init__(self, svrapp, config_section):
@@ -33,6 +34,7 @@ class program(object):
 		self.pid = None
 
 		self.launch_cnt = 0
+		self.autorestart_cnt = 0
 		self.start_time = None
 		self.stop_time = None
 		self.exit_time = None
@@ -89,7 +91,7 @@ class program(object):
 			self.state = program_state_enum.DISABLED
 
 		self.ulimits = {}
-		#TODO: Enable other ulimits to be specified 
+		#TODO: Enable other ulimits..
 		try:
 			coredump = get_boolean(self.config.get('coredump',False))
 		except ValueError:
@@ -97,6 +99,13 @@ class program(object):
 			self.state = program_state_enum.CFGERROR
 			return
 		if coredump: self.ulimits[resource.RLIMIT_CORE] = (-1,-1)
+
+		try:
+			self.autorestart = get_boolean(self.config.get('autorestart',False))
+		except ValueError:
+			L.error("Unknown 'autorestart' option '{0}' in {1} -> CFGERROR".format(self.config.get('autorestart','?'), config_section))
+			self.state = program_state_enum.CFGERROR
+			return
 
 
 		# Prepare log files
@@ -304,7 +313,7 @@ class program(object):
 		# Handle state change properly
 		if self.state == program_state_enum.STARTING:
 			Lmy.error("{0} exited too quickly (now in FATAL state)".format(self.ident))
-			L.warning("{0} exited too quickly (-> FATAL)".format(self))
+			L.warning("{0} exited too quickly -> FATAL".format(self))
 			self.state = program_state_enum.FATAL
 
 		elif self.state == program_state_enum.STOPPING:
@@ -313,9 +322,16 @@ class program(object):
 			self.state = program_state_enum.STOPPED
 
 		else:
-			Lmy.info("{0} exited unexpectedly (now in FATAL state)".format(self.ident))
-			L.warning("{0} exited unexpectedly (-> FATAL)".format(self))
-			self.state = program_state_enum.FATAL
+			if self.autorestart:
+				Lmy.info("{0} exited unexpectedly and going to be restarted".format(self.ident))
+				L.warning("{0} exited unexpectedly -> FATAL -> autorestart".format(self))
+				self.state = program_state_enum.FATAL
+				self.autorestart_cnt += 1
+				self.start()
+			else:
+				Lmy.info("{0} exited unexpectedly (now in FATAL state)".format(self.ident))
+				L.warning("{0} exited unexpectedly -> FATAL".format(self))
+				self.state = program_state_enum.FATAL
 
 
 	def on_tick(self, now):

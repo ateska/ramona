@@ -3,7 +3,7 @@ TODO list
 
 Generic
 -------
-- (!HIGH PRIO!): Automatic restart of failed program (configurable) - autorestart/exitcodes option
+- exitcodes option for autorestart (autorestart=1,2,3)
 - Switch for using process group approach (default is on)
 - (low prio): SSL (optional) for protecting console-server channel
 - ulimit/resources (similar to core dump) -> minfds, minprocs
