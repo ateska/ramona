@@ -50,7 +50,10 @@ class _console_cmd(cmd.Cmd):
 			
 		try:
 			self.parser.parse(line.split())
-		except SyntaxError:
+		except SyntaxError: # To capture cases like 'xxx' (avoid exiting)
+			self.parser.parse(['help'])
+			return 'help'
+		except SystemExit: # To capture cases like 'tail -xxx' (avoid exiting)
 			self.parser.parse(['help'])
 			return 'help'
 		return line
