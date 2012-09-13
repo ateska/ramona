@@ -99,12 +99,17 @@ def read_config(configs=None, use_env=True):
 ###
 
 def get_boolean(value):
+	'''
+	Translates string/<any-type> value into boolean value. It is kind of similar to ConfigParser.getboolean but this one is used also in different places of code
+	'''
 	if value is True: return True
 	if value is False: return False
 
-	if value.upper() in ('TRUE','ON','YES'):
+	value = str(value)
+
+	if value.upper() in ('TRUE','ON','YES','1'):
 		return True
-	elif value.upper() in ('FALSE','OFF','NO'):
+	elif value.upper() in ('FALSE','OFF','NO','0'):
 		return False
 	else:
 		raise ValueError("Invalid boolean string '{0}'' (use one of true, on, yes, false, off or no).".format(value))
