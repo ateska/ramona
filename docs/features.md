@@ -76,6 +76,7 @@ stderr=<logdir>
 - tail command
 	- it works even when output is redirected or null
 - log rotate (options logmaxsize and logbackups) [logmaxsize is not hard limit just a trigger for rotate]
+- print "STARTING" and "EXITED" banners to log_err
 
 Configuration
 -------------

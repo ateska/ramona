@@ -236,6 +236,7 @@ class program(object):
 		self.pid = self.spawn(self.cmdline[0], self.cmdline) #TODO: self.cmdline[0] can be substituted by self.ident or any arbitrary string
 		self.log_out.open()
 		self.log_err.open()
+		self.log_err.write("\n------[ STARTING by Ramona on {0} ]------\n".format(time.strftime("%Y-%m-%d %H:%M:%S")))
 		self.state = program_state_enum.STARTING
 		self.start_time = time.time()
 		self.stop_time = None
@@ -308,6 +309,7 @@ class program(object):
 			self.stderr = None
 
 		# Close log files
+		self.log_err.write("\n------[ EXITED on {0} with status {1} ]------\n".format(time.strftime("%Y-%m-%d %H:%M:%S"), status))
 		self.log_out.close()
 		self.log_err.close()
 
