@@ -292,6 +292,21 @@ Full-Width Styles
   border-bottom-right-radius: 2px;
 }
 
+#pypi_banner {
+  display: block;
+  position: absolute;
+  top:0;
+  right: 200px;
+  z-index: 10;
+  padding: 10px 50px 10px 10px;
+  color: #fff;
+  background: url('../images/download.png') #19E537 no-repeat 95% 50%;
+  font-weight: 700;
+  box-shadow: 0 0 10px rgba(0,0,0,.5);
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
+}
+
 #header_wrap {
   background: #212121;
   background: -moz-linear-gradient(top, #373737, #212121);
