@@ -21,8 +21,11 @@
 					<h2 id="project_tagline">Your next favorite runtime supervisor.</h2>
 
 						<section id="downloads">
+							<!--
 							<a class="zip_download_link" href="https://github.com/ateska/ramona/zipball/master">Download this project as a .zip file</a>
 							<a class="tar_download_link" href="https://github.com/ateska/ramona/tarball/master">Download this project as a tar.gz file</a>
+						-->
+							<a href="http://pypi.python.org/pypi/ramona">Download from PyPi</a>
 						</section>
 				</header>
 		</div>
@@ -31,19 +34,14 @@
 		<div id="main_content_wrap" class="outer">
 			<section id="main_content" class="inner">
 
-<p><em>Ramona</em> is an enterprise-grade runtime supervisor that allows controlling and monitoring software programs during their execution life cycle. It is heavily influenced by supervisord but this is actually written from scratch due to different requirement set.</p>
-
-<p>It is primarily meant to be blended into your project source code set to provide supervisor/console functionality of init.d-like start/stop control, continuous integration (e.g. unit/functional/performance test launcher), deployment automation and other command-line oriented features. It should ideally represent the only executable of the project - kind of 'dispatcher' to rest of project components. It is design the way that you should be able to extend that easily if needed (e.g. to include your own tasks).</p>
-
-<p>It is implemented in Python but it is not limited to be used only in Python projects.</p>
-
+<p><em>Ramona</em> is an enterprise-grade runtime supervisor that allows controlling and monitoring software programs during their execution life cycle.</p>
+<p>It provides supervisor/console functionality of init.d-like start/stop control, continuous integration (e.g. unit/functional/performance test launcher), deployment automation and other command-line oriented features. </p>
 <p>Target platforms are all modern UNIXes, BSD derivates and Windows.</p>
 
 <h3>Quick introduction</h3>
 
 <p>Let's assume your project (named foo) directory looks as follow:</p>
-<pre><code>
-foo/
+<pre><code>foo/
   bin/
     share/
     src/
@@ -52,18 +50,15 @@ foo/
     foo.conf
 </code></pre>
 <p>Ramona system will the provide you with following command-line API:</p>
-<pre><code>
-$ ./foo.py --help
+<pre><code>$ ./foo.py --help
 usage: foo.py [-h] [-c CONFIGFILE] [-d] [-s]
-               {start,stop,restart,status,help,console,server,clean,unittests}
+               {start,stop,restart,status,help,console,server}
                ...
 
 optional arguments:
   -h, --help            show this help message and exit
   -c CONFIGFILE, --config CONFIGFILE
-                        Specify configuration file(s) to read (this option can
-                        be given more times). This will override build-in
-                        application level configuration.
+                        Specify configuration file(s) to read.
   -d, --debug           Enable debug (verbose) output.
   -s, --silent          Enable silent mode of operation (only errors are
                         printed).
@@ -79,12 +74,25 @@ subcommands:
     server              Launch server in the foreground
 </code></pre>
 
-<h3>Authors and Contributors</h3>
+<h3>Download and Installation</h3>
+<h5>Installation using <em>pip</em></h5>
+<pre><code>$ pip install ramona</code></pre>
+
+<h5>Installation using <em>easy_install</em></h5>
+<pre><code>$ easy_install ramona</code></pre>
+
+<h5>Download from</h5>
 <ul>
-		<li>Ales Teska(<a href="https://github.com/ateska" class="user-mention">@ateska</a></li>
-		<li>Jan Stastny(<a href="https://github.com/jstastny" class="user-mention">@jstastny</a></li>
+		<li><a href="http://pypi.python.org/pypi/ramona">Python Package Index</a> (PyPi)</li>
 </ul>
 
+<h3>Authors and Contributors</h3>
+<ul>
+		<li>Ales Teska (<a href="https://github.com/ateska" class="user-mention">@ateska</a>)</li>
+		<li>Jan Stastny (<a href="https://github.com/jstastny" class="user-mention">@jstastny</a>)</li>
+</ul>
+
+</section>
 		<!-- FOOTER  -->
 		<div id="footer_wrap" class="outer">
 			<footer class="inner">
