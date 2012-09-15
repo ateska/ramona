@@ -50,10 +50,24 @@ class RamonaDevConsoleApp(ramona.console_app):
 
 
 	@ramona.tool
-	def register(self):
-		'Upload (register) new version to PyPi'
-		os.execl(sys.executable, sys.executable, 'setup.py', 'register', '-r', 'http://testpypi.python.org/pypi')
+	def upload_test(self):
+		'Upload (register) new version to TestPyPi'
+		os.system("{0} setup.py \
+			sdist --formats=gztar,zip --owner=root --group=root \
+			register -r http://testpypi.python.org/pypi \
+			upload -r http://testpypi.python.org/pypi \
+			".format(sys.executable)
+		)
 
+	@ramona.tool
+	def upload_test(self):
+		'Upload (register) new version to PyPi'
+		os.system("{0} setup.py \
+			sdist --formats=gztar,zip --owner=root --group=root \
+			register -r http://pypi.python.org/pypi \
+			upload -r http://pypi.python.org/pypi \
+			".format(sys.executable)
+		)
 
 	@ramona.tool
 	def version(self):
