@@ -100,6 +100,8 @@ Empty variable (e.g. CLASSPATH in previous example) will explicitly remove menti
 		- [prefix]/etc/[appname].conf (Linux|MacOSX)
 - Application name in configuration ([general] appname)
 - Some options uses 'magic' values (&lt;magic>)
+- [program:x] 'processgroup' switch for using/not-using process group approach (default is on)
+
 
 HTTP frontend
 -------------

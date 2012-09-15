@@ -4,7 +4,6 @@ TODO list
 Generic
 -------
 - exitcodes option for autorestart (autorestart=1,2,3)
-- Switch for using process group approach (default is on)
 - (low prio): SSL (optional) for protecting console-server channel
 - ulimit/resources (similar to core dump) -> minfds, minprocs
 - Unify & document sys.exit codes 

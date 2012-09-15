@@ -26,6 +26,7 @@ class program(object):
 		'disabled': False,
 		'coredump': False,
 		'autorestart': False,
+		'processgroup': True,
 	}
 
 	def __init__(self, svrapp, config_section):
@@ -104,6 +105,13 @@ class program(object):
 			self.autorestart = get_boolean(self.config.get('autorestart',False))
 		except ValueError:
 			L.error("Unknown 'autorestart' option '{0}' in {1} -> CFGERROR".format(self.config.get('autorestart','?'), config_section))
+			self.state = program_state_enum.CFGERROR
+			return
+
+		try:
+			get_boolean(self.config.get('processgroup',True))
+		except ValueError:
+			L.error("Unknown 'processgroup' option '{0}' in {1} -> CFGERROR".format(self.config.get('processgroup','?'), config_section))
 			self.state = program_state_enum.CFGERROR
 			return
 
@@ -191,8 +199,9 @@ class program(object):
 			return pid
 
 		try:
-			# Launch in dedicated process group
-			os.setsid()
+			# Launch in dedicated process group (optionally)
+			if get_boolean(self.config.get('processgroup',True)):
+				os.setsid()
 
 			# Stdin/stdout/stderr
 			if self.config['stdin'] == '<null>':
@@ -258,7 +267,10 @@ class program(object):
 		self.act_stopsignals = self.stopsignals[:]
 		signal = self.get_next_stopsignal()
 		try:
-			os.kill(-self.pid, signal) # Killing whole process group
+			if get_boolean(self.config.get('processgroup',True)):
+				os.kill(-self.pid, signal) # Killing whole process group
+			else:
+				os.kill(self.pid, signal)
 		except:
 			pass
 		self.state = program_state_enum.STOPPING
@@ -350,7 +362,10 @@ class program(object):
 				L.warning("{0} is still terminating - sending another signal".format(self))
 				signal = self.get_next_stopsignal()
 				try:
-					os.kill(-self.pid, signal) # Killing whole process group
+					if get_boolean(self.config.get('processgroup',True)):
+						os.kill(-self.pid, signal) # Killing whole process group
+					else:
+						os.kill(self.pid, signal)
 				except:
 					pass
 
