@@ -12,7 +12,7 @@ setup(
 	packages=['ramona','ramona.server','ramona.console','ramona.console.cmd','ramona.httpfend'],
 	license='BSD 2-clause "Simplified" License',
 	long_description=open('README').read(),
-	url='https://github.com/ateska/ramona',
+	url='http://ateska.github.com/ramona/',
 	requires="pyev",
 	package_data={
 		'ramona.httpfend': [
