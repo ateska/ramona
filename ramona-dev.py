@@ -60,7 +60,7 @@ class RamonaDevConsoleApp(ramona.console_app):
 		)
 
 	@ramona.tool
-	def upload_test(self):
+	def upload(self):
 		'Upload (register) new version to PyPi'
 		os.system("{0} setup.py \
 			sdist --formats=gztar,zip --owner=root --group=root \
