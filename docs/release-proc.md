@@ -17,3 +17,7 @@ Release procedure
 		- ./demo.py start
 		- ./demo.py status
 		- ./demo.py stop
+9) Run upload to testpypi.python.org: ./ramona-dev.py upload_test
+10) Check on http://testpypi.python.org/pypi/ramona
+11) Prepare for final release !
+12) Run upload to pypi.python.org: ./ramona-dev.py upload
