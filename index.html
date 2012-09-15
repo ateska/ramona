@@ -33,7 +33,7 @@
 
 <p><em>Ramona</em> is an enterprise-grade runtime supervisor that allows controlling and monitoring software programs during their execution life cycle. It is heavily influenced by supervisord but this is actually written from scratch due to different requirement set.</p>
 
-<p>It is primarily meant to be blended into your project source code set to provide supervisor/console functionality of init.d-like start/stop control, task frontend (e.g. unit/functional/performance test launcher) and other command-line oriented features. It should ideally represent the only executable of the project - kind of 'dispatcher' to rest of a project. It is design the way that you should be able to extend that easily if needed (e.g. to include your own tasks).</p>
+<p>It is primarily meant to be blended into your project source code set to provide supervisor/console functionality of init.d-like start/stop control, continuous integration (e.g. unit/functional/performance test launcher), deployment automation and other command-line oriented features. It should ideally represent the only executable of the project - kind of 'dispatcher' to rest of project components. It is design the way that you should be able to extend that easily if needed (e.g. to include your own tasks).</p>
 
 <p>It is implemented in Python but it is not limited to be used only in Python projects.</p>
 
@@ -42,7 +42,7 @@
 <h3>Quick introduction</h3>
 
 <p>Let's assume your project (named foo) directory looks as follow:</p>
-<code><pre>
+<pre><code>
 foo/
   bin/
     share/
@@ -50,22 +50,40 @@ foo/
     docs/
     foo.py &lt;--- this is Ramona
     foo.conf
-</pre></code>
+</code></pre>
+<p>Ramona system will the provide you with following command-line API:</p>
+<pre><code>
+$ ./foo.py --help
+usage: foo.py [-h] [-c CONFIGFILE] [-d] [-s]
+               {start,stop,restart,status,help,console,server,clean,unittests}
+               ...
 
-<h3>Rather Drive Stick?</h3>
+optional arguments:
+  -h, --help            show this help message and exit
+  -c CONFIGFILE, --config CONFIGFILE
+                        Specify configuration file(s) to read (this option can
+                        be given more times). This will override build-in
+                        application level configuration.
+  -d, --debug           Enable debug (verbose) output.
+  -s, --silent          Enable silent mode of operation (only errors are
+                        printed).
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+subcommands:
+  {start,stop,restart,status,help,console,server}
+    start               Launch subprocess(es)
+    stop                Terminate subprocess(es)
+    restart             Restart subprocess(es)
+    status              Show status of subprocess(es)
+    help                Display help
+    console             Enter interactive console mode
+    server              Launch server in the foreground
+</code></pre>
 
 <h3>Authors and Contributors</h3>
-
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
-
-<h3>Support or Contact</h3>
-
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
-			</section>
-		</div>
-
+<ul>
+		<li>Ales Teska(<a href="https://github.com/ateska" class="user-mention">@ateska</a></li>
+		<li>Jan Stastny(<a href="https://github.com/jstastny" class="user-mention">@jstastny</a></li>
+</ul>
 
 		<!-- FOOTER  -->
 		<div id="footer_wrap" class="outer">
