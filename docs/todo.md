@@ -62,9 +62,3 @@ HTTP frontend
 Deployment
 ----------
 - Consider https://help.github.com/articles/splitting-a-subpath-out-into-a-new-repo for embedded deployments (for released versions)
-
-Manual
-------
-- Wiki-like
-- Example of init.d script (and modern alternatives like init) for ramona-based app
-- Quick fact sheet
