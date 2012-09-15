@@ -316,7 +316,7 @@ class program(object):
 		# Handle state change properly
 		if self.state == program_state_enum.STARTING:
 			Lmy.error("{0} exited too quickly (now in FATAL state)".format(self.ident))
-			L.warning("{0} exited too quickly -> FATAL".format(self))
+			L.error("{0} exited too quickly -> FATAL".format(self))
 			self.state = program_state_enum.FATAL
 
 		elif self.state == program_state_enum.STOPPING:
@@ -326,14 +326,14 @@ class program(object):
 
 		else:
 			if self.autorestart:
-				Lmy.info("{0} exited unexpectedly and going to be restarted".format(self.ident))
-				L.warning("{0} exited unexpectedly -> FATAL -> autorestart".format(self))
+				Lmy.error("{0} exited unexpectedly and going to be restarted".format(self.ident))
+				L.error("{0} exited unexpectedly -> FATAL -> autorestart".format(self))
 				self.state = program_state_enum.FATAL
 				self.autorestart_cnt += 1
 				self.start(reset_autorestart_cnt=False)
 			else:
-				Lmy.info("{0} exited unexpectedly (now in FATAL state)".format(self.ident))
-				L.warning("{0} exited unexpectedly -> FATAL".format(self))
+				Lmy.error("{0} exited unexpectedly (now in FATAL state)".format(self.ident))
+				L.error("{0} exited unexpectedly -> FATAL".format(self))
 				self.state = program_state_enum.FATAL
 
 
