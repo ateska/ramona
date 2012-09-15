@@ -21,4 +21,4 @@ BSD 2-clause "Simplified" License
 # - http://www.python.org/dev/peps/pep-0386/
 # - http://www.python.org/dev/peps/pep-0345/#version-specifiers
 
-version = '0.9b1' # Also in setup.py
+version = 'master' # Also in setup.py
