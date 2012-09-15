@@ -17,4 +17,8 @@ License
 BSD 2-clause "Simplified" License
 '''
 
-version = '0.2.dev2' # Also in setup.py
+#For proper version formatting see:
+# - http://www.python.org/dev/peps/pep-0386/
+# - http://www.python.org/dev/peps/pep-0345/#version-specifiers
+
+version = '0.9b1.dev1' # Also in setup.py
