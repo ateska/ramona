@@ -4,6 +4,7 @@ from .console.cnsapp import console_app, tool
 Ramona - Runtime supervisor
 ===========================
 
+Project page on PyPi: http://pypi.python.org/pypi/ramona
 Project page on GitHub: https://github.com/ateska/ramona 
 
 Authors
