@@ -8,7 +8,7 @@ Release procedure
 5) Check ./setup.py:
 	- version info
 	- classifiers (e.g. Development Status)
-6) Check ./__init__.py:
+6) Check ./ramona/__init__.py:
 	- version info
 7) Check briefly ./README.md and ./README
 8) Run tests:
@@ -21,3 +21,5 @@ Release procedure
 10) Check on http://testpypi.python.org/pypi/ramona
 11) Prepare for final release !
 12) Run upload to pypi.python.org: ./ramona-dev.py upload
+13) Check on http://pypi.python.org/pypi/ramona
+14) Switch back to 'master' branch and enter [VERSION]dev1 into ./setup.py and ./ramona/__init__.py
