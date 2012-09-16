@@ -74,6 +74,13 @@ class RamonaDevConsoleApp(ramona.console_app):
 		print ramona.version
 
 
+	@ramona.tool
+	def manual(self):
+		'Build HTML manual'
+		shutil.rmtree('docs/manual/_build/html')
+		os.system('LC_ALL=en_US.UTF-8 make -C docs/manual html')
+
+
 if __name__ == '__main__':
 	app = RamonaDevConsoleApp(configuration='./ramona.conf')
 	app.run()
