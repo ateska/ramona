@@ -26,7 +26,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Ramona 0.9 beta 1 documentation" href="index.html" />
-    <link rel="next" title="Features" href="features.html" />
+    <link rel="next" title="Installation" href="install.html" />
     <link rel="prev" title="Ramona Documentation" href="index.html" /> 
   </head>
   <body>
@@ -37,7 +37,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="features.html" title="Features"
+          <a href="install.html" title="Installation"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="index.html" title="Ramona Documentation"
@@ -53,7 +53,84 @@
             
   <div class="section" id="introduction">
 <h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
-<p>TODO</p>
+<p>Ramona is runtime supervisor: component of a software product that takes care of smooth start and stop of the solution (including daemonization), of it&#8217;s runtime monitoring (logging, unexpected exits, etc.) and of various tasks that are connected with project like continuous integration, unit test automation, documentation builds etc.</p>
+<p>Full set of features is described <a class="reference external" href="features.html">here</a>.</p>
+<div class="section" id="integration-with-your-project">
+<h2>Integration with your project<a class="headerlink" href="#integration-with-your-project" title="Permalink to this headline">¶</a></h2>
+<p>Assuming you have successfully <a class="reference external" href="install.html">installed</a> Ramona, you can start integrating it with your project.</p>
+<p>You have to provide two files: <strong>supervisor launcher</strong> and its <strong>configuration</strong>.</p>
+<div class="section" id="supervisor-launcher">
+<h3>Supervisor launcher<a class="headerlink" href="#supervisor-launcher" title="Permalink to this headline">¶</a></h3>
+<p>Supervisor launcher is small piece of Python code, that is actually executable by user.</p>
+<p>Assuming your project is called <em>foo</em>, you need to create file <tt class="docutils literal"><span class="pre">foo.py</span></tt> with following content (just copy&amp;paste it).</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/env python</span>
+<span class="kn">import</span> <span class="nn">ramona</span>
+
+<span class="k">class</span> <span class="nc">FooConsoleApp</span><span class="p">(</span><span class="n">ramona</span><span class="o">.</span><span class="n">console_app</span><span class="p">):</span>
+      <span class="k">pass</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+      <span class="n">app</span> <span class="o">=</span> <span class="n">FooConsoleApp</span><span class="p">(</span><span class="n">configuration</span><span class="o">=</span><span class="s">&#39;./foo.conf&#39;</span><span class="p">)</span>
+      <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Make sure that it is marked as executable (e.g. by <tt class="docutils literal"><span class="pre">chmod</span> <span class="pre">a+x</span> <span class="pre">./foo.py</span></tt> on UNIX platform).</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">It is important to use correct version of Python interpreter with Ramona. Some systems happens to have multiple versions installed, so PATH environment variable should be correctly set for relevant user(s) to point to proper Python.</p>
+</div>
+</div>
+<div class="section" id="configuration">
+<h3>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h3>
+<p>You also need to create application-level configuration file which will instruct Ramona what to do.</p>
+<p>Create file named <tt class="docutils literal"><span class="pre">foo.conf</span></tt> (actually referenced from <tt class="docutils literal"><span class="pre">foo.py</span></tt> you just created - you are free to change name based on your preferences).</p>
+<p>Content of the file is as follows:</p>
+<div class="highlight-python"><pre>[general]
+appname=foo
+
+[program:appserver]
+command=[command-to-start-your-app]</pre>
+</div>
+<p><tt class="docutils literal"><span class="pre">[command-to-start-your-app]</span></tt> is command that your project uses to start.</p>
+<p>You can entry <tt class="docutils literal"><span class="pre">[program:x]</span></tt> section more times - for each &#8216;long running&#8217; component of your project.</p>
+</div>
+</div>
+<div class="section" id="basic-usage">
+<h2>Basic usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h2>
+<p>Ramona provides build-in help system.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>./foo.py --help
+usage: foo.py <span class="o">[</span>-h<span class="o">]</span> <span class="o">[</span>-c CONFIGFILE<span class="o">]</span> <span class="o">[</span>-d<span class="o">]</span> <span class="o">[</span>-s<span class="o">]</span>
+              <span class="o">{</span>start,stop,restart,status,help,tail,console,server<span class="o">}</span> ...
+
+optional arguments:
+  -h, --help            show this <span class="nb">help </span>message and <span class="nb">exit</span>
+  -c CONFIGFILE, --config CONFIGFILE
+                        Specify configuration file<span class="o">(</span>s<span class="o">)</span> to <span class="nb">read</span> <span class="o">(</span>this option can
+                        be given more <span class="nb">times</span><span class="o">)</span>. This will override build-in
+                        application level configuration.
+  -d, --debug           Enable debug <span class="o">(</span>verbose<span class="o">)</span> output.
+  -s, --silent          Enable silent mode of operation <span class="o">(</span>only errors are
+                        printed<span class="o">)</span>.
+
+subcommands:
+  <span class="o">{</span>start,stop,restart,status,help,tail,console,server<span class="o">}</span>
+    start               Launch subprocess<span class="o">(</span>es<span class="o">)</span>
+    stop                Terminate subprocess<span class="o">(</span>es<span class="o">)</span>
+    restart             Restart subprocess<span class="o">(</span>es<span class="o">)</span>
+    status              Show status of subprocess<span class="o">(</span>es<span class="o">)</span>
+    <span class="nb">help                </span>Display <span class="nb">help</span>
+<span class="nb">    </span>tail                Tail log of specified program
+    console             Enter interactive console mode
+    server              Launch server in the foreground
+</pre></div>
+</div>
+<p>Start of your application (all programs):</p>
+<div class="highlight-python"><pre>$ ./foo.py start</pre>
+</div>
+<p>Stop of your application (all programs):</p>
+<div class="highlight-python"><pre>$ ./foo.py stop</pre>
+</div>
+</div>
 </div>
 
 
@@ -62,12 +139,25 @@
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Introduction</a><ul>
+<li><a class="reference internal" href="#integration-with-your-project">Integration with your project</a><ul>
+<li><a class="reference internal" href="#supervisor-launcher">Supervisor launcher</a></li>
+<li><a class="reference internal" href="#configuration">Configuration</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#basic-usage">Basic usage</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="index.html"
                         title="previous chapter">Ramona Documentation</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="features.html"
-                        title="next chapter">Features</a></p>
+  <p class="topless"><a href="install.html"
+                        title="next chapter">Installation</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/intro.txt"
@@ -97,7 +187,7 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="features.html" title="Features"
+          <a href="install.html" title="Installation"
              >next</a> |</li>
         <li class="right" >
           <a href="index.html" title="Ramona Documentation"
