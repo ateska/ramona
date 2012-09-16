@@ -22,8 +22,11 @@ Contents:
    :maxdepth: 2
 
    intro.rst
+   install.rst
    features.rst
    quickref.rst
+   credits.rst
+
 .. [TODO]: Example of init.d script (and modern alternatives like init) for ramona-based app
 
 

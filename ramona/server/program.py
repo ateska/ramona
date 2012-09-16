@@ -55,8 +55,9 @@ class program(object):
 
 		cmd = self.config.get('command')
 		if cmd is None:
-			L.fatal("Program {0} doesn't specify command - don't know how to launch it".format(self.ident))
-			sys.exit(2)
+			L.error("Missing command option in {0} -> CFGERROR".format(config_section))
+			self.state = program_state_enum.CFGERROR
+			return
 
 		if cmd == '<httpfend>':
 			cmd = '{0} -u -m ramona.httpfend'.format(sys.executable)
