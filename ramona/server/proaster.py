@@ -44,7 +44,9 @@ Program roaster is object that control all configured programs, their start/stop
 
 		# Pass only known program names
 		not_found = filter_set.difference(roaster_dict)
-		if len(not_found) > 0: raise svrcall_error("Unknown/invalid program names: {0}".format(', '.join(not_found)))
+		if len(not_found) > 0:
+			for pn in not_found:
+				Lmy.error('Unknown/invalid program name: {0}'.format(pn))
 
 		for ident, p in roaster_dict.iteritems():
 			if ident in filter_set: yield p
