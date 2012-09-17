@@ -105,16 +105,28 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 		elif self.path.startswith("/log/"):
 			parsed = urlparse.urlparse(self.path)
 			logname = parsed.path[5:]
-			logdir = config.get("general", "logdir")
-			logpath = os.path.abspath(os.path.join(".", logdir, logname))
+			parts = logname.split("/")
+			if len(parts) < 2:
+				self.send_error(httplib.NOT_FOUND, "Invalid URL.")
+				return
+			stream = parts[0]
+			if stream not in ("stdout", "stderr"):
+				self.send_error(httplib.NOT_FOUND, "'{0}' is not a valid type of stream. Only 'stdout' and 'stderr' are supported.".format(stream))
+				return
+			program = urllib.unquote_plus(parts[1].rpartition(".")[0])
+			conn = self.socket_connect()
+			params = {
+					"program": program,
+					"stream": stream, 
+			}
 			try:
-				with open(logpath, "r") as f:
-					self.send_response(httplib.OK)
-					self.send_header("Content-Type", "text/plain; charset=utf-8")
-					self.end_headers()
-					self.wfile.write(f.read())
+				ret = cnscom.svrcall(conn, cnscom.callid_tail, json.dumps(params))
+				self.send_response(httplib.OK)
+				self.send_header("Content-Type", "text/plain; charset=utf-8")
+				self.end_headers()
+				self.wfile.write(ret)
 			except Exception, e:
-				self.send_error(httplib.NOT_FOUND, str(e))
+				self.send_error(httplib.INTERNAL_SERVER_ERROR, str(e))
 				return
 
 		else:
@@ -183,14 +195,14 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 	
 	def buildStatusTable(self, statuses):
 		ret = '<table id="statusTable" class="table table-hover table-bordered"><thead>'
-		ret += '<tr><th>Process ident.</th><th>Status</th><th>PID</th><th><abbr title="Launch counter">L.cnt.</abbr></th><th>Start time</th><th>Exit time</th><th>Exit code</th><th></th></tr>'
+		ret += '<tr><th>Process ident.</th><th>Status</th><th><abbr title="O = stdout, E = stderr">Log</abbr></th><th>PID</th><th><abbr title="Launch counter">L.cnt.</abbr></th><th>Start time</th><th>Exit time</th><th>Exit code</th><th></th></tr>'
 		ret += "</thead>"
 		ret += "<tbody>"
 		for sp in statuses:
 			ret += "<tr>"
 			ident = sp.pop('ident', '???')
 			#TODO: Log name can be different
-			ret += '<th><a href="/log/{0}.log">{0}</a></th>'.format(cgi.escape(ident))
+			ret += '<th>{0}</th>'.format(cgi.escape(ident))
 			labelCls = "label-inverse"
 			progState = sp.pop("state")
 			
@@ -207,6 +219,7 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			
 			stlbl = cnscom.program_state_enum.labels.get(progState, "({0})".format(progState))
 			ret += '<td><span class="label {0}">{1}</span></td>'.format(labelCls, cgi.escape(stlbl))
+			ret += '<td><a href="/log/stdout/{0}.log" target="_blank">O</a> <a href="/log/stderr/{0}.log" target="_blank">E</a>'.format(urllib.quote_plus(ident))
 			pid = sp.pop('pid', "")
 			ret += '<td>{0}</td>'.format(pid)
 			ret += '<td>{0}</td>'.format(sp.pop('launch_cnt', ""))
@@ -231,14 +244,14 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			if pid != os.getpid():
 				# TODO: Should there be some filtering for STOPPING ???
 				if progState not in (cnscom.program_state_enum.FATAL, cnscom.program_state_enum.RUNNING, cnscom.program_state_enum.STARTING):
-					actions.append('<a class="btn btn-small btn-success" href="/?{0}">Start</a>'.format(cgi.escape(urllib.urlencode([("action", "start"), ("ident", ident)]))))
+					actions.append('<a class="btn btn-small btn-success" href="/?{0}">Start</a>'.format(urllib.urlencode([("action", "start"), ("ident", ident)])))
 				
 				if progState == cnscom.program_state_enum.RUNNING:
-					actions.append('<a class="btn btn-small btn-danger" href="/?{0}">Stop</a>'.format(cgi.escape(urllib.urlencode([("action", "stop"), ("ident", ident)]))))
-					actions.append('<a class="btn btn-small btn-warning" href="/?{0}">Restart</a>'.format(cgi.escape(urllib.urlencode([("action", "restart"), ("ident", ident)]))))
+					actions.append('<a class="btn btn-small btn-danger" href="/?{0}">Stop</a>'.format(urllib.urlencode([("action", "stop"), ("ident", ident)])))
+					actions.append('<a class="btn btn-small btn-warning" href="/?{0}">Restart</a>'.format(urllib.urlencode([("action", "restart"), ("ident", ident)])))
 			
 				if progState == cnscom.program_state_enum.FATAL:
-					actions.append('<a class="btn btn-small btn-inverse" href="/?{0}">Start (force)</a>'.format(cgi.escape(urllib.urlencode([("action", "start"), ("ident", ident), ("force", "1")]))))
+					actions.append('<a class="btn btn-small btn-inverse" href="/?{0}">Start (force)</a>'.format(urllib.urlencode([("action", "start"), ("ident", ident), ("force", "1")])))
 
 
 			ret += '<td>{0}</td>'.format(" ".join(actions))
