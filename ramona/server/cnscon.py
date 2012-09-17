@@ -23,6 +23,7 @@ class console_connection(object):
 		self.write_buf = None
 		
 		self.yield_enabled = False
+		self.return_expected = False # This is synchronization element used in asserts preventing IPC goes out of sync
 
 		self.watcher = pyev.Io(self.sock._sock, pyev.EV_READ, serverapp.loop, self.io_cb)
 		self.watcher.start()
@@ -76,6 +77,7 @@ class console_connection(object):
 					params = self.read_buf[4:4+paramlen]
 					self.read_buf = self.read_buf[4+paramlen:]
 					
+					self.return_expected = True
 					try:
 						ret = self.serverapp.dispatch_svrcall(self, callid, params)
 					except Exception, e:
@@ -136,19 +138,25 @@ class console_connection(object):
 		'''
 		Internal function that manages communication of response (type return) to the console (client).
 		'''
+		assert self.return_expected
+
 		self.yield_enabled = False
 		ret = str(ret)
 		lenret = len(ret)
 		if lenret >= 0x7fff:
 			self.handle_error()
 			raise RuntimeError("Transmitted return value is too long (callid={0})".format(callid))
+		
 		self.write(struct.pack(cnscom.resp_struct_fmt, cnscom.resp_magic, cnscom.resp_return, lenret) + ret)
+		self.return_expected = False
 
 
 	def send_exception(self, e, callid='-'):
 		'''
 		Internal function that manages communication of response (type exception) to the console (client).
 		'''
+		assert self.return_expected
+
 		self.yield_enabled = False
 		ret = str(e)
 		lenret = len(ret)
@@ -156,9 +164,11 @@ class console_connection(object):
 			self.handle_error()
 			raise RuntimeError("Transmitted exception is too long (callid={0})".format(callid))
 		self.write(struct.pack(cnscom.resp_struct_fmt, cnscom.resp_magic, cnscom.resp_exception, lenret) + ret)
+		self.return_expected = False
 
 
 	def yield_message(self, message):
+		assert self.return_expected
 		if not self.yield_enabled: return
 
 		messagelen = len(message)
