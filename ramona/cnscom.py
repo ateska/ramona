@@ -136,7 +136,9 @@ class socket_uri(object):
 			if self.uri.path != '': raise RuntimeError("Path has to be empty in socket URI {0}".format(uri))
 
 		elif self.protocol == 'unix':
-			pass
+			if self.uri.netloc != '':
+				# Special case of situation when netloc is not empty (path is relative)
+				self.uri = self.uri._replace(netloc='', path=self.uri.netloc + self.uri.path)
 
 		else:
 			raise RuntimeError("Unknown/unsuported protocol '{0}' in socket URI {1}".format(self.protocol, uri))
