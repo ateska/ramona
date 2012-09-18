@@ -18,17 +18,17 @@ class kmp_search(object):
 				shift += self.shifts[pos-shift]
 		self.shifts[pos+1] = shift
 
-		self.startPos = 0
-		self.matchLen = 0
+		self.startpos = 0
+		self.matchsel = 0
 
 
 	def search(self, text):
 		for c in text:
-			while self.matchLen == self.patternlen or self.matchLen >= 0 and self.pattern[self.matchLen] != c:
-				self.startPos += self.shifts[self.matchLen]
-				self.matchLen -= self.shifts[self.matchLen]
-			self.matchLen += 1
-			if self.matchLen == self.patternlen:
-				return self.startPos
+			while self.matchsel == self.patternlen or self.matchsel >= 0 and self.pattern[self.matchsel] != c:
+				self.startpos += self.shifts[self.matchsel]
+				self.matchsel -= self.shifts[self.matchsel]
+			self.matchsel += 1
+			if self.matchsel == self.patternlen:
+				return self.startpos
 		return -1
 
