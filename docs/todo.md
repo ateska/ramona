@@ -50,6 +50,7 @@ Mailing to admin
 - On autorestart mail trigger
 - On FATAL mail trigger
 - Mailing issues to admin: https://github.com/ateska/ramona/issues/1
+- Standalone log scanner (not connected to particular program) to enable supervising of e.g. CGI scripts
 
 HTTP frontend
 -------------
