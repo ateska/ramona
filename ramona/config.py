@@ -10,13 +10,13 @@ config_defaults = {
 		'logbackups': '3',
 	},
 	'ramona:server' : {
-		'consoleuri': 'tcp://localhost:9876',
+		'consoleuri': 'unix://.ramona.sock',
 		'pidfile': '',
 		'log': '<logdir>',
 		'loglevel': 'INFO',
 	},
 	'ramona:console' : {
-		'serveruri': 'tcp://localhost:9876',
+		'serveruri': 'unix://.ramona.sock',
 		'history': '',
 	},
 	'ramona:smtp' : {
