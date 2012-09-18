@@ -27,6 +27,8 @@ class program(object):
 		'coredump': False,
 		'autorestart': False,
 		'processgroup': True,
+		'logscan_stdout': '',
+		'logscan_stderr': '',
 	}
 
 	def __init__(self, svrapp, config_section):
@@ -132,17 +134,17 @@ class program(object):
 				fname = os.path.join(config.get('general','logdir'), self.ident + '.log')
 			else:
 				fname = os.path.join(config.get('general','logdir'), self.ident + '-out.log')
-			self.log_out = log_mediator(fname)
+			self.log_out = log_mediator(self.ident, 'stdout', fname)
 		elif stdout_cnf == '<stderr>':
 			pass
 		elif stdout_cnf == '<null>':
-			self.log_out = log_mediator(None)
+			self.log_out = log_mediator(self.ident, 'stdout', None)
 		elif stdout_cnf[:1] == '<':
 			L.error("Unknown stdout option in {0} -> CFGERROR".format(config_section))
 			self.state = program_state_enum.CFGERROR
 			return			
 		else:
-			self.log_out = log_mediator(stdout_cnf)
+			self.log_out = log_mediator(self.ident, 'stdout', stdout_cnf)
 
 		# Stderr settings
 		if stderr_cnf == '<logdir>':
@@ -150,20 +152,43 @@ class program(object):
 				fname = os.path.join(config.get('general','logdir'), self.ident + '.log')
 			else:
 				fname = os.path.join(config.get('general','logdir'), self.ident + '-err.log')
-			self.log_err = log_mediator(fname)
+			self.log_err = log_mediator(self.ident, 'stderr', fname)
 		elif stderr_cnf == '<stdout>':
 			self.log_err = self.log_out
 		elif stderr_cnf == '<null>':
-			self.log_err = log_mediator(None)
+			self.log_err = log_mediator(self.ident, 'stderr', None)
 		elif stderr_cnf[:1] == '<':
 			L.error("Unknown stderr option in {0} -> CFGERROR".format(config_section))
 			self.state = program_state_enum.CFGERROR
 			return
 		else:
-			self.log_err = log_mediator(stderr_cnf)
+			self.log_err = log_mediator(self.ident, 'stderr', stderr_cnf)
 
 		if stdout_cnf == '<stderr>':
 			self.log_out = self.log_err
+
+
+		# Log scans
+		for stream, logmed in [('stdout', self.log_out),('stderr', self.log_err)]:
+
+			for logscanseg in self.config.get('logscan_{0}'.format(stream)).split(','):
+				logscanseg = logscanseg.strip()
+				if logscanseg == '': continue
+
+				try:
+					pattern, target = logscanseg.split('>',1)
+				except ValueError:
+					L.error("Unknown 'logscan_{2}' option '{0}' in {1} -> CFGERROR".format(logscanseg, config_section, stream))
+					self.state = program_state_enum.CFGERROR
+					return
+
+				if target not in ('mail','dailymail'):
+					L.error("Unknown 'logscan_{2}' option '{0}' in {1} -> CFGERROR".format(target, config_section, stream))
+					self.state = program_state_enum.CFGERROR
+					return
+
+				logmed.add_scanner(pattern, target)
+
 
 		# Environment variables
 		self.env = os.environ.copy()

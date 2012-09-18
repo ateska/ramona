@@ -1,5 +1,6 @@
 import re, collections, io, os, glob, logging
 from ..config import config
+from ..kmpsearch import kmp_search
 
 ###
 
@@ -21,12 +22,17 @@ class log_mediator(object):
 	maxtailbuflen = 64*1024 # 64Kb is max len. of tail buffer
 	rotlognamerg = re.compile('\.([0-9]+)$')
 
-	def __init__(self, fname):
+	def __init__(self, prog_ident, stream_name, fname):
 		'''
+		@param prog_ident: identification of the program (x from [program:x])
+		@param stream_name: stdout or stderr
 		@param fname: name of connected log file, can be None if no log is connected
 		'''
+		self.prog_ident = prog_ident
+		self.stream_name = stream_name
 		self.fname = fname
 		self.outf = None
+		self.scanners = []
 
 		self.tailbuf = collections.deque()
 		self.tailbuflen = 0
@@ -72,6 +78,10 @@ class log_mediator(object):
 				self.rotate()
 
 		self.__add_to_tailbuf(data)
+
+		# Search for patterns
+		for s in self.scanners:
+			s.search(data)
 
 
 	def rotate(self):
@@ -131,15 +141,30 @@ class log_mediator(object):
 		return "".join(d)
 
 
-# # Following code is just example
-#
-# Init:
-# Log searching (just example)
-#self.kmp = kmp_search('error')
-#
-# Use:
-# if sourceid == 1:
-# 	i = self.kmp.search(data)
-# 	if i >= 0:
-# 		# Pattern detected in the data
-# 		pass
+	def add_scanner(self, pattern, target):
+		self.scanners.append(
+			_log_scanner(self.prog_ident, self.stream_name, pattern, target)
+		)
+
+
+class _log_scanner(kmp_search):
+
+	def __init__(self, prog_ident, stream_name, pattern, target):
+		kmp_search.__init__(self, pattern)
+		assert target in ('mail','dailymail')
+		self.target = target
+		self.prog_ident = prog_ident
+		self.stream_name = stream_name
+
+
+	def search(self, text):
+		text = text.lower()
+		ret = kmp_search.search(self, text)
+		if ret < 0: return ret
+
+		L.debug("Pattern '{0}' observed for {1} {2} -> {3}.".format(
+			''.join(self.pattern),
+			self.prog_ident,
+			self.stream_name,
+			self.target
+		))
