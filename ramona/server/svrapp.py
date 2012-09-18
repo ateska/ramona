@@ -39,14 +39,15 @@ class server_app(program_roaster, idlework_appmixin):
 			stream=sys.stderr,
 			format="%(asctime)s %(levelname)s: %(message)s",
 			)
+		L.debug("Configuration loaded from: {0}".format(', '.join(itertools.chain(config_files,config_includes))))
+
 		# Prepare message yield logger
 		my_logger = logging.getLogger('my')
 		my_logger.setLevel(logging.DEBUG) 
 		my_logger.addHandler(message_yield_loghandler(self))
 		my_logger.propagate = False
 
-		L.debug("Configuration loaded from: {0}".format(', '.join(itertools.chain(config_files,config_includes))))
-		
+		# Open console communication socket (listen mode)
 		socket_factory = cnscom.socket_uri(config.get("ramona:server", "consoleuri"))
 		try:
 			self.sock = socket_factory.create_socket_listen()
