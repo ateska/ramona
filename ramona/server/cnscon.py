@@ -168,8 +168,8 @@ class console_connection(object):
 
 
 	def yield_message(self, message):
-		assert self.return_expected
 		if not self.yield_enabled: return
+		assert self.return_expected
 
 		messagelen = len(message)
 		if messagelen >= 0x7fff:
