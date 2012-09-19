@@ -1,5 +1,6 @@
 import json, time, itertools, collections, logging
 from ... import cnscom
+from ._completes import complete_ident
 
 ###
 
@@ -14,6 +15,14 @@ L = logging.getLogger('status')
 
 def init_parser(parser):
 	parser.add_argument('program', nargs='*', help='Optionally specify program(s) in scope of the command')
+
+###
+
+def complete(cnsapp, text, line, begidx, endidx):
+        textst = text.strip()
+        ret = []
+        ret.extend(complete_ident(cnsapp, textst))
+        return ret
 
 ###
 

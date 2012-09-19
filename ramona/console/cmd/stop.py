@@ -1,6 +1,8 @@
 import json
 from ... import cnscom
 from .. import exception
+from ._completes import complete_ident
+
 ###
 
 name = 'stop'
@@ -14,6 +16,14 @@ def init_parser(parser):
 	parser.add_argument('-c','--core-dump', action='store_true', help='Stop and dump core (core dump must be enabled in program configuration)')
 	parser.add_argument('-E','--stop-and-exit', action='store_true', help='Stop all programs and exit Ramona server. Command-line default for:\n%(prog)s')
 	parser.add_argument('-T','--stop-and-stay', action='store_true', help='Stop all programs and keep server running.')
+
+###
+
+def complete(cnsapp, text, line, begidx, endidx):
+        textst = text.strip()
+        ret = []
+        ret.extend(complete_ident(cnsapp, textst))
+        return ret
 
 ###
 

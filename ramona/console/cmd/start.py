@@ -1,6 +1,7 @@
 import json
 from ... import cnscom
 from .. import exception
+from ._completes import complete_ident
 ###
 
 name = 'start'
@@ -14,6 +15,14 @@ def init_parser(parser):
 	parser.add_argument('-f','--force-start', action='store_true', help='Force start of processes in FATAL state')
 	parser.add_argument('-S','--server-only', action='store_true', help='Start only server, programs are not launched')
 	parser.add_argument('program', nargs='*', help='Optionally specify program(s) in scope of the command')
+
+###
+
+def complete(cnsapp, text, line, begidx, endidx):
+	textst = text.strip()
+	ret = []
+	ret.extend(complete_ident(cnsapp, textst))
+	return ret
 
 ###
 

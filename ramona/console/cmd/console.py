@@ -39,17 +39,19 @@ class _console_cmd(cmd.Cmd):
 		self.parser = consoleparser(self.cnsapp)
 
 		# Build dummy method for each command in the parser
-		for m in self.parser.subcommands.keys():
+		for cmdname, cmditem in self.parser.subcommands.iteritems():
 			def do_cmd_template(self, _cmdline):
 				try:
 					self.parser.execute(self.cnsapp)
 				except Exception, e:
 					L.error("{0}".format(e))
 
-			setattr(self.__class__, "do_{0}".format(m), do_cmd_template)
+			setattr(self.__class__, "do_{0}".format(cmdname), do_cmd_template)
+			
+			if hasattr(cmditem, "complete"):
+				setattr(self.__class__, "complete_{0}".format(cmdname), cmditem.complete)
 
 		cmd.Cmd.__init__(self)
-	
 
 	def precmd(self, line):
 		if line == '': return ''
