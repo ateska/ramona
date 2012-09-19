@@ -170,7 +170,6 @@ class program(object):
 
 		# Log scans
 		for stream, logmed in [('stdout', self.log_out),('stderr', self.log_err)]:
-
 			for logscanseg in self.config.get('logscan_{0}'.format(stream)).split(','):
 				logscanseg = logscanseg.strip()
 				if logscanseg == '': continue
