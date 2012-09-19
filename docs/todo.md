@@ -29,6 +29,7 @@ Logging
 - log rotate of Ramona server log (stdout/stderr redirection)
 - tail '-f' (forever) mode 
 - compress older (xxxx.log.2+) log rotated files
+- make tail buffer more line oriented
 
 Configuration
 -------------
