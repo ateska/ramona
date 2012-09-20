@@ -25,9 +25,11 @@ class notificator(object):
 					self.delivery = None
 				else:
 					self.delivery = delurl
-					# Connection test
-					smtpcon = smtplib.SMTP(self.delivery.hostname, self.delivery.port)
-					smtpcon.quit()
+					try:# Connection test
+						smtpcon = smtplib.SMTP(self.delivery.hostname, self.delivery.port)
+						smtpcon.quit()
+					except Exception, e:
+						L.warning("Given SMTP server ({1}) is not responding: {0}".format(e, delivery))
 
 					self.sender = config.get('ramona:notify','sender')
 					if self.sender == '<user>':
