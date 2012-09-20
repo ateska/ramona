@@ -19,10 +19,9 @@ config_defaults = {
 		'serveruri': 'unix://.ramona.sock',
 		'history': '',
 	},
-	'ramona:smtp' : {
-		'smtphost': '',
-		'smtpport': '25',
-		'sender': '',
+	'ramona:notify' : {
+		'delivery': '',
+		'sender': '<user>',
 	}
 }
 
