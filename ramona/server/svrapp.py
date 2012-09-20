@@ -7,6 +7,7 @@ from .cnscon import console_connection, message_yield_loghandler, deffered_retur
 from .proaster import program_roaster
 from .idlework import idlework_appmixin
 from .svrappsingl import server_app_singleton
+from .notify import notificator
 
 from . import call_status
 
@@ -73,6 +74,9 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 
 		program_roaster.__init__(self)
 		idlework_appmixin.__init__(self)
+
+		# Build notificator component
+		self.notificator = notificator(self)
 
 
 	def run(self):

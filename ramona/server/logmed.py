@@ -1,6 +1,7 @@
 import re, collections, io, os, glob, logging
 from ..config import config
 from ..kmpsearch import kmp_search
+from .svrappsingl import get_svrapp
 
 ###
 
@@ -80,8 +81,31 @@ class log_mediator(object):
 		self.__add_to_tailbuf(data)
 
 		# Search for patterns
-		for s in self.scanners:
-			s.search(data)
+		if len(self.scanners) > 0:
+			stext = data.lower()
+			for s in self.scanners:
+				r = s.search(stext)
+				if r < 0: continue
+
+				# Take last three tail entries (very likely lines)
+				tail = ""
+				for i in range(-3,0):
+					try:
+						tail += self.tailbuf[i][0]
+					except IndexError:
+						pass
+				tail = tail[-2048:] # Limit result to 2kb of text
+
+				svrapp = get_svrapp()
+				if svrapp is not None:
+					svrapp.notificator.publish(
+						s.target,
+						s.prog_ident,
+						s.stream_name,
+						''.join(s.pattern),
+						tail
+					)
+
 
 
 	def rotate(self):
@@ -156,15 +180,3 @@ class _log_scanner(kmp_search):
 		self.prog_ident = prog_ident
 		self.stream_name = stream_name
 
-
-	def search(self, text):
-		text = text.lower()
-		ret = kmp_search.search(self, text)
-		if ret < 0: return ret
-
-		L.debug("Pattern '{0}' observed for {1} {2} -> {3}.".format(
-			''.join(self.pattern),
-			self.prog_ident,
-			self.stream_name,
-			self.target
-		))
