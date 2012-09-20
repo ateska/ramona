@@ -14,7 +14,7 @@ class log_mediator(object):
 	This object serves as mediator between program and its log files.
 
 	It provides following functionality:
-		- log rotation (TODO)
+		- log rotation
 		- tail buffer (TODO)
 		- seek for patterns in log stream and eventually trigger error mail
 	'''
