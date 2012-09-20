@@ -398,6 +398,7 @@ class program(object):
 	def get_next_stopsignal(self):
 		if self.coredump_enabled:
 			self.coredump_enabled = None
+			L.debug("Core dump enabled for {0} - using SIGQUIT".format(self))
 			return signal.SIGQUIT
 		if len(self.act_stopsignals) == 0: return signal.SIGKILL
 		return self.act_stopsignals.pop(0)
