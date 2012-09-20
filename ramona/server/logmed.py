@@ -175,7 +175,7 @@ class _log_scanner(kmp_search):
 
 	def __init__(self, prog_ident, stream_name, pattern, target):
 		kmp_search.__init__(self, pattern)
-		assert target in ('mail','dailymail')
+		assert target in ('now','daily') or target.startswith('mailto:')
 		self.target = target
 		self.prog_ident = prog_ident
 		self.stream_name = stream_name

@@ -181,7 +181,7 @@ class program(object):
 					self.state = program_state_enum.CFGERROR
 					return
 
-				if target not in ('mail','dailymail'):
+				if target not in ('now','daily') and not target.startswith('mailto:'):
 					L.error("Unknown 'logscan_{2}' option '{0}' in {1} -> CFGERROR".format(target, config_section, stream))
 					self.state = program_state_enum.CFGERROR
 					return
