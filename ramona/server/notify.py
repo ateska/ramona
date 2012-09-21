@@ -10,6 +10,8 @@ L = logging.getLogger('notify')
 
 class notificator(object):
 
+	# Configure urlparce
+	if 'smtp' not in urlparse.uses_params: urlparse.uses_params.append('smtp')
 
 	def __init__(self, svrapp):
 		self.appname = config.get('general','appname')
@@ -19,13 +21,13 @@ class notificator(object):
 			self.delivery = None
 		else:
 			delurl = urlparse.urlparse(delivery)
-			if delurl.scheme == 'smtp':
+			if delurl.scheme == 'smtp' :
 				if delurl.hostname is None:
 					L.error("Delivery URL has no hostname: {0}".format(delivery))
 					self.delivery = None
 				else:
 					self.delivery = delurl
-					try:# Connection test
+					try: # Connection test
 						smtpcon = smtplib.SMTP(self.delivery.hostname, self.delivery.port)
 						smtpcon.quit()
 					except Exception, e:
@@ -56,17 +58,25 @@ class notificator(object):
 		nfttext += tail	
 		nfttext += '\n'+'-'*80+'\n'
 
+		if target.startswith('mailto'):
+			receiver = urlparse.urlparse(target).path
+		else: 
+			receiver = None
+
 		#TODO: Decide what to do based on 'target' value
 
 		self._send_mail('{0} / {1} / {2} / {3}'.format(
-			self.appname,
-			prog_ident,
-			pattern,
-			hostname,
-			), nfttext)
+				self.appname,
+				prog_ident,
+				pattern,
+				hostname,
+				), 
+			nfttext,
+			receiver
+		)
 
 
-	def _send_mail(self, subject, text):
+	def _send_mail(self, subject, text, receiver=None):
 		try:
 			text = ''.join([
 				'Hello,\n\nRamona detected following condition:\n',
@@ -75,7 +85,11 @@ class notificator(object):
 			])
 
 			sender = self.sender
-			receiver = self.receiver
+			if receiver is None:
+				receiver = self.receiver
+			elif isinstance(receiver, basestring):
+				receiver = [receiver]
+
 
 			msg = MIMEText(text, 'plain', 'utf-8')
 			msg['Subject'] = subject + ' by Ramona'
@@ -83,6 +97,10 @@ class notificator(object):
 			msg['To'] = ', '.join(receiver)
 
 			s = smtplib.SMTP(self.delivery.hostname, self.delivery.port)
+			p = dict(urlparse.parse_qsl(self.delivery.params))
+			if p.get('tls', 1): s.starttls()
+			if self.delivery.username is not None and self.delivery.password is not None:
+				s.login(self.delivery.username, self.delivery.password)
 			s.sendmail(sender, receiver, msg.as_string())
 			s.quit()
 
