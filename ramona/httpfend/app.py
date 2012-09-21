@@ -1,5 +1,5 @@
-import sys, os, socket, ConfigParser, errno, logging, httplib, BaseHTTPServer, mimetypes, json, signal, base64
-import time, cgi, pprint, urllib, urlparse, itertools
+import sys, os, socket, ConfigParser, errno, logging, httplib, BaseHTTPServer, mimetypes, json, signal
+import time, cgi, pprint, urllib, urlparse, itertools, base64, hashlib
 from ..config import config, read_config, get_numeric_loglevel
 from .. import cnscom
 
@@ -98,6 +98,8 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 				self.send_error(httplib.NOT_IMPLEMENTED, "The authentication method '{0}' is not supported. Only Basic authnetication method is supported.".format(method))
 				return
 			username, _, password = base64.b64decode(authdata).partition(":")
+			if httpfend_app.instance.password.startswith("{SHA}"):
+				password = "{SHA}" + hashlib.sha1(password).hexdigest()
 			if username != httpfend_app.instance.username or password != httpfend_app.instance.password:
 				self.serve_auth_headers()
 				return
