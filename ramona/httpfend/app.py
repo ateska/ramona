@@ -1,4 +1,4 @@
-import sys, os, socket, ConfigParser, errno, logging, httplib, BaseHTTPServer, mimetypes, json, signal
+import sys, os, socket, ConfigParser, errno, logging, httplib, BaseHTTPServer, mimetypes, json, signal, base64
 import time, cgi, pprint, urllib, urlparse, itertools
 from ..config import config, read_config, get_numeric_loglevel
 from .. import cnscom
@@ -50,6 +50,18 @@ class httpfend_app(object):
 		except ConfigParser.NoOptionError, e:
 			L.fatal("Missing configuration option: {0}. Exiting".format(e))
 			sys.exit(1)
+		
+		self.username = None
+		self.password = None 
+		try:
+			self.username = config.get(os.environ['RAMONA_SECTION'], 'username')
+			self.password = config.get(os.environ['RAMONA_SECTION'], 'password')
+		except:
+			pass
+		
+		if self.username is not None and self.password is None:
+			L.fatal("Configuration error: 'username' option is set, but 'password' option is not set. Please set 'password'")
+			sys.exit(1) 
 
 		Handler = RamonaHttpReqHandler
 		self.httpd = BaseHTTPServer.HTTPServer((host, port), Handler)
@@ -75,6 +87,21 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 	ActionToCallid = {"start": cnscom.callid_start, "stop": cnscom.callid_stop, "restart": cnscom.callid_restart}
 	
 	def do_GET(self):
+		authheader = self.headers.getheader("Authorization", None)
+		if httpfend_app.instance.username is not None and authheader is None:
+			self.serve_auth_headers()
+			return
+		
+		elif httpfend_app.instance.username is not None and authheader is not None:
+			method, authdata = authheader.split(" ") 
+			if method != "Basic":
+				self.send_error(httplib.NOT_IMPLEMENTED, "The authentication method '{0}' is not supported. Only Basic authnetication method is supported.".format(method))
+				return
+			username, _, password = base64.b64decode(authdata).partition(":")
+			if username != httpfend_app.instance.username or password != httpfend_app.instance.password:
+				self.serve_auth_headers()
+				return
+		
 		scriptdir = os.path.join(".", "ramona", "httpfend")
 		if self.path.startswith("/static/"):
 			parts = self.path.split("/")
@@ -306,7 +333,14 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			if e.errno == errno.ECONNREFUSED: return None
 			if e.errno == errno.ENOENT and self.cnsconuri.protocol == 'unix': return None
 			raise
-
+	
+	def serve_auth_headers(self):
+		self.send_response(httplib.UNAUTHORIZED)
+		self.send_header('WWW-Authenticate', 'Basic realm="Ramona HTTP frontend"')
+		self.send_header('Content-type', 'text/html')
+		self.end_headers()
+		# TODO: Print non-authenticated page from template
+		self.wfile.write("Not authenticated")
 
 def natural_relative_time(diff_sec):
 	#TODO: Improve this significantly - maybe even add unit test
