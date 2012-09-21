@@ -46,8 +46,7 @@ Python specific
 - python version (minimal) check
 
 Mailing to admin
-----------------------
-- Scan output streams of the program for keywords (by default 'error', 'fatal', 'exception') and send email when such event occurs
+----------------
 - On autorestart mail trigger
 - On FATAL mail trigger
 - Mailing issues to admin: https://github.com/ateska/ramona/issues/1

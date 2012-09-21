@@ -103,6 +103,11 @@ Empty variable (e.g. CLASSPATH in previous example) will explicitly remove menti
 - [program:x] 'processgroup' switch for using/not-using process group approach (default is on)
 
 
+Mailing to admin
+----------------
+- Scan output streams of the program for keywords (by default 'error', 'fatal', 'exception') and send email when such event occurs
+- Config sample (from [program:x]): logscan_stdout=error>mailto:foo2@bar.com,fatal>now,exception>now,warn>daily
+
 HTTP frontend
 -------------
 - standalone process
