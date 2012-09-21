@@ -1,6 +1,7 @@
 import json
 from ... import cnscom
 from .. import exception
+from ._completes import complete_ident
 ###
 
 name = 'tail'
@@ -13,6 +14,15 @@ def init_parser(parser):
 	parser.add_argument('program', help='Specify program(s) in scope of the command')
 
 ###
+
+def complete(cnsapp, text, line, begidx, endidx):
+	textst = text.strip()
+	ret = []
+	ret.extend(complete_ident(cnsapp, textst))
+	return ret
+
+###
+
 
 def main(cnsapp, args):
 
