@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>{appname} - Ramona administation console</title>
+	<link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="shortcut icon" href="/static/img/favicon.ico" />
+</head>
+<body>
+	<div class="container">
+		<h1>{appname}</h1><p class="lead">Ramona web administration console</p>
+		<div class="alert alert-block alert-error">
+		  <h4>User not authenticated!</h4>
+		  The provided username and password does not match the configuration in <code>[{configsection}]</code> section.
+		  <br>Please review the configuration and try to login again.
+		</div>
+		
+	<hr>
+	<footer>
+		<p>Ramona project:
+		<a href="http://ateska.github.com/ramona/">Ramona project page</a> |
+		<a href="https://github.com/ateska/ramona">Ramona @ GitHub</a> |
+		<a href="http://pypi.python.org/pypi/ramona">Ramona @ PyPi</a>
+		</p>
+	</footer>
+	</div>
+</body>
+</html>
