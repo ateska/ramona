@@ -142,8 +142,8 @@ def launch_proxy_tool(fn, cmd, cmdline):
 		# Child
 		try:
 			fn(cmdline)
-		except:
-			pass
+		except Exception, e:
+			print "Execution of tool failed: ", e
 		os._exit(0)
 	else:
 		# Parent
