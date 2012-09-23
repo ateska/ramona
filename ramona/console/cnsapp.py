@@ -24,7 +24,7 @@ Console application (base for custom implementations)
 		os.chdir(os.path.dirname(sys.argv[0]))
 
 		# Check if this is request for proxy tool - and avoid parsing
-		if len(sys.argv) > 100:
+		if len(sys.argv) > 1:
 			for mn in dir(self):
 				fn = getattr(self, mn)
 				if not hasattr(fn, 'proxy_tool'): continue
