@@ -85,8 +85,28 @@ class httpfend_app(object):
 class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 	
 	ActionToCallid = {"start": cnscom.callid_start, "stop": cnscom.callid_stop, "restart": cnscom.callid_restart}
+	scriptdir = os.path.join(".", "ramona", "httpfend")
 	
 	def do_GET(self):
+		
+		if self.path.startswith("/static/"):
+			parts = self.path.split("/")
+			fname = os.path.join(self.scriptdir, *[x for x in parts if len(x) > 0])
+			if not os.path.isfile(fname):
+				self.send_error(httplib.NOT_FOUND)
+				return
+			try:
+				f = open(fname, "r")
+			except IOError:
+				self.send_error(httplib.NOT_FOUND)
+				return
+			with f:
+				self.send_response(httplib.OK)
+				self.send_header("Content-Type", mimetypes.guess_type(self.path)[0])
+				self.end_headers()
+				self.wfile.write(f.read())
+				return
+		
 		authheader = self.headers.getheader("Authorization", None)
 		if httpfend_app.instance.username is not None and authheader is None:
 			self.serve_auth_headers()
@@ -103,24 +123,6 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			if username != httpfend_app.instance.username or password != httpfend_app.instance.password:
 				self.serve_auth_headers()
 				return
-		
-		scriptdir = os.path.join(".", "ramona", "httpfend")
-		if self.path.startswith("/static/"):
-			parts = self.path.split("/")
-			fname = os.path.join(scriptdir, *[x for x in parts if len(x) > 0])
-			if not os.path.isfile(fname):
-				self.send_error(httplib.NOT_FOUND)
-				return
-			try:
-				f = open(fname, "r")
-			except IOError:
-				self.send_error(httplib.NOT_FOUND)
-				return
-			with f:
-				self.send_response(httplib.OK)
-				self.send_header("Content-Type", mimetypes.guess_type(self.path)[0])
-				self.end_headers()
-				self.wfile.write(f.read())
 		
 		elif self.path.startswith("/ajax/"):
 			parsed = urlparse.urlparse(self.path)
@@ -210,7 +212,7 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 					  <button type="button" class="close" data-dismiss="alert">&times;</button>
 					  {1}
 					</div>'''.format(level, msg)
-			with open(os.path.join(scriptdir, "index.tmpl.html")) as f:
+			with open(os.path.join(self.scriptdir, "index.tmpl.html")) as f:
 				sttable = self.buildStatusTable(json.loads(self.getStatuses()))
 				self.wfile.write(f.read().format(
 					statuses=sttable,
@@ -230,7 +232,6 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 		for sp in statuses:
 			ret += "<tr>"
 			ident = sp.pop('ident', '???')
-			#TODO: Log name can be different
 			ret += '<th>{0}</th>'.format(cgi.escape(ident))
 			labelCls = "label-inverse"
 			progState = sp.pop("state")
@@ -282,9 +283,7 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 				if progState == cnscom.program_state_enum.FATAL:
 					actions.append('<a class="btn btn-small btn-inverse" href="/?{0}">Start (force)</a>'.format(urllib.urlencode([("action", "start"), ("ident", ident), ("force", "1")])))
 
-
 			ret += '<td>{0}</td>'.format(" ".join(actions))
-			
 			ret += "</tr>"
 			
 			if len(sp) > 0:
@@ -341,8 +340,12 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 		self.send_header('WWW-Authenticate', 'Basic realm="Ramona HTTP frontend"')
 		self.send_header('Content-type', 'text/html')
 		self.end_headers()
-		# TODO: Print non-authenticated page from template
-		self.wfile.write("Not authenticated")
+		with open(os.path.join(self.scriptdir, "401.tmpl.html")) as f:
+			self.wfile.write(f.read().format(
+					appname=config.get('general','appname'),
+					configsection=os.environ['RAMONA_SECTION'])
+			)
+		
 
 def natural_relative_time(diff_sec):
 	#TODO: Improve this significantly - maybe even add unit test
