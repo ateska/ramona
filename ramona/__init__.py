@@ -1,4 +1,4 @@
-from .console.cnsapp import console_app, tool
+from .console.cnsapp import console_app, tool, proxy_tool
 
 '''
 Ramona - Runtime supervisor

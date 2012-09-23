@@ -23,12 +23,15 @@ class _parser_base(argparse.ArgumentParser):
 			cmd.init_parser(subparser)
 			self.subcommands[cmd.name] = cmd
 
-		#Iterate via application object to find 'tool' (decorated method)
+		#Iterate via application object to find 'tool' and 'proxy_tool' (decorated method)
 		for mn in dir(cnsapp):
 			fn = getattr(cnsapp, mn)
-			if not hasattr(fn, 'tool'): continue
-			self.subparsers.add_parser(mn, help=fn.__doc__)
-			self.subcommands[mn] = fn.im_func # Unbound method
+			if hasattr(fn, 'tool'):
+				self.subparsers.add_parser(mn, help=fn.__doc__)
+				self.subcommands[mn] = fn.im_func # Unbound method
+			elif hasattr(fn, 'proxy_tool'):
+				self.subparsers.add_parser(mn, help=fn.__doc__)
+				# Not subcommand as proxy tools are handled prior argument parsing
 
 
 	def build_cmdlist(self):

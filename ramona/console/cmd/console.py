@@ -30,6 +30,7 @@ else:
 
 class _console_cmd(cmd.Cmd):
 
+	#TODO: Support for proxy_tool
 
 	def __init__(self, cnsapp):
 		self.prompt = '> '
@@ -52,6 +53,7 @@ class _console_cmd(cmd.Cmd):
 				setattr(self.__class__, "complete_{0}".format(cmdname), cmditem.complete)
 
 		cmd.Cmd.__init__(self)
+
 
 	def precmd(self, line):
 		if line == '': return ''

@@ -8,11 +8,11 @@ Generic
 - ulimit/resources (similar to core dump) -> minfds, minprocs
 - Unify & document sys.exit codes 
 - Reload/reset command (restarting ramona server)
+- Restart in yield mode should also terminate & start ramona server
 - [tool:x] support (how to do this properly - config is read __after__ arguments are parsed)
 - console command enable/disable to allow change status during runtime
 - [program:x] disabled 'magic' options:
 	 - e.g. <on-platform linux:mac>
-- [tool:x] - support floader case (hand-over to other executable)
 - test Ramona how it runs in out-of-diskspace conditions
 - 'user' option - If ramona runs as root, this UNIX user account will be used as the account which runs the program. If ramona is not running as root, this option has no effect.
 - 'directory' option

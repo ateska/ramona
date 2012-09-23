@@ -23,6 +23,15 @@ Console application (base for custom implementations)
 		# Change directory to location of user console script
 		os.chdir(os.path.dirname(sys.argv[0]))
 
+		# Check if this is request for proxy tool - and avoid parsing
+		if len(sys.argv) > 100:
+			for mn in dir(self):
+				fn = getattr(self, mn)
+				if not hasattr(fn, 'proxy_tool'): continue
+				if mn == sys.argv[1]:
+					ret = fn(sys.argv[1:])
+					sys.exit(ret)
+
 		# Parse command line arguments
 		self.argparser = argparser(self)
 
@@ -160,4 +169,13 @@ def tool(fn):
 	Tool decorator foc console_app
 	'''
 	fn.tool = fn.func_name
+	return fn
+
+#
+
+def proxy_tool(fn):
+	'''
+	Proxy tool (with straight argument passing) decorator foc console_app
+	'''
+	fn.proxy_tool = fn.func_name
 	return fn
