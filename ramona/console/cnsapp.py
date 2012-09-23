@@ -77,8 +77,6 @@ Console application (base for custom implementations)
 
 		L.debug("Configuration read from: {0}".format(', '.join(config_files)))
 
-		self.is_interactive = False # Is in interactive console mode
-
 		# Prepare server connection factory
 		self.cnsconuri = cnscom.socket_uri(config.get('ramona:console','serveruri'))
 		self.ctlconsock = None
@@ -143,6 +141,15 @@ Console application (base for custom implementations)
 				raise exception.server_not_responding_error("Server is not responding - maybe it isn't running.")
 
 			return cnscom.svrcall(self.ctlconsock, callid, params)
+
+
+	def wait_for_svrexit(self):
+		if self.ctlconsock is None: return
+		while True:
+			x = self.ctlconsock.recv(4096)
+			if len(x) == 0: break
+		self.ctlconsock
+		self.ctlconsock = None
 
 
 	def auto_server_start(self):

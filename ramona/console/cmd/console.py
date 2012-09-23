@@ -82,34 +82,29 @@ class _console_cmd(cmd.Cmd):
 #
 
 def main(cnsapp, args):
-	old_is_interactive = cnsapp.is_interactive
-	cnsapp.is_interactive = True
-	try:
-		L.info("Ramona console for {0}".format(config.get('general','appname'))) #TODO: Add version info
+	L.info("Ramona console for {0}".format(config.get('general','appname'))) #TODO: Add version info
 
-		histfile = config.get('ramona:console', 'history')
-		if histfile != '':
-			histfile = os.path.expanduser(histfile)
-			try:
-				readline.read_history_file(histfile)
-			except IOError:
-				pass
-
-		c = _console_cmd(cnsapp)
+	histfile = config.get('ramona:console', 'history')
+	if histfile != '':
+		histfile = os.path.expanduser(histfile)
 		try:
-			c.cmdloop()
-		
-		except Exception, e:
-			L.exception("Exception during cmd loop:")
+			readline.read_history_file(histfile)
+		except IOError:
+			pass
 
-		except KeyboardInterrupt:
-			print ""
-		
-		finally:
-			if histfile != '':
-				try:
-					readline.write_history_file(histfile)
-				except Exception, e:
-					L.warning("Cannot write console history file '{1}': {0}".format(e, histfile))
+	c = _console_cmd(cnsapp)
+	try:
+		c.cmdloop()
+	
+	except Exception, e:
+		L.exception("Exception during cmd loop:")
+
+	except KeyboardInterrupt:
+		print ""
+	
 	finally:
-		cnsapp.is_interactive = old_is_interactive
+		if histfile != '':
+			try:
+				readline.write_history_file(histfile)
+			except Exception, e:
+				L.warning("Cannot write console history file '{1}': {0}".format(e, histfile))

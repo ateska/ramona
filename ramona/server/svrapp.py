@@ -129,6 +129,7 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 					else:
 						raise
 				else:
+					if self.termstatus is not None: self.sock.close() # Do not accept new connection when exiting
 					if sock.family==socket.AF_UNIX and address=='': address = sock.getsockname()
 					conn = console_connection(sock, address, self)
 					self.conns.add(conn)
@@ -280,6 +281,7 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 				self.stop_program(force=True)
 
 		if (self.termstatus == 2):
+			self.__close_idle_conns()
 			if len(self.conns) == 0:
 				self.__init_real_exit()
 
@@ -294,8 +296,9 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 
 
 	def __init_soft2_exit(self, cnscon=None):
-		'''Term status 2 is simple - just waiting for all console connections to close'''
+		'''Term status 2: Clean idling console connections and wait for others console connections to close'''
 		if self.termstatus > 2: return
+		if self.termstatus == 1: self.__close_idle_conns()
 		self.termstatus = 2
 		self.termstatus_change = time.time()
 
@@ -304,6 +307,15 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 		self.termstatus = 3
 		self.termstatus_change = time.time()
 		self.stop_loop()
+
+
+	def __close_idle_conns(self):
+		for conn in list(self.conns):
+			if conn.write_buf is None \
+			   and len(conn.read_buf) == 0 \
+			   and conn.yield_enabled is False \
+			   and conn.return_expected is False:
+				conn.close()
 
 
 def _SIGALARM_handler(signum, frame):

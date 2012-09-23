@@ -34,7 +34,7 @@ def main(cnsapp, args):
 	if args.stop_and_exit and args.stop_and_stay:
 		raise exception.parameters_error('Cannot specify -T and -E option at once.')
 
-	if len(args.program) == 0 and not args.stop_and_stay and not cnsapp.is_interactive:
+	if len(args.program) == 0 and not args.stop_and_stay:
 		args.stop_and_exit = True
 
 	params={
@@ -51,3 +51,5 @@ def main(cnsapp, args):
 		auto_connect=True
 	)
 
+	if args.stop_and_exit:
+		cnsapp.wait_for_svrexit()
