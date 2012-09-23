@@ -1,4 +1,4 @@
-import os, cmd, logging, sys
+import os, cmd, logging, sys, functools
 from ...config import config
 from ... import cnscom
 
@@ -30,11 +30,10 @@ else:
 
 class _console_cmd(cmd.Cmd):
 
-	#TODO: Support for proxy_tool
-
 	def __init__(self, cnsapp):
 		self.prompt = '> '
 		self.cnsapp = cnsapp
+		
 
 		from ..parser import consoleparser
 		self.parser = consoleparser(self.cnsapp)
@@ -52,6 +51,16 @@ class _console_cmd(cmd.Cmd):
 			if hasattr(cmditem, "complete"):
 				setattr(self.__class__, "complete_{0}".format(cmdname), cmditem.complete)
 
+		# Add also proxy_tools
+		self.proxy_tool_set = set()
+		for mn in dir(cnsapp):
+			fn = getattr(cnsapp, mn)
+			if not hasattr(fn, 'proxy_tool'): continue
+
+			self.proxy_tool_set.add(mn)
+			setattr(self.__class__, "do_{0}".format(mn), functools.partial(launch_proxy_tool, fn, mn))
+
+
 		cmd.Cmd.__init__(self)
 
 
@@ -60,7 +69,16 @@ class _console_cmd(cmd.Cmd):
 		if line == "EOF":
 			print
 			sys.exit(0)
-			
+
+		# Check if this is proxy tool - if yes, then bypass parser
+		try:
+			farg, _ = line.split(' ',1)
+		except ValueError:
+			farg = line
+		farg = farg.strip()
+		if farg in self.proxy_tool_set:
+			return line
+
 		try:
 			self.parser.parse(line.split())
 		except SyntaxError: # To capture cases like 'xxx' (avoid exiting)
@@ -108,3 +126,26 @@ def main(cnsapp, args):
 				readline.write_history_file(histfile)
 			except Exception, e:
 				L.warning("Cannot write console history file '{1}': {0}".format(e, histfile))
+
+#
+
+def launch_proxy_tool(fn, cmd, cmdline):
+	'''
+	To launch proxy tool, we need to fork and then call proxy_tool method in child.
+	Parent is waiting for child exit ...
+	'''
+	cmdline = cmdline.split(' ')
+	cmdline.insert(0, cmd)
+
+	pid = os.fork()
+	if pid == 0:
+		# Child
+		try:
+			fn(cmdline)
+		except:
+			pass
+		os._exit(0)
+	else:
+		# Parent
+		ret = os.waitpid(pid, 0) # Wait for child process to finish
+
