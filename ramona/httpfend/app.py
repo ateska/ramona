@@ -116,15 +116,18 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			method, authdata = authheader.split(" ") 
 			if method != "Basic":
 				self.send_error(httplib.NOT_IMPLEMENTED, "The authentication method '{0}' is not supported. Only Basic authnetication method is supported.".format(method))
+				L.info("Invalid auth method")
 				return
 			username, _, password = base64.b64decode(authdata).partition(":")
+			
 			if httpfend_app.instance.password.startswith("{SHA}"):
 				password = "{SHA}" + hashlib.sha1(password).hexdigest()
+			
 			if username != httpfend_app.instance.username or password != httpfend_app.instance.password:
 				self.serve_auth_headers()
 				return
 		
-		elif self.path.startswith("/ajax/"):
+		if self.path.startswith("/ajax/"):
 			parsed = urlparse.urlparse(self.path)
 			action = parsed.path[6:]
 			if action == "statusTable":
