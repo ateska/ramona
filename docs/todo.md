@@ -3,6 +3,7 @@ TODO list
 
 Generic
 -------
+- yield something (to Lmy) when starting process in FATAL state, which actually causes nothing to happen -> user needs to be informed that process was not started as it is in FATAL state (and advice using 'force' option)
 - exitcodes option for autorestart (autorestart=1,2,3)
 - (low prio): SSL (optional) for protecting console-server channel
 - ulimit/resources (similar to core dump) -> minfds, minprocs

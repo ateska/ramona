@@ -24,6 +24,7 @@ Contents:
    intro.rst
    install.rst
    features.rst
+   config.rst
    quickref.rst
    credits.rst
 
