@@ -43,13 +43,13 @@ class httpfend_app(object):
 
 		try:
 			host = config.get(os.environ['RAMONA_SECTION'], 'host')
+		except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
+			host = "localhost"
+		
+		try:
 			port = config.getint(os.environ['RAMONA_SECTION'], 'port')
-		except ConfigParser.NoSectionError, e:
-			L.fatal("Missing configuration section {0}. Exiting.".format(os.environ['RAMONA_SECTION']))
-			sys.exit(1)
-		except ConfigParser.NoOptionError, e:
-			L.fatal("Missing configuration option: {0}. Exiting".format(e))
-			sys.exit(1)
+		except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
+			port = 5588
 		
 		self.username = None
 		self.password = None 

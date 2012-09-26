@@ -62,10 +62,12 @@ HTTP front end (Web console)
 
 Configuration:
 
-- The HTTP frontend is added to configuration file as any other program, only with the special `command=<httpfend>`.
-- Configuration sample including comments:
+- The HTTP frontend is added to configuration file as any other program, only with the special option `command=<httpfend>`.
+- To enable HTTP frontend, just add the below sample configuration and then open http://localhost:5588
 
 .. code-block:: ini
   
   [program:ramonahttpfend]
   command=<httpfend>
+
+For all configuration options see :ref:`config-ramonahttpfend`.
