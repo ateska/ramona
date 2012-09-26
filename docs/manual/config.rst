@@ -59,5 +59,37 @@ TODO
 [program:ramonahttpfend]
 ------------------------
 
-TODO
+Example:
 
+.. code-block:: ini
+  
+  [program:ramonahttpfend]
+  command=<httpfend>
+
+  # IP address/hostname where the HTTP frontend should listen
+  host=127.0.0.1
+  
+  # Port where the HTTP frontend should listen
+  port=5588
+  
+  # Use username and password options only if you want to enable basic authentication
+  username=admin
+  
+  # Can get either plain text or a SHA1 hash, if the password starts with {SHA} prefix
+  password=pass
+
+
+
+``port``
+
+  A TCP host:port value or (e.g. ``127.0.0.1:9001``) on which
+  supervisor will listen for HTTP/XML-RPC requests.
+  :program:`supervisorctl` will use XML-RPC to communicate with
+  :program:`supervisord` over this port.  To listen on all interfaces
+  in the machine, use ``:9001`` or ``*:9001``.
+
+  *Default*:  No default.
+
+  *Required*:  Yes.
+
+  *Introduced*: 3.0
