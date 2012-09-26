@@ -67,7 +67,10 @@ Program roaster is object that control all configured programs, their start/stop
 		else: states = (program_state_enum.STOPPED,)
 
 		for p in l:
-			if p.state not in states: continue
+			if p.state not in states:
+				if p.state == program_state_enum.FATAL: Lmy.warning("Program {0} is in FATAL state.".format(p.ident))
+				if p.state == program_state_enum.CFGERROR: Lmy.warning("Program {0} is in CFGERROR state.".format(p.ident))
+				continue
 			self.start_seq.add(p)		
 
 		self.__startstop_pad_next(True)
@@ -122,6 +125,9 @@ Program roaster is object that control all configured programs, their start/stop
 				self.restart_seq.add(p)
 			elif p.state in start_states:
 				self.restart_seq.add(p)
+			elif p.state == program_state_enum.FATAL: Lmy.warning("Program {0} is in FATAL state.".format(p.ident))
+			elif p.state == program_state_enum.CFGERROR: Lmy.warning("Program {0} is in CFGERROR state.".format(p.ident))
+
 
 		self.__startstop_pad_next(False)
 
