@@ -56,6 +56,8 @@ TODO
 TODO
 
 
+.. _config-ramonahttpfend:
+
 [program:ramonahttpfend]
 ------------------------
 
@@ -66,10 +68,10 @@ Example:
   [program:ramonahttpfend]
   command=<httpfend>
 
-  # IP address/hostname where the HTTP frontend should listen
+  # IP address/hostname where the HTTP frontend will listen
   host=127.0.0.1
   
-  # Port where the HTTP frontend should listen
+  # Port where the HTTP frontend will listen
   port=5588
   
   # Use username and password options only if you want to enable basic authentication
@@ -80,16 +82,54 @@ Example:
 
 
 
+``host``
+	
+  IP address or hostname, where the Ramona HTTP frontend will listen.
+  Use ``0.0.0.0`` to make Ramona HTTP frontend listen on IP addresses of all network interfaces.
+
+  *Default*:  ``localhost``
+
+  *Required*:  No
+
 ``port``
 
-  A TCP host:port value or (e.g. ``127.0.0.1:9001``) on which
-  supervisor will listen for HTTP/XML-RPC requests.
-  :program:`supervisorctl` will use XML-RPC to communicate with
-  :program:`supervisord` over this port.  To listen on all interfaces
-  in the machine, use ``:9001`` or ``*:9001``.
+  Port on which the Ramona HTTP frontend will listen.
+  
+  *Default*:  ``5588``
 
-  *Default*:  No default.
+  *Required*:  No
+  
+``username``
+  
+  Username used for authentication to Ramona HTTP frontend. 
+  The authentication will be required only if the ``username``
+  option is used.
+  
+  *Default*:  No default
 
-  *Required*:  Yes.
+  *Required*:  No
+  
+``password``
+  
+  Password to be used in combination with ``username`` for authentication. 
+  If ``username`` option is used, the the ``password`` has to be specified as well --
+  Ramona HTTP frontend will fail to start otherwise.
+  
+  The value can be either a plain text password or a SHA hash of the password.
+  The SHA password hash has to be prefixed with ``{SHA}`` prefix, for example:
 
-  *Introduced*: 3.0
+  .. code-block:: ini
+  
+     password={SHA}e5e9fa1ba31ecd1ae84f75caaa474f3a663f05f4
+  
+  which is a hash for word ``secret``. To generate the hash to be used for the configuration,
+  you can use the following command (works on Linux):
+  
+  .. code-block:: sh
+  
+     echo -n "secret" | sha1sum
+  
+  *Default*:  No default
+
+  *Required*:  No
+  
