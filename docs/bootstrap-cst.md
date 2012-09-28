@@ -70,3 +70,7 @@ http://twitter.github.com/bootstrap/customize.html
 
 ## Customize variables
 All is default
+
+## After download
+
+* Use only bootstrap/css/bootstrap.min.css file (copy that to ramona/httpfend/static/bootstrap/css/ folder)
