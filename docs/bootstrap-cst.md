@@ -2,70 +2,71 @@ Bootstrap customizations
 ========================
 http://twitter.github.com/bootstrap/customize.html
 
-1. Choose components
+## Choose components
 
-Scaffolding
-[X] Normalize and reset
-[X] Body type and links
-[X] Grid system
-[X] Layouts
+### Scaffolding
+* [X] Normalize and reset
+* [X] Body type and links
+* [X] Grid system
+* [X] Layouts
 
-Base CSS
-[X] Headings, body, etc
-[X] Code and pre
-[X] Labels and badges
-[X] Tables
-[X] Forms
-[X] Buttons
-[ ] Icons
+### Base CSS
+* [X] Headings, body, etc
+* [X] Code and pre
+* [X] Labels and badges
+* [X] Tables
+* [X] Forms
+* [X] Buttons
+* [ ] Icons
 
-Components
-[ ] Button groups and dropdowns
-[ ] Navs, tabs, and pills
-[ ] Navbar
-[ ] Breadcrumbs
-[ ] Pagination
-[ ] Pager
-[ ] Thumbnails
-[X] Alerts
-[ ] Progress bars
-[ ] Hero unit
+### Components
+* [ ] Button groups and dropdowns
+* [ ] Navs, tabs, and pills
+* [ ] Navbar
+* [ ] Breadcrumbs
+* [ ] Pagination
+* [ ] Pager
+* [ ] Thumbnails
+* [X] Alerts
+* [ ] Progress bars
+* [ ] Hero unit
 
-JS Components
-[ ] Tooltips
-[ ] Popovers
-[ ] Modals
-[ ] Dropdowns
-[ ] Collapse
-[ ] Carousel
+### JS Components
+* [ ] Tooltips
+* [ ] Popovers
+* [ ] Modals
+* [ ] Dropdowns
+* [ ] Collapse
+* [ ] Carousel
 
-Miscellaneous
-[X] Wells
-[X] Close icon
-[X] Utilities
-[ ] Component animations
+### Miscellaneous
+* [X] Wells
+* [X] Close icon
+* [X] Utilities
+* [ ] Component animations
 
-Responsive
-[X] Visible/hidden classes
-[ ] Narrow tablets and below (<767px)
-[ ] Tablets to desktops (767-979px)
-[ ] Large desktops (>1200px)
-[ ] Responsive navbar
+### Responsive
+* [X] Visible/hidden classes
+* [ ] Narrow tablets and below (<767px)
+* [ ] Tablets to desktops (767-979px)
+* [ ] Large desktops (>1200px)
+* [ ] Responsive navbar
 
-2. Select jQuery plugins
-[ ] Transitions (required for any animation)
-[ ] Modals
-[ ] Dropdowns
-[ ] Scrollspy
-[ ] Togglable tabs
-[ ] Tooltips
-[ ] Popovers (requires Tooltips)
-[ ] Affix
-[ ] Alert messages
-[ ] Buttons
-[ ] Collapse
-[ ] Carousel
-[ ] Typeahead
+## Select jQuery plugins
 
-3. Customize variables
+* [ ] Transitions (required for any animation)
+* [ ] Modals
+* [ ] Dropdowns
+* [ ] Scrollspy
+* [ ] Togglable tabs
+* [ ] Tooltips
+* [ ] Popovers (requires Tooltips)
+* [ ] Affix
+* [ ] Alert messages
+* [ ] Buttons
+* [ ] Collapse
+* [ ] Carousel
+* [ ] Typeahead
+
+## Customize variables
 All is default
