@@ -274,7 +274,7 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			actions = []
 			if pid != os.getpid():
 				# TODO: Should there be some filtering for STOPPING ???
-				if progState not in (cnscom.program_state_enum.FATAL, cnscom.program_state_enum.RUNNING, cnscom.program_state_enum.STARTING):
+				if progState not in (cnscom.program_state_enum.FATAL, cnscom.program_state_enum.RUNNING, cnscom.program_state_enum.STARTING, cnscom.program_state_enum.DISABLED):
 					actions.append('<a class="btn btn-small btn-success" href="/?{0}">Start</a>'.format(urllib.urlencode([("action", "start"), ("ident", ident)])))
 				
 				if progState == cnscom.program_state_enum.RUNNING:
@@ -288,7 +288,7 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			ret += "</tr>"
 			
 			if len(sp) > 0:
-				ret += '<tr class="info"><td colspan="2"></td><td colspan="6"><pre class="pre-scrollable">'
+				ret += '<tr class="info"><td colspan="2"></td><td colspan="7"><pre class="pre-scrollable">'
 				ret += cgi.escape(pprint.pformat(sp, width=3))
 				ret += '</pre></td></tr>'
 		
