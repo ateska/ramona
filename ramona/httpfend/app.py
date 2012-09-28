@@ -207,12 +207,8 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			for msgid in qs.get('msgid', []):
 				m = httpfend_app.instance.logmsgs.pop(int(msgid), None)
 				if m is not None:
-					level, msg = m
-					
-					logmsg += '''<div class="alert alert-{0}">
-					  <button type="button" class="close" data-dismiss="alert">&times;</button>
-					  {1}
-					</div>'''.format(level, msg)
+					logmsg += '''<div class="alert alert-{0}">{1}</div>'''.format(*m)
+
 			with open(os.path.join(self.scriptdir, "index.tmpl.html")) as f:
 				sttable = self.buildStatusTable(json.loads(self.getStatuses()))
 				self.wfile.write(f.read().format(
