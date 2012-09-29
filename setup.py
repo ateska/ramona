@@ -8,7 +8,7 @@ setup(
 	description='Enterprise-grade runtime supervisor',
 	author='Ales Teska',
 	author_email='ales.teska+ramona@gmail.com',
-	version='master', # Also in ramona.__init__.py (+ relevant version format specification)
+	version='0.9b2', # Also in ramona.__init__.py (+ relevant version format specification)
 	packages=['ramona','ramona.server','ramona.console','ramona.console.cmd','ramona.httpfend'],
 	license='BSD 2-clause "Simplified" License',
 	long_description=open('README').read(),
