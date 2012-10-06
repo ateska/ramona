@@ -85,7 +85,7 @@ class httpfend_app(object):
 class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 	
 	ActionToCallid = {"start": cnscom.callid_start, "stop": cnscom.callid_stop, "restart": cnscom.callid_restart}
-	scriptdir = os.path.join(".", "ramona", "httpfend")
+	scriptdir = os.path.dirname(__file__)
 	
 	def do_GET(self):
 		
