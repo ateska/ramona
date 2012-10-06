@@ -1,5 +1,5 @@
 import sys, os, socket, ConfigParser, errno, logging, httplib, BaseHTTPServer, mimetypes, json, signal
-import time, cgi, pprint, urllib, urlparse, itertools, base64, hashlib
+import time, cgi, pprint, urllib, urlparse, itertools, base64, hashlib, pkgutil, zipimport
 from ..config import config, read_config, get_numeric_loglevel
 from .. import cnscom
 
@@ -81,31 +81,59 @@ class httpfend_app(object):
 		L.info("Received signal {0}. Stopping the server.".format(signum))
 		self.httpd.shutdown()
 
+def _is_egg():
+	ret = isinstance(pkgutil.get_loader(__name__), zipimport.zipimporter)
+	return ret
+
+_scriptdir = os.path.dirname(__file__)
+def _static_file_exists(path):
+	if _is_egg():
+		from pkg_resources import resource_exists
+		if path.startswith("/"): path = path[1:]
+		return resource_exists("ramona.httpfend", path)
+	else:
+		parts = path.split("/")
+		fname = os.path.join(_scriptdir, *[x for x in parts if len(x) > 0])
+		return os.path.isfile(fname)
+	return True
+
+def _get_static_file(path):
+	if _is_egg():
+		from pkg_resources import resource_stream
+		if path.startswith("/"): path = path[1:]
+		return resource_stream("ramona.httpfend", path)
+
+	else:
+		parts = path.split("/")
+		return open(os.path.join(_scriptdir, *[x for x in parts if len(x) > 0]), "rb")
+
+#			
 
 class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 	
 	ActionToCallid = {"start": cnscom.callid_start, "stop": cnscom.callid_stop, "restart": cnscom.callid_restart}
-	scriptdir = os.path.dirname(__file__)
+	_scriptdir = os.path.dirname(__file__)
 	
 	def do_GET(self):
 		
 		if self.path.startswith("/static/"):
 			parts = self.path.split("/")
-			fname = os.path.join(self.scriptdir, *[x for x in parts if len(x) > 0])
-			if not os.path.isfile(fname):
+			if not _static_file_exists(self.path):
 				self.send_error(httplib.NOT_FOUND)
 				return
 			try:
-				f = open(fname, "r")
+				f = _get_static_file(self.path)
 			except IOError:
 				self.send_error(httplib.NOT_FOUND)
 				return
-			with f:
+			try:
 				self.send_response(httplib.OK)
 				self.send_header("Content-Type", mimetypes.guess_type(self.path)[0])
 				self.end_headers()
 				self.wfile.write(f.read())
 				return
+			finally:
+				f.close()
 		
 		authheader = self.headers.getheader("Authorization", None)
 		if httpfend_app.instance.username is not None and authheader is None:
@@ -209,14 +237,17 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 				if m is not None:
 					logmsg += '''<div class="alert alert-{0}">{1}</div>'''.format(*m)
 
-			with open(os.path.join(self.scriptdir, "index.tmpl.html")) as f:
+			f = _get_static_file("index.tmpl.html")
+			try:
 				sttable = self.buildStatusTable(json.loads(self.getStatuses()))
 				self.wfile.write(f.read().format(
 					statuses=sttable,
 					logmsg=logmsg,
 					appname=config.get('general','appname')
 				))
-				
+			finally:
+				f.close()
+	
 	def log_message(self, fmt, *args):
 		L.debug("{0} -- [{1}]: {2}".format(self.address_string(), self.log_date_time_string(), fmt % args))
 			
