@@ -2,6 +2,7 @@ from distutils.core import setup
 
 # See http://guide.python-distribute.org/
 # See http://docs.python.org/distutils/setupscript.html
+# See http://peak.telecommunity.com/DevCenter/setuptools
 
 setup(
 	name='ramona',
@@ -16,6 +17,7 @@ setup(
 	download_url='http://pypi.python.org/pypi/ramona',
 	install_requires=["pyev"],
 	requires=["pyev"],
+	zipsafe=False,
 	package_data={
 		'ramona.httpfend': [
 			'*.html',
