@@ -26,6 +26,7 @@ Features
 - immediate/yield modes of start/stop/restart commands
 - core dump enabled stop of program
 - Automatic (configurable) restart of failed program
+- [program:x] command now can contain environment variable reference (e.g. ${HOME}) that will be expanded; also [env] is taken in account
 
 Console
 -------
