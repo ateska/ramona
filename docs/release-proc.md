@@ -24,5 +24,5 @@ Release procedure
 12. Commit to Git
 13. Run upload to pypi.python.org: `./ramona-dev.py upload`
 14. Check on http://pypi.python.org/pypi/ramona
-15. Create tag 'release-[VERSION]'
+15. Create tag 'release-[VERSION]' (e.g. release-0.9b3) with comment e.g. "Beta release 0.9b3"
 16. Switch back to 'master' branch and you are done
