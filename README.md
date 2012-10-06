@@ -57,6 +57,7 @@ Links
 -----
 
 * [Ramona project page](http://ateska.github.com/ramona/)
+* [Ramona documentation](http://ateska.github.com/ramona/manual)
 * [Ramona @ GitHub](https://github.com/ateska/ramona)
 * [Ramona @ PyPi](http://pypi.python.org/pypi/ramona)
 * [Ramona @ Ohloh](https://www.ohloh.net/p/ateska_ramona)
