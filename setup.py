@@ -13,15 +13,14 @@ setup(
 	license='BSD 2-clause "Simplified" License',
 	long_description=open('README').read(),
 	url='http://ateska.github.com/ramona/',
+	download_url='http://pypi.python.org/pypi/ramona',
 	install_requires=["pyev"],
 	requires=["pyev"],
 	package_data={
 		'ramona.httpfend': [
 			'*.html',
 			'static/jquery/*.js',
-			'static/bootstrap/js/*.js',
 			'static/bootstrap/css/*.css',
-			'static/bootstrap/img/*.png',
 			'static/img/*.gif',
 			'static/img/*.ico',
 			]
