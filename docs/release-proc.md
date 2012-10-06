@@ -4,7 +4,7 @@ Release procedure
 1. Make sure master branch (or relevant originating branch) is stable and releasable
 2. Formulate release version 'string' (e.g. 0.9b1) -> use it instead placeholder [VERSION] bellow
 3. git checkout -b release-[VERSION-MASTER.VERSION-MINOR] master (git checkout -b release-0.9 master)
-	or if merging to existing release branch, perform merge.
+	or if merging to existing release branch, perform switch to that release branch and merge from master.
 4. Now we are working in the release branch
 5. Check `./setup.py`:
 	- version info
