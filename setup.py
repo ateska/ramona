@@ -16,6 +16,7 @@ setup(
 	download_url='http://pypi.python.org/pypi/ramona',
 	install_requires=["pyev"],
 	requires=["pyev"],
+	zip_safe=False,
 	package_data={
 		'ramona.httpfend': [
 			'*.html',
