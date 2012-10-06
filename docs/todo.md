@@ -57,6 +57,7 @@ HTTP frontend
 - Remove/optimize JQuery (following Bootstrap example)
 - Store static files in a way that setuptools and py2exe will work correctly. See: http://stackoverflow.com/questions/1395593/managing-resources-in-a-python-project
 - RESTful API
+- Listen on multiple IP addresses
 - (low prio): HTTPS
 - (low prio): IPv6
 
