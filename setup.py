@@ -13,6 +13,7 @@ setup(
 	license='BSD 2-clause "Simplified" License',
 	long_description=open('README').read(),
 	url='http://ateska.github.com/ramona/',
+	install_requires=["pyev"],
 	requires=["pyev"],
 	package_data={
 		'ramona.httpfend': [
