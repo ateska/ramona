@@ -224,6 +224,11 @@ class program(object):
 			return pid
 
 		try:
+			# Expand environment variables in command and arguments
+			os.environ = self.env
+			cmd = os.path.expandvars(cmd)
+			args = map(os.path.expandvars, args)
+
 			# Launch in dedicated process group (optionally)
 			if get_boolean(self.config.get('processgroup',True)):
 				os.setsid()
