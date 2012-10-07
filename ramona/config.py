@@ -1,6 +1,7 @@
 import os, sys, logging, ConfigParser
 ###
 
+# Defaults are stated in documentation, if you change them here, update documentation too!
 config_defaults = {
 	'general' : {
 		'appname' : 'ramona-driven-app',
