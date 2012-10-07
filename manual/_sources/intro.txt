@@ -97,12 +97,12 @@ Ramona provides build-in help system.
       console             Enter interactive console mode
       server              Launch server in the foreground
 
-Start of your application (all programs)::
+Start of your application::
 
   $ ./foo.py start
 
 
-Stop of your application (all programs)::
+Stop of your application::
 
   $ ./foo.py stop
 

@@ -1,5 +1,5 @@
 
-Ramona Quick Reference
-======================
+Quick Reference
+===============
 
 TODO

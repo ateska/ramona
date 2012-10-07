@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Features &mdash; Ramona 0.9 beta 1 documentation</title>
+    <title>Features &mdash; Ramona 0.9 beta 6 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.9 beta 1',
+        VERSION:     '0.9 beta 6',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,8 +25,8 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Ramona 0.9 beta 1 documentation" href="index.html" />
-    <link rel="next" title="Ramona Quick Reference" href="quickref.html" />
+    <link rel="top" title="Ramona 0.9 beta 6 documentation" href="index.html" />
+    <link rel="next" title="Configuration" href="config.html" />
     <link rel="prev" title="Installation" href="install.html" /> 
   </head>
   <body>
@@ -37,12 +37,12 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="quickref.html" title="Ramona Quick Reference"
+          <a href="config.html" title="Configuration"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="install.html" title="Installation"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Ramona 0.9 beta 1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Ramona 0.9 beta 6 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -53,7 +53,62 @@
             
   <div class="section" id="features">
 <h1>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="program">
+<h2>Program<a class="headerlink" href="#program" title="Permalink to this headline">¶</a></h2>
+<p>TODO
+Program life cycle (statuses)</p>
+</div>
+<div class="section" id="program-roaster">
+<h2>Program roaster<a class="headerlink" href="#program-roaster" title="Permalink to this headline">¶</a></h2>
 <p>TODO</p>
+</div>
+<div class="section" id="command-line-console">
+<h2>Command-line console<a class="headerlink" href="#command-line-console" title="Permalink to this headline">¶</a></h2>
+<p>TODO</p>
+</div>
+<div class="section" id="logging">
+<h2>Logging<a class="headerlink" href="#logging" title="Permalink to this headline">¶</a></h2>
+<p>TODO</p>
+</div>
+<div class="section" id="mailing-to-admin">
+<h2>Mailing to admin<a class="headerlink" href="#mailing-to-admin" title="Permalink to this headline">¶</a></h2>
+<p>TODO</p>
+</div>
+<div class="section" id="custom-tools">
+<h2>Custom tools<a class="headerlink" href="#custom-tools" title="Permalink to this headline">¶</a></h2>
+<p>TODO</p>
+</div>
+<div class="section" id="log-scanning">
+<h2>Log scanning<a class="headerlink" href="#log-scanning" title="Permalink to this headline">¶</a></h2>
+<p>TODO</p>
+</div>
+<div class="section" id="ramona-environment-variables">
+<h2>Ramona environment variables<a class="headerlink" href="#ramona-environment-variables" title="Permalink to this headline">¶</a></h2>
+<p>RAMONA_CONFIGS
+RAMONA_SECTION</p>
+<p>TODO</p>
+</div>
+<div class="section" id="http-front-end-web-console">
+<h2>HTTP front end (Web console)<a class="headerlink" href="#http-front-end-web-console" title="Permalink to this headline">¶</a></h2>
+<img alt="_images/httpfend.png" src="_images/httpfend.png" style="width: 600px;" />
+<ul class="simple">
+<li>standalone process</li>
+<li>displays states of programs</li>
+<li>allows to start/stop/restart each or all of them</li>
+<li>allows displaying tail of log files</li>
+<li>basic authentication</li>
+</ul>
+<p>Configuration:</p>
+<ul class="simple">
+<li>The HTTP frontend is added to configuration file as any other program, only with the special option <cite>command=&lt;httpfend&gt;</cite>.</li>
+<li>To enable HTTP frontend, just add the below sample configuration and then open <a class="reference external" href="http://localhost:5588">http://localhost:5588</a></li>
+</ul>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[program:ramonahttpfend]</span>
+<span class="na">command</span><span class="o">=</span><span class="s">&lt;httpfend&gt;</span>
+</pre></div>
+</div>
+<p>For all configuration options see <a class="reference internal" href="config.html#config-ramonahttpfend"><em>[program:ramonahttpfend]</em></a>.</p>
+</div>
 </div>
 
 
@@ -62,12 +117,28 @@
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Features</a><ul>
+<li><a class="reference internal" href="#program">Program</a></li>
+<li><a class="reference internal" href="#program-roaster">Program roaster</a></li>
+<li><a class="reference internal" href="#command-line-console">Command-line console</a></li>
+<li><a class="reference internal" href="#logging">Logging</a></li>
+<li><a class="reference internal" href="#mailing-to-admin">Mailing to admin</a></li>
+<li><a class="reference internal" href="#custom-tools">Custom tools</a></li>
+<li><a class="reference internal" href="#log-scanning">Log scanning</a></li>
+<li><a class="reference internal" href="#ramona-environment-variables">Ramona environment variables</a></li>
+<li><a class="reference internal" href="#http-front-end-web-console">HTTP front end (Web console)</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="install.html"
                         title="previous chapter">Installation</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="quickref.html"
-                        title="next chapter">Ramona Quick Reference</a></p>
+  <p class="topless"><a href="config.html"
+                        title="next chapter">Configuration</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/features.txt"
@@ -97,12 +168,12 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="quickref.html" title="Ramona Quick Reference"
+          <a href="config.html" title="Configuration"
              >next</a> |</li>
         <li class="right" >
           <a href="install.html" title="Installation"
              >previous</a> |</li>
-        <li><a href="index.html">Ramona 0.9 beta 1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Ramona 0.9 beta 6 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

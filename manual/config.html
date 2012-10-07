@@ -1,0 +1,250 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Configuration &mdash; Ramona 0.9 beta 6 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.9 beta 6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Ramona 0.9 beta 6 documentation" href="index.html" />
+    <link rel="next" title="Tools Cookbook" href="tools.html" />
+    <link rel="prev" title="Features" href="features.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="tools.html" title="Tools Cookbook"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="features.html" title="Features"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Ramona 0.9 beta 6 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="configuration">
+<h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
+<p>Configuration is build the way that user program(s) can share the same configuration file(s) with Ramona system. Configuration is compatible with Python <a class="reference external" href="http://docs.python.org/library/configparser.html">ConfigParser</a>. These are basic configuration files that use structure similar to what you would find on Microsoft Windows INI files.</p>
+<div class="section" id="application-and-site-level-configuration">
+<h2>Application and site level configuration<a class="headerlink" href="#application-and-site-level-configuration" title="Permalink to this headline">¶</a></h2>
+<p>Configuration also supports split into <em>application level configuration</em> and <em>site level configuration</em>. In this concept application development team provides <em>application level configuration</em> as a part of source code and users are given an option to provide their own <em>site level configurations</em> that can override or enhance application level configurations.</p>
+<p>Practically application level configuration can specify file(s) to optionally include - these files can provide site level configuration.</p>
+<p>Application and site level configuration as syntactically equal.</p>
+</div>
+<div class="section" id="general-section">
+<h2>[general] section<a class="headerlink" href="#general-section" title="Permalink to this headline">¶</a></h2>
+<p>TODO</p>
+<dl class="attribute">
+<dt id="consoleuri">
+<tt class="descname">consoleuri</tt><a class="headerlink" href="#consoleuri" title="Permalink to this definition">¶</a></dt>
+<dd><p>One or multiple &#8216;socket URIs&#8217; specifying where Ramona server should listen for console connections.
+You can specify more network interfaces, protocols or ports, URIs are comma-separated. It should be synchronized with [ramona:console] option serveruri (where configuration of client side is specified), otherwise console connection fails.</p>
+<p>Supported connection variants:</p>
+<ul class="simple">
+<li>UNIX sockets<ul>
+<li>optional parameter &#8216;mode&#8217; specifies UNIX file permissions for created socket file system entry (in octal representation)</li>
+</ul>
+</li>
+<li>TCP IPv4</li>
+<li>TCP IPv6</li>
+</ul>
+<p><em>Default</em>: <tt class="docutils literal"><span class="pre">unix://.ramona.sock</span></tt></p>
+<p><em>Required</em>: Yes (but default will work)</p>
+<p>Example:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[general]</span>
+<span class="na">consoleuri</span><span class="o">=</span><span class="s">unix:///tmp/demoramona.sock;mode=0600,tcp://localhost:5566</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="env-section">
+<h2>[env] section<a class="headerlink" href="#env-section" title="Permalink to this headline">¶</a></h2>
+<p>Environment section allows to specify <a class="reference external" href="http://en.wikipedia.org/wiki/Environment_variable">environment variables</a> that will be added to the environment variable set that applies to running Ramona server.</p>
+<p>Environment variable section example:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[env]</span>
+<span class="na">VARIABLE</span><span class="o">=</span><span class="s">value</span>
+<span class="na">PYTHONPATH</span><span class="o">=</span><span class="s">./mylibs</span>
+<span class="na">CLASSPATH</span><span class="o">=</span><span class="s">./myjars</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="ramona-server-section">
+<h2>[ramona:server] section<a class="headerlink" href="#ramona-server-section" title="Permalink to this headline">¶</a></h2>
+<p>TODO</p>
+</div>
+<div class="section" id="ramona-notify-section">
+<h2>[ramona:notify] section<a class="headerlink" href="#ramona-notify-section" title="Permalink to this headline">¶</a></h2>
+<p>TODO</p>
+</div>
+<div class="section" id="program-x-section">
+<h2>[program:X] section<a class="headerlink" href="#program-x-section" title="Permalink to this headline">¶</a></h2>
+<p>TODO</p>
+</div>
+<div class="section" id="program-ramonahttpfend">
+<span id="config-ramonahttpfend"></span><h2>[program:ramonahttpfend]<a class="headerlink" href="#program-ramonahttpfend" title="Permalink to this headline">¶</a></h2>
+<p>Example:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[program:ramonahttpfend]</span>
+<span class="na">command</span><span class="o">=</span><span class="s">&lt;httpfend&gt;</span>
+
+<span class="c"># IP address/hostname where the HTTP frontend will listen</span>
+<span class="na">host</span><span class="o">=</span><span class="s">127.0.0.1</span>
+
+<span class="c"># Port where the HTTP frontend will listen</span>
+<span class="na">port</span><span class="o">=</span><span class="s">5588</span>
+
+<span class="c"># Use username and password options only if you want to enable basic authentication</span>
+<span class="na">username</span><span class="o">=</span><span class="s">admin</span>
+
+<span class="c"># Can get either plain text or a SHA1 hash, if the password starts with {SHA} prefix</span>
+<span class="na">password</span><span class="o">=</span><span class="s">pass</span>
+</pre></div>
+</div>
+<dl class="attribute">
+<dt id="host">
+<tt class="descname">host</tt><a class="headerlink" href="#host" title="Permalink to this definition">¶</a></dt>
+<dd><p>IP address or hostname, where the Ramona HTTP frontend will listen.
+Use <tt class="docutils literal"><span class="pre">0.0.0.0</span></tt> to make Ramona HTTP frontend listen on IP addresses of all network interfaces.</p>
+<p><em>Default</em>:  <tt class="docutils literal"><span class="pre">localhost</span></tt></p>
+<p><em>Required</em>:  No</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="port">
+<tt class="descname">port</tt><a class="headerlink" href="#port" title="Permalink to this definition">¶</a></dt>
+<dd><p>Port on which the Ramona HTTP frontend will listen.</p>
+<p><em>Default</em>:  <tt class="docutils literal"><span class="pre">5588</span></tt></p>
+<p><em>Required</em>:  No</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="username">
+<tt class="descname">username</tt><a class="headerlink" href="#username" title="Permalink to this definition">¶</a></dt>
+<dd><p>Username used for authentication to Ramona HTTP frontend.
+The authentication will be required only if the <tt class="docutils literal"><span class="pre">username</span></tt>
+option is used.</p>
+<p><em>Default</em>:  No default</p>
+<p><em>Required</em>:  No</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="password">
+<tt class="descname">password</tt><a class="headerlink" href="#password" title="Permalink to this definition">¶</a></dt>
+<dd><p>Password to be used in combination with <tt class="docutils literal"><span class="pre">username</span></tt> for authentication.
+If <tt class="docutils literal"><span class="pre">username</span></tt> option is used, the the <tt class="docutils literal"><span class="pre">password</span></tt> has to be specified as well &#8211;
+Ramona HTTP frontend will fail to start otherwise.</p>
+<p>The value can be either a plain text password or a SHA hash of the password.
+The SHA password hash has to be prefixed with <tt class="docutils literal"><span class="pre">{SHA}</span></tt> prefix, for example:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="na">password</span><span class="o">=</span><span class="s">{SHA}e5e9fa1ba31ecd1ae84f75caaa474f3a663f05f4</span>
+</pre></div>
+</div>
+<p>which is a hash for word <tt class="docutils literal"><span class="pre">secret</span></tt>. To generate the hash to be used for the configuration,
+you can use the following command (works on Linux):</p>
+<div class="highlight-sh"><div class="highlight"><pre><span class="nb">echo</span> -n <span class="s2">&quot;secret&quot;</span> | sha1sum
+</pre></div>
+</div>
+<p><em>Default</em>:  No default</p>
+<p><em>Required</em>:  No</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Configuration</a><ul>
+<li><a class="reference internal" href="#application-and-site-level-configuration">Application and site level configuration</a></li>
+<li><a class="reference internal" href="#general-section">[general] section</a></li>
+<li><a class="reference internal" href="#env-section">[env] section</a></li>
+<li><a class="reference internal" href="#ramona-server-section">[ramona:server] section</a></li>
+<li><a class="reference internal" href="#ramona-notify-section">[ramona:notify] section</a></li>
+<li><a class="reference internal" href="#program-x-section">[program:X] section</a></li>
+<li><a class="reference internal" href="#program-ramonahttpfend">[program:ramonahttpfend]</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="features.html"
+                        title="previous chapter">Features</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="tools.html"
+                        title="next chapter">Tools Cookbook</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/config.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="tools.html" title="Tools Cookbook"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="features.html" title="Features"
+             >previous</a> |</li>
+        <li><a href="index.html">Ramona 0.9 beta 6 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Ales Teska.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
