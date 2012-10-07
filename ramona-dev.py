@@ -77,7 +77,8 @@ class RamonaDevConsoleApp(ramona.console_app):
 	@ramona.tool
 	def manual(self):
 		'Build HTML manual'
-		shutil.rmtree('docs/manual/_build/html')
+		if os.path.isdir('docs/manual/_build'):
+			shutil.rmtree('docs/manual/_build')
 		os.system('LC_ALL=en_US.UTF-8 make -C docs/manual html')
 
 

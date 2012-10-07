@@ -26,7 +26,6 @@ Contents:
    features.rst
    config.rst
    tools.rst
-   quickref.rst
    credits.rst
 
 .. [TODO]: Example of init.d script (and modern alternatives like init) for ramona-based app
