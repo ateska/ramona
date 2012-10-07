@@ -12,7 +12,7 @@ class socket_uri(object):
 	if 'unix' not in urlparse.uses_params: urlparse.uses_params.append('unix')
 
 	def __init__(self, uri):
-		self.uri = urlparse.urlparse(uri)
+		self.uri = urlparse.urlparse(uri.strip())
 		self.uriparams = dict(urlparse.parse_qsl(self.uri.params))
 
 		self.protocol = self.uri.scheme.lower()
