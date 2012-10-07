@@ -21,6 +21,32 @@ Application and site level configuration as syntactically equal.
 TODO
 
 
+.. attribute:: consoleuri
+
+  One or multiple 'socket URIs' specifying where Ramona server should listen for console connections.
+  You can specify more network interfaces, protocols or ports, URIs are comma-separated. It should be synchronized with [ramona:console] option serveruri (where configuration of client side is specified), otherwise console connection fails.
+
+  Supported connection variants:
+
+  - UNIX sockets
+  
+    - optional parameter 'mode' specifies UNIX file permissions for created socket file system entry (in octal representation)
+
+  - TCP IPv4
+  - TCP IPv6
+
+  *Default*: ``unix://.ramona.sock``
+
+  *Required*: Yes (but default will work)
+
+  Example:
+
+  .. code-block:: ini
+
+    [general]
+    consoleuri=unix:///tmp/demoramona.sock;mode=0600,tcp://localhost:5566
+
+
 [env] section
 -------------
 
@@ -81,8 +107,7 @@ Example:
   password=pass
 
 
-
-``host``
+.. attribute:: host
 	
   IP address or hostname, where the Ramona HTTP frontend will listen.
   Use ``0.0.0.0`` to make Ramona HTTP frontend listen on IP addresses of all network interfaces.
@@ -91,15 +116,17 @@ Example:
 
   *Required*:  No
 
-``port``
+
+.. attribute:: port
 
   Port on which the Ramona HTTP frontend will listen.
   
   *Default*:  ``5588``
 
   *Required*:  No
-  
-``username``
+
+
+.. attribute:: username
   
   Username used for authentication to Ramona HTTP frontend. 
   The authentication will be required only if the ``username``
@@ -108,8 +135,9 @@ Example:
   *Default*:  No default
 
   *Required*:  No
-  
-``password``
+
+
+.. attribute:: password
   
   Password to be used in combination with ``username`` for authentication. 
   If ``username`` option is used, the the ``password`` has to be specified as well --
