@@ -1,6 +1,6 @@
 import sys, os, socket, signal, errno, weakref, logging, argparse, itertools, time
 import pyev
-from .. import cnscom
+from .. import cnscom, socketuri
 from ..config import config, read_config, config_files, config_includes, get_numeric_loglevel
 from ..cnscom import program_state_enum, svrcall_error
 from .cnscon import console_connection, message_yield_loghandler, deffered_return
@@ -50,21 +50,30 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 		my_logger.addHandler(message_yield_loghandler(self))
 		my_logger.propagate = False
 
-		# Open console communication socket (listen mode)
-		socket_factory = cnscom.socket_uri(config.get("ramona:server", "consoleuri"))
-		try:
-			self.sock = socket_factory.create_socket_listen()
-		except socket.error, e:
-			L.fatal("It looks like that server is already running: {0}".format(e))
+		# Open console communication sockets (listen mode)
+		self.cnssockets = []
+		consoleuri = config.get("ramona:server", "consoleuri")
+		for cnsuri in consoleuri.split(','):
+			socket_factory = socketuri.socket_uri(cnsuri)
+			try:
+				socks = socket_factory.create_socket_listen()
+			except socket.error, e:
+				L.fatal("It looks like that server is already running: {0}".format(e))
+				sys.exit(1)
+			self.cnssockets.extend(socks)
+		if len(self.cnssockets) == 0:
+			L.fatal("There is no console socket configured - considering this as fatal error")
 			sys.exit(1)
-		self.sock.setblocking(0)
 
 		self.loop = pyev.default_loop()
 		self.watchers = [pyev.Signal(sig, self.loop, self.__terminal_signal_cb) for sig in self.STOPSIGNALS]
 		self.watchers.append(pyev.Child(0, False, self.loop, self.__child_signal_cb))
-		self.watchers.append(pyev.Io(self.sock._sock, pyev.EV_READ, self.loop, self.__accept_cb))
 		self.watchers.append(pyev.Periodic(0, 1.0, self.loop, self.__tick_cb))
-		
+
+		for sock in self.cnssockets:
+			sock.setblocking(0)
+			self.watchers.append(pyev.Io(sock._sock, pyev.EV_READ, self.loop, self.__accept_cb))
+
 		self.conns = weakref.WeakSet()
 		self.termstatus =  None
 		self.termstatus_change = None
@@ -80,7 +89,8 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 
 
 	def run(self):
-		self.sock.listen(socket.SOMAXCONN)
+		for sock in self.cnssockets:
+			sock.listen(socket.SOMAXCONN)
 		for watcher in self.watchers:
 			watcher.start()
 
@@ -91,7 +101,7 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 				open(pidfile,'w').write("{0}\n".format(os.getpid()))
 			except Exception, e:
 				L.critical("Cannot create pidfile: {0}".format(e)) 
-				del self.sock # Make sure that socket is explicitly closed (and eventual UNIX socket file deleted)
+				del self.cnssockets # Make sure that socket is explicitly closed (and eventual UNIX socket file deleted)
 				sys.exit(1)
 				
 		# Launch loop
@@ -111,27 +121,42 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 					os.unlink(pidfile)
 				except Exception, e:
 					L.error("Cannot remove pidfile: {0}".format(e))
-					self.sock.close()
-					del self.sock # Make sure that socket is explicitly closed (and eventual UNIX socket file deleted)
+					while len(self.cnssockets) > 0:
+						sock = self.cnssockets.pop()
+						sock.close()
+						del sock # Make sure that socket is explicitly closed (and eventual UNIX socket file deleted)
 					sys.exit(1)
 
 		sys.exit(0)
 
 
 	def __accept_cb(self, watcher, revents):
+		'''Accept incomming console connection'''
 		try:
+			# Fist find relevant socket
+			sock = None
+			for s in self.cnssockets:
+				if s.fileno() == watcher.fd:
+					sock = s
+					break
+
+			if sock is None:
+				L.warning("Received accept request on unknown socket {0}".format(watcher.fd))
+				return
+
+			# Accept all connection that are pending in listen backlog
 			while True:
 				try:
-					sock, address = self.sock.accept()
+					clisock, address = sock.accept()
 				except socket.error as err:
 					if err.args[0] in self.NONBLOCKING:
 						break
 					else:
 						raise
 				else:
-					if self.termstatus is not None: self.sock.close() # Do not accept new connection when exiting
-					if sock.family==socket.AF_UNIX and address=='': address = sock.getsockname()
-					conn = console_connection(sock, address, self)
+					if self.termstatus is not None: clisock.close() # Do not accept new connection when exiting
+					if clisock.family==socket.AF_UNIX and address=='': address = clisock.getsockname()
+					conn = console_connection(clisock, address, self)
 					self.conns.add(conn)
 
 		except:
@@ -173,7 +198,8 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 		Stop internal loop and exit.
 		'''
 		self.loop.stop(pyev.EVBREAK_ALL)
-		self.sock.close()
+		for sock in self.cnssockets:
+			sock.close()
 		while self.watchers:
 			self.watchers.pop().stop()
 

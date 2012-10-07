@@ -1,7 +1,7 @@
 import sys, os, socket, errno, logging, time
 from ..config import config, read_config, config_files
 from ..utils import launch_server_daemonized
-from .. import cnscom
+from .. import cnscom, socketuri
 from .parser import argparser
 from . import exception
 
@@ -78,7 +78,7 @@ Console application (base for custom implementations)
 		L.debug("Configuration read from: {0}".format(', '.join(config_files)))
 
 		# Prepare server connection factory
-		self.cnsconuri = cnscom.socket_uri(config.get('ramona:console','serveruri'))
+		self.cnsconuri = socketuri.socket_uri(config.get('ramona:console','serveruri'))
 		self.ctlconsock = None
 
 
