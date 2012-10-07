@@ -63,8 +63,11 @@ class httpfend_app(object):
 			L.fatal("Configuration error: 'username' option is set, but 'password' option is not set. Please set 'password'")
 			sys.exit(1) 
 
-		Handler = RamonaHttpReqHandler
-		self.httpd = BaseHTTPServer.HTTPServer((host, port), Handler)
+		handler = RamonaHttpReqHandler
+		self.servers = list()
+		
+		httpd = HTTPServerWrapper((host, port), handler, socket.AF_INET)
+		self.servers.append(httpd)
 		
 		# Prepare server connection factory
 		self.cnsconuri = cnscom.socket_uri(config.get('ramona:console','serveruri'))
@@ -74,12 +77,23 @@ class httpfend_app(object):
 		signal.signal(signal.SIGINT, self.stop)
 
 	def run(self):
-		L.info("Started HTTP frontend at http://{0}:{1}".format(self.httpd.server_name, self.httpd.server_port))
-		self.httpd.serve_forever()
+		for httpd in self.servers:
+			L.info("Started HTTP frontend at http://{0}:{1}".format(httpd.server_name, httpd.server_port))
+			httpd.serve_forever()
 	
 	def stop(self, signum, frame):
-		L.info("Received signal {0}. Stopping the server.".format(signum))
-		self.httpd.shutdown()
+		for httpd in self.servers:
+			L.info("Received signal {0}. Stopping the server.".format(signum))
+			httpd.shutdown()
+
+#
+
+class HTTPServerWrapper(BaseHTTPServer.HTTPServer):
+	def __init__(self, server_address, req_handler, addr_family):
+		self.address_family = addr_family
+		BaseHTTPServer.HTTPServer.__init__(self, server_address, req_handler)
+
+#
 
 def _is_egg():
 	ret = isinstance(pkgutil.get_loader(__name__), zipimport.zipimporter)
@@ -107,7 +121,7 @@ def _get_static_file(path):
 		parts = path.split("/")
 		return open(os.path.join(_scriptdir, *[x for x in parts if len(x) > 0]), "rb")
 
-#			
+#
 
 class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 	
