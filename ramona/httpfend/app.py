@@ -1,7 +1,7 @@
 import sys, os, socket, ConfigParser, errno, logging, httplib, BaseHTTPServer, mimetypes, json, signal
 import time, cgi, pprint, urllib, urlparse, itertools, base64, hashlib, pkgutil, zipimport
 from ..config import config, read_config, get_numeric_loglevel
-from .. import cnscom
+from .. import cnscom, socketuri
 
 ###
 
@@ -67,7 +67,7 @@ class httpfend_app(object):
 		self.httpd = BaseHTTPServer.HTTPServer((host, port), Handler)
 		
 		# Prepare server connection factory
-		self.cnsconuri = cnscom.socket_uri(config.get('ramona:console','serveruri'))
+		self.cnsconuri = socketuri.socket_uri(config.get('ramona:console','serveruri'))
 		
 		self.logmsgcnt = itertools.count()
 		self.logmsgs = dict()
