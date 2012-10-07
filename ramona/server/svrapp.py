@@ -51,12 +51,16 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 		my_logger.propagate = False
 
 		# Open console communication sockets (listen mode)
-		socket_factory = socketuri.socket_uri(config.get("ramona:server", "consoleuri"))
-		try:
-			self.cnssockets = socket_factory.create_socket_listen()
-		except socket.error, e:
-			L.fatal("It looks like that server is already running: {0}".format(e))
-			sys.exit(1)
+		self.cnssockets = []
+		consoleuri = config.get("ramona:server", "consoleuri")
+		for cnsuri in consoleuri.split(','):
+			socket_factory = socketuri.socket_uri(cnsuri)
+			try:
+				socks = socket_factory.create_socket_listen()
+			except socket.error, e:
+				L.fatal("It looks like that server is already running: {0}".format(e))
+				sys.exit(1)
+			self.cnssockets.extend(socks)
 		if len(self.cnssockets) == 0:
 			L.fatal("There is no console socket configured - considering this as fatal error")
 			sys.exit(1)
