@@ -8,7 +8,7 @@ class socket_uri(object):
 	This is actually quite generic implementation - not specific to console-server IPC communication.
 	'''
 
-	# Configure urlparce
+	# Configure urlparse
 	if 'unix' not in urlparse.uses_params: urlparse.uses_params.append('unix')
 
 	def __init__(self, uri):
