@@ -24,6 +24,7 @@ class console_connection(object):
 		
 		self.yield_enabled = False
 		self.return_expected = False # This is synchronization element used in asserts preventing IPC goes out of sync
+		self.tailf_enabled = False
 
 		self.watcher = pyev.Io(self.sock._sock, pyev.EV_READ, serverapp.loop, self.io_cb)
 		self.watcher.start()
@@ -113,6 +114,8 @@ class console_connection(object):
 			L.warning("Socket is closed - write operation is ignored")
 			return
 
+		#TODO: Close socket if write buffer is tooo long
+
 		if self.write_buf is None:
 			self.write_buf = data
 			self.reset(pyev.EV_READ | pyev.EV_WRITE)
@@ -176,6 +179,16 @@ class console_connection(object):
 			raise RuntimeError("Transmitted yield message is too long.")
 
 		self.write(struct.pack(cnscom.resp_struct_fmt, cnscom.resp_magic, cnscom.resp_yield_message, messagelen) + message)
+
+
+	def send_tailf(self, data):
+		if not self.tailf_enabled: return
+
+		datalen = len(data)
+		if datalen >= 0x7fff:
+			raise RuntimeError("Transmitted yield message is too long.")
+
+		self.write(struct.pack(cnscom.resp_struct_fmt, cnscom.resp_magic, cnscom.resp_tailf_data, datalen) + data)
 
 ###
 

@@ -268,7 +268,17 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 			except KeyError, e:
 				raise svrcall_error("{0}".format(e.message))
 			
-			return program.tail(**kwargs)
+			return program.tail(cnscon, **kwargs)
+
+		elif callid == cnscom.callid_tailf_stop:
+			kwargs = cnscom.parse_json_kwargs(params)
+			program = kwargs.pop('program')
+			try:
+				program = self.get_program(program)
+			except KeyError, e:
+				raise svrcall_error("{0}".format(e.message))
+			
+			return program.tailf_stop(cnscon, **kwargs)
 
 		else:
 			L.error("Received unknown callid: {0}".format(callid))

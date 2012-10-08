@@ -12,6 +12,7 @@ callid_stop = 2
 callid_restart = 3
 callid_status = 4
 callid_tail = 5
+callid_tailf_stop = 6 # Terminate previously initialized tailf mode
 
 #
 
@@ -24,6 +25,7 @@ resp_struct_fmt = '!ccH'
 resp_return = 'R'
 resp_exception = 'E'
 resp_yield_message = 'M' # Used to propagate message from server to console
+resp_tailf_data = 'T' # Used to send data in tail -f mode
 
 ###
 
@@ -68,29 +70,7 @@ def svrcall(cnssocket, callid, params=""):
 	cnssocket.send(struct.pack(call_struct_fmt, call_magic, callid, paramlen)+params)
 
 	while 1:
-		x = time.time()
-		resp = ""
-		while len(resp) < 4:
-			rlist, _, _ = select.select([cnssocket],[],[], 5)
-			if len(rlist) == 0:
-				if time.time() - x > 2: L.error("Looping detected")
-				continue
-			ndata = cnssocket.recv(4 - len(resp))
-			if len(ndata) == 0:
-				raise EOFError("It looks like server closed connection")
-
-			resp += ndata
-
-		magic, retype, paramlen = struct.unpack(resp_struct_fmt, resp)
-		assert magic == resp_magic
-
-		# Read rest of the response (size given by paramlen)
-		params = ""
-		while paramlen > 0:
-			ndata = cnssocket.recv(paramlen)
-			params += ndata
-			paramlen -= len(ndata)
-
+		retype, params = svrresp(cnssocket)
 
 		if retype == resp_return:
 			# Remote server call returned normally
@@ -109,7 +89,42 @@ def svrcall(cnssocket, callid, params=""):
 			continue
 
 		else:
-			raise RuntimeError("Unknown server response: {0}".format(retype))
+			raise RuntimeError("Unknown/invalid server response: {0}".format(retype))
+
+###
+
+def svrresp(cnssocket, loop_detector=True):
+	'''Receive and parse one server response - used inherently by svrcall.
+
+	@param cnssocket: Socket to server (created by socket_uri factory)
+	@param loop_detector: If set to True, logs warning when server is not responding in 2 seconds	
+	@return: tuple(retype, params) - retype is cnscom.resp_* integer and params are data attached to given response
+	'''
+
+	x = time.time()
+	resp = ""
+	while len(resp) < 4:
+		rlist, _, _ = select.select([cnssocket],[],[], 5)
+		if len(rlist) == 0:
+			if loop_detector and time.time() - x > 2: L.error("Looping detected")
+			continue
+		ndata = cnssocket.recv(4 - len(resp))
+		if len(ndata) == 0:
+			raise EOFError("It looks like server closed connection")
+
+		resp += ndata
+
+	magic, retype, paramlen = struct.unpack(resp_struct_fmt, resp)
+	assert magic == resp_magic
+
+	# Read rest of the response (size given by paramlen)
+	params = ""
+	while paramlen > 0:
+		ndata = cnssocket.recv(paramlen)
+		params += ndata
+		paramlen -= len(ndata)
+
+	return retype, params
 
 ###
 

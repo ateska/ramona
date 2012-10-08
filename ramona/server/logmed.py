@@ -1,4 +1,4 @@
-import re, collections, io, os, glob, logging
+import re, collections, io, os, glob, weakref, logging
 from ..config import config
 from ..kmpsearch import kmp_search
 from .svrappsingl import get_svrapp
@@ -37,6 +37,7 @@ class log_mediator(object):
 
 		self.tailbuf = collections.deque()
 		self.tailbuflen = 0
+		self.tailfset = weakref.WeakSet()
 
 		# Read last content of the file into tail buffer
 		if self.fname is not None and os.path.isfile(self.fname):
@@ -153,8 +154,12 @@ class log_mediator(object):
 
 			self.tailbuflen -= odatalen
 
+		# Send tail to tailf clients
+		for cnscon in self.tailfset:
+			cnscon.send_tailf(data)
 
-	def tail(self):
+
+	def tail(self, cnscon, tailf):
 		d = collections.deque()
 		dlen = 0
 		for data, datalen in reversed(self.tailbuf):
@@ -162,7 +167,16 @@ class log_mediator(object):
 			if dlen >= 0x7fff: break #Protect maximum IPC data len
 			d.appendleft(data)
 
+		if tailf:
+			cnscon.tailf_enabled = True
+			self.tailfset.add(cnscon)
+
 		return "".join(d)
+
+
+	def tailf_stop(self, cnscon):
+		self.tailfset.remove(cnscon)
+		cnscon.tailf_enabled = False
 
 
 	def add_scanner(self, pattern, target):
