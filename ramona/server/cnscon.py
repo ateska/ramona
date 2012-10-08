@@ -186,7 +186,7 @@ class console_connection(object):
 
 		datalen = len(data)
 		if datalen >= 0x7fff:
-			raise RuntimeError("Transmitted yield message is too long.")
+			raise RuntimeError("Transmitted tailf data are too long.")
 
 		self.write(struct.pack(cnscom.resp_struct_fmt, cnscom.resp_magic, cnscom.resp_tailf_data, datalen) + data)
 
