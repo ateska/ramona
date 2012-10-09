@@ -41,7 +41,7 @@ Watchdog
 
 Python specific
 ---------------
-- native python program execution (using sys.executable)
+- native python program execution (using sys.executable - substitute for STRIGAPYTHON)
 - python version (minimal) check
 
 Mailing to admin
@@ -50,6 +50,7 @@ Mailing to admin
 - On FATAL mail trigger
 - Mailing issues to admin: https://github.com/ateska/ramona/issues/1
 - Standalone log scanner (not connected to particular program) to enable supervising of e.g. CGI scripts
+- daily/weekly/monthly targets
 
 HTTP frontend
 -------------
