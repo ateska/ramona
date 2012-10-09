@@ -1,6 +1,7 @@
 import unittest
 import logging
 from . import config
+from . import sendmail
 ###
 '''
 To launch unit test:
@@ -19,3 +20,7 @@ class TestConfig(unittest.TestCase):
 		self.assertEqual(lvl, logging.ERROR)
 
 		self.assertRaises(ValueError, config.get_numeric_loglevel, '')
+
+
+	def test_get_default_fromaddr(self):
+		sendmail.get_default_fromaddr()

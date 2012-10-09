@@ -1,4 +1,4 @@
-import smtplib, logging, os
+import smtplib, logging, getpass, socket, os
 from email.mime.text import MIMEText
 from .config import config
 ###
@@ -15,12 +15,7 @@ def send_mail(recipient, subject, mail_body):
 		return
 
 	sender = config.get('ramona:smtp','sender')
-	if sender is None:
-		sender = "{0}@{1}".format(
-			# TODO: Does not work on Linux either
-			os.getusername(), #TODO: Probably not working in windows - http://stackoverflow.com/questions/842059/is-there-a-portable-way-to-get-the-current-username-in-python
-			'xxx'
-		)
+	if sender is None: sender = get_default_fromaddr()
 
 	msg = MIMEText(mail_body)
 	msg['Subject'] = subject
@@ -30,3 +25,7 @@ def send_mail(recipient, subject, mail_body):
 	s = smtplib.SMTP( config.getint('ramona:smtp','port'))
 	s.sendmail(sender, [recipient], msg.as_string())
 	s.quit()
+
+
+def get_default_fromaddr():
+	return "{0}@{1}".format(getpass.getuser(), socket.getfqdn())
