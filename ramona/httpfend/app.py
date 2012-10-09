@@ -1,5 +1,6 @@
-import sys, os, socket, ConfigParser, errno, logging, httplib, BaseHTTPServer, mimetypes, json, signal
-import time, cgi, pprint, urllib, urlparse, itertools, base64, hashlib, pkgutil, zipimport
+import sys, os, socket, ConfigParser, errno, logging, httplib, BaseHTTPServer, mimetypes, json, signal, threading
+import time, cgi, pprint, urllib, urlparse, itertools, base64, hashlib, pkgutil, zipimport, collections
+import pyev
 from ..config import config, read_config, get_numeric_loglevel
 from .. import cnscom, socketuri
 
@@ -21,12 +22,10 @@ if not mimetypes.inited:
 
 class httpfend_app(object):
 
-	instance = None
-
+	STOPSIGNALS = [signal.SIGINT, signal.SIGTERM]
+	NONBLOCKING = frozenset([errno.EAGAIN, errno.EWOULDBLOCK])
+	
 	def __init__(self):
-		assert self.instance is None
-		httpfend_app.instance = self
-		
 		# Read config
 		read_config()
 		
@@ -42,14 +41,9 @@ class httpfend_app(object):
 		)
 
 		try:
-			host = config.get(os.environ['RAMONA_SECTION'], 'host')
+			listenaddr = config.get(os.environ['RAMONA_SECTION'], 'listen')
 		except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
-			host = "localhost"
-		
-		try:
-			port = config.getint(os.environ['RAMONA_SECTION'], 'port')
-		except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
-			port = 5588
+			listenaddr = "tcp://localhost:5588"
 		
 		self.username = None
 		self.password = None 
@@ -61,37 +55,98 @@ class httpfend_app(object):
 		
 		if self.username is not None and self.password is None:
 			L.fatal("Configuration error: 'username' option is set, but 'password' option is not set. Please set 'password'")
-			sys.exit(1) 
-
-		handler = RamonaHttpReqHandler
-		self.servers = list()
-		
-		httpd = HTTPServerWrapper((host, port), handler, socket.AF_INET)
-		self.servers.append(httpd)
+			sys.exit(1)
 		
 		# Prepare server connection factory
 		self.cnsconuri = socketuri.socket_uri(config.get('ramona:console','serveruri'))
 		
 		self.logmsgcnt = itertools.count()
 		self.logmsgs = dict()
-		signal.signal(signal.SIGINT, self.stop)
+			
+		self.workers = collections.deque() 
 
+		self.svrsockets = []
+		
+		for addr in listenaddr.split(','):
+			socket_factory = socketuri.socket_uri(addr)
+			try:
+				socks = socket_factory.create_socket_listen()
+			except socket.error, e:
+				L.fatal("It looks like that server is already running: {0}".format(e))
+				sys.exit(1)
+			self.svrsockets.extend(socks)
+
+		if len(self.svrsockets) == 0:
+			L.fatal("There is no http server listen address configured - considering this as fatal error")
+			sys.exit(1)
+
+		self.loop = pyev.default_loop()
+		self.watchers = [pyev.Signal(sig, self.loop, self.__terminal_signal_cb) for sig in self.STOPSIGNALS]
+		
+		for sock in self.svrsockets:
+			sock.setblocking(0)
+			self.watchers.append(pyev.Io(sock._sock, pyev.EV_READ, self.loop, self.__on_accept))
+		
 	def run(self):
-		for httpd in self.servers:
-			L.info("Started HTTP frontend at http://{0}:{1}".format(httpd.server_name, httpd.server_port))
-			httpd.serve_forever()
+		
+		for sock in self.svrsockets:
+			sock.listen(socket.SOMAXCONN)
+			L.info("Ramona HTTP frontend is listening at {0}".format(sock.getsockname()))
+		for watcher in self.watchers:
+			watcher.start()
+		
+		# Launch loop
+		try:
+			self.loop.start()
+		finally:
+			for w in self.workers:
+				w.join(0.5)
+
+	def __on_accept(self, watcher, events):
+		# Fist find relevant socket
+		sock = None
+		for s in self.svrsockets:
+			if s.fileno() == watcher.fd:
+				sock = s
+				break
+		if sock is None:
+			L.warning("Received accept request on unknown socket {0}".format(watcher.fd))
+			return
+		# Accept all connection that are pending in listen backlog
+		while True:
+			try:
+				clisock, address = sock.accept()
+				
+			except socket.error as err:
+				if err.args[0] in self.NONBLOCKING:
+					break
+				else:
+					raise
+			else:
+				worker = RequestWorker(clisock, address, self)
+				worker.start()
+				self.workers.append(worker)
 	
-	def stop(self, signum, frame):
-		for httpd in self.servers:
-			L.info("Received signal {0}. Stopping the server.".format(signum))
-			httpd.shutdown()
+	def __terminal_signal_cb(self, watcher, events):
+		watcher.loop.stop()
 
 #
 
-class HTTPServerWrapper(BaseHTTPServer.HTTPServer):
-	def __init__(self, server_address, req_handler, addr_family):
-		self.address_family = addr_family
-		BaseHTTPServer.HTTPServer.__init__(self, server_address, req_handler)
+class RequestWorker(threading.Thread):
+	
+	def __init__(self, sock, address, server):
+		threading.Thread.__init__(self, name="worker")
+		self.sock = sock
+		self.address = address
+		self.server = server
+	
+	def run(self):
+		try:
+			RamonaHttpReqHandler(self.sock, self.address, self.server)
+		except:
+			L.exception("Uncaught exception during worker thread execution:")
+		finally:
+			self.server.workers.remove(self)
 
 #
 
@@ -125,6 +180,10 @@ def _get_static_file(path):
 
 class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 	
+	def __init__(self, request, client_address, server):
+		BaseHTTPServer.BaseHTTPRequestHandler.__init__(self, request, client_address, server)
+		self.server = server
+	
 	ActionToCallid = {"start": cnscom.callid_start, "stop": cnscom.callid_stop, "restart": cnscom.callid_restart}
 	_scriptdir = os.path.dirname(__file__)
 	
@@ -150,20 +209,20 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 				f.close()
 		
 		authheader = self.headers.getheader("Authorization", None)
-		if httpfend_app.instance.username is not None and authheader is None:
+		if self.server.username is not None and authheader is None:
 			self.serve_auth_headers()
 			return
 		
-		elif httpfend_app.instance.username is not None and authheader is not None:
+		elif self.server.username is not None and authheader is not None:
 			method, authdata = authheader.split(" ") 
 			if method != "Basic":
 				self.send_error(httplib.NOT_IMPLEMENTED, "The authentication method '{0}' is not supported. Only Basic authnetication method is supported.".format(method))
 				return
 			username, _, password = base64.b64decode(authdata).partition(":")
-			if httpfend_app.instance.password.startswith("{SHA}"):
+			if self.server.password.startswith("{SHA}"):
 				password = "{SHA}" + hashlib.sha1(password).hexdigest()
 			
-			if username != httpfend_app.instance.username or password != httpfend_app.instance.password:
+			if username != self.server.username or password != self.server.password:
 				self.serve_auth_headers()
 				return
 		
@@ -247,7 +306,7 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			
 			logmsg = ""
 			for msgid in qs.get('msgid', []):
-				m = httpfend_app.instance.logmsgs.pop(int(msgid), None)
+				m = self.server.logmsgs.pop(int(msgid), None)
 				if m is not None:
 					logmsg += '''<div class="alert alert-{0}">{1}</div>'''.format(*m)
 
@@ -338,8 +397,8 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 	
 	
 	def addLogMessage(self, level, msg):
-		msgid = httpfend_app.instance.logmsgcnt.next()
-		httpfend_app.instance.logmsgs[msgid] = (level, msg)
+		msgid = self.server.logmsgcnt.next()
+		self.server.logmsgs[msgid] = (level, msg)
 		return msgid
 	
 	def getAbsPath(self, path="/", **kwargs):
@@ -370,7 +429,7 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 	def socket_connect(self):
 		if hasattr(self, "socket_conn"): return self.socket_conn
 		try:
-			self.socket_conn = httpfend_app.instance.cnsconuri.create_socket_connect()
+			self.socket_conn = self.server.cnsconuri.create_socket_connect()
 			return self.socket_conn
 		except socket.error, e:
 			if e.errno == errno.ECONNREFUSED: return None
@@ -382,11 +441,14 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 		self.send_header('WWW-Authenticate', 'Basic realm="Ramona HTTP frontend"')
 		self.send_header('Content-type', 'text/html')
 		self.end_headers()
-		with open(os.path.join(self.scriptdir, "401.tmpl.html")) as f:
+		f = _get_static_file("401.tmpl.html")
+		try:
 			self.wfile.write(f.read().format(
 					appname=config.get('general','appname'),
 					configsection=os.environ['RAMONA_SECTION'])
 			)
+		finally:
+			f.close()
 		
 
 def natural_relative_time(diff_sec):
