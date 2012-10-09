@@ -106,6 +106,9 @@ class httpfend_app(object):
 		try:
 			self.loop.start()
 		finally:
+			# Stop accepting new work
+			for sock in self.svrsockets: sock.close()
+
 			# Join threads  ...
 			for i in range(len(self.workers)-1,-1,-1):
 				w = self.workers[i]
