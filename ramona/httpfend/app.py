@@ -41,9 +41,9 @@ class httpfend_app(object):
 		)
 
 		try:
-			listenaddr = config.get(os.environ['RAMONA_SECTION'], 'listen')
+			self.listenaddr = config.get(os.environ['RAMONA_SECTION'], 'listen')
 		except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
-			listenaddr = "tcp://localhost:5588"
+			self.listenaddr = "tcp://localhost:5588"
 		
 		self.username = None
 		self.password = None 
@@ -67,7 +67,7 @@ class httpfend_app(object):
 
 		self.svrsockets = []
 		
-		for addr in listenaddr.split(','):
+		for addr in self.listenaddr.split(','):
 			socket_factory = socketuri.socket_uri(addr)
 			try:
 				socks = socket_factory.create_socket_listen()
@@ -91,10 +91,12 @@ class httpfend_app(object):
 		
 		for sock in self.svrsockets:
 			sock.listen(socket.SOMAXCONN)
-			L.info("Ramona HTTP frontend is listening at {0}".format(sock.getsockname()))
+			L.debug("Ramona HTTP frontend is listening at {0}".format(sock.getsockname()))
 		for watcher in self.watchers:
 			watcher.start()
-		
+
+		L.info('Ramona HTTP frontend started and is available at {0}'.format(self.listenaddr))
+
 		# Launch loop
 		try:
 			self.loop.start()
