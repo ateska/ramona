@@ -41,14 +41,9 @@ class httpfend_app(object):
 		)
 
 		try:
-			host = config.get(os.environ['RAMONA_SECTION'], 'host')
+			listenaddr = config.get(os.environ['RAMONA_SECTION'], 'listen')
 		except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
-			host = "localhost"
-		
-		try:
-			port = config.getint(os.environ['RAMONA_SECTION'], 'port')
-		except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
-			port = 5588
+			listenaddr = "tcp://localhost:5588"
 		
 		self.username = None
 		self.password = None 
@@ -71,9 +66,9 @@ class httpfend_app(object):
 		self.workers = collections.deque() 
 
 		self.svrsockets = []
-		consoleuri = "tcp://localhost:8888"
-		for cnsuri in consoleuri.split(','):
-			socket_factory = socketuri.socket_uri(cnsuri)
+		
+		for addr in listenaddr.split(','):
+			socket_factory = socketuri.socket_uri(addr)
 			try:
 				socks = socket_factory.create_socket_listen()
 			except socket.error, e:
@@ -85,8 +80,6 @@ class httpfend_app(object):
 			L.fatal("There is no http server listen address configured - considering this as fatal error")
 			sys.exit(1)
 
-		handler = RamonaHttpReqHandler
-		
 		self.loop = pyev.default_loop()
 		self.watchers = [pyev.Signal(sig, self.loop, self.__terminal_signal_cb) for sig in self.STOPSIGNALS]
 		
@@ -98,6 +91,7 @@ class httpfend_app(object):
 		
 		for sock in self.svrsockets:
 			sock.listen(socket.SOMAXCONN)
+			L.info("Ramona HTTP frontend is listening at {0}".format(sock.getsockname()))
 		for watcher in self.watchers:
 			watcher.start()
 		
@@ -106,8 +100,7 @@ class httpfend_app(object):
 			self.loop.start()
 		finally:
 			for w in self.workers:
-#				w.join()
-				pass
+				w.join(0.5)
 
 	def __on_accept(self, watcher, events):
 		# Fist find relevant socket
