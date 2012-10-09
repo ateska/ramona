@@ -54,9 +54,9 @@ class notificator(object):
 		nfttext += 'Program: {0}\n'.format(prog_ident)
 		nfttext += 'Pattern: {0}\n'.format(pattern)
 		nfttext += 'Hostname: {0}\n'.format(hostname)
-		nfttext += '\n'+'-'*80+'\n'
+		nfttext += '\n'+'-'*50+'\n'
 		nfttext += tail	
-		nfttext += '\n'+'-'*80+'\n'
+		nfttext += '\n'+'-'*50+'\n'
 
 		if target.startswith('mailto'):
 			receiver = urlparse.urlparse(target).path
