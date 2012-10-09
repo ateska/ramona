@@ -140,6 +140,7 @@ class httpfend_app(object):
 				else:
 					raise
 			else:
+				clisock.setblocking(1)
 				worker = RequestWorker(clisock, address, self)
 				worker.start()
 				self.workers.append(worker)
