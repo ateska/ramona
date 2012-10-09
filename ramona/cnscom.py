@@ -70,7 +70,7 @@ def svrcall(cnssocket, callid, params=""):
 	cnssocket.send(struct.pack(call_struct_fmt, call_magic, callid, paramlen)+params)
 
 	while 1:
-		retype, params = svrresp(cnssocket)
+		retype, params = svrresp(cnssocket, hang_message="callid : {0}".format(callid))
 
 		if retype == resp_return:
 			# Remote server call returned normally
@@ -93,11 +93,12 @@ def svrcall(cnssocket, callid, params=""):
 
 ###
 
-def svrresp(cnssocket, loop_detector=True):
+def svrresp(cnssocket, hang_detector=True, hang_message='details not provided'):
 	'''Receive and parse one server response - used inherently by svrcall.
 
 	@param cnssocket: Socket to server (created by socket_uri factory)
-	@param loop_detector: If set to True, logs warning when server is not responding in 2 seconds	
+	@param hang_detector: If set to True, logs warning when server is not responding in 2 seconds	
+	@param hang_message: Details about server call to be included in eventual hang message
 	@return: tuple(retype, params) - retype is cnscom.resp_* integer and params are data attached to given response
 	'''
 
@@ -106,7 +107,7 @@ def svrresp(cnssocket, loop_detector=True):
 	while len(resp) < 4:
 		rlist, _, _ = select.select([cnssocket],[],[], 5)
 		if len(rlist) == 0:
-			if loop_detector and time.time() - x > 2: L.error("Looping detected")
+			if hang_detector and time.time() - x > 2: L.error("Possible server hang detected - {0}".format(hang_message))
 			continue
 		ndata = cnssocket.recv(4 - len(resp))
 		if len(ndata) == 0:

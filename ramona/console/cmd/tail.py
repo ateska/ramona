@@ -50,7 +50,7 @@ def main(cnsapp, args):
 	# Handle tail -f mode
 	try:
 		while 1:
-			retype, params = cnscom.svrresp(cnsapp.ctlconsock, loop_detector=False)
+			retype, params = cnscom.svrresp(cnsapp.ctlconsock, hang_detector=False)
 			if retype == cnscom.resp_tailf_data:
 				sys.stdout.write(params)
 			else:
