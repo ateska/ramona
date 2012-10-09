@@ -4,74 +4,82 @@ import pyev
 from .. import socketuri
 import logging as L
 import select
+import collections
+import sys
+import threading
+from BaseHTTPServer import BaseHTTPRequestHandler
+import errno
+from .app import RamonaHttpReqHandler
 
-class connection(object):
-	def start(self, sock, address, serverapp):
-		self.msg = "HTTP/1.0 200 OK\r\nContent-Length: 5\r\n\r\nPong!\r\n"
-		self.sock = sock
-		self.sock.setblocking(0)
-		self.write = self.write_msg
-		self.writewatcher = pyev.Io(self.sock, pyev.EV_WRITE, serverapp.loop, self.write)
-		self.writewatcher.start()
-
+class connection(threading.Thread):
 	
-#	def io_cb(self, watcher, revents):
-#		try:
-#			if (revents & pyev.EV_READ) == pyev.EV_READ:
-#				self.handle_read()
-#
-#			if self.sock is None: return # Socket has been just closed
-#
-#			if (revents & pyev.EV_WRITE) == pyev.EV_WRITE:
-#				self.handle_write()
-#		except:
-#			L.exception("Exception during IO on console connection:")
-#
-#
-#	def handle_write(self):
-#		try:
-#			sent = self.sock.send(self.write_buf[:select.PIPE_BUF])
-#		except socket.error as err:
-#			if err.args[0] not in self.NONBLOCKING:
-#				#TODO: Log "error writing to {0}".format(self.sock)
-#				self.handle_error()
-#				return
-#		else :
-#			self.write_buf = self.write_buf[sent:]
-#			if len(self.write_buf) == 0:
-#				self.reset(pyev.EV_READ)
-#				self.write_buf = None
-
-
-	def write_msg(self, watcher, events):
-		self.sock.send(self.msg)
-		self.writewatcher.stop()
-		self.sock.close()
+	def __init__(self, sock, address, server):
+		threading.Thread.__init__(self, name="worker")
+		self.sock = sock
+		self.address = address
+		self.server = server
+	
+	def run(self):
+		try:
+			handler = RamonaHttpReqHandler(self.sock, self.address, self.server)
+		except:
+			L.exception("Uncaught exception during worker thread execution:")
 
 class Server(object):
-	def start(self, loop):
-		self.loop = loop
-		socket_factory = socketuri.socket_uri("tcp://localhost:9999")
-		self.socks = socket_factory.create_socket_listen()
+	
+	STOPSIGNALS = [signal.SIGINT, signal.SIGTERM]
+	NONBLOCKING = frozenset([errno.EAGAIN, errno.EWOULDBLOCK])
+	
+	def __init__(self):
+		self.workers = collections.deque()
 		
-#		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#		self.sock.bind(('localhost', 10000))
-#		self.sock.listen(500)
-#		self.watchers.append(pyev.Io(sock._sock, pyev.EV_READ, self.loop, self.__accept_cb))
-		self.acceptwatchers = []
-		for sock in self.socks:
-			sock.setblocking(0)
-			self.acceptwatchers.append(pyev.Io(sock._sock, pyev.EV_READ, self.loop, self.accept))
-			sock.listen(socket.SOMAXCONN)
-		for watcher in self.acceptwatchers:
-			watcher.start()
-#		self.acceptwatcher = pyev.Io(self.sock._sock, pyev.EV_READ, loop, self.accept)
-#		self.acceptwatcher.start()
+		# Open console communication sockets (listen mode)
+		self.svrsockets = []
+#		consoleuri = config.get("ramona:server", "consoleuri")
+		consoleuri = "tcp://localhost:8888"
+		for cnsuri in consoleuri.split(','):
+			socket_factory = socketuri.socket_uri(cnsuri)
+			try:
+				socks = socket_factory.create_socket_listen()
+			except socket.error, e:
+				L.fatal("It looks like that server is already running: {0}".format(e))
+				sys.exit(1)
+			self.svrsockets.extend(socks)
+		if len(self.svrsockets) == 0:
+			L.fatal("There is no console socket configured - considering this as fatal error")
+			sys.exit(1)
 
-	def accept(self, watcher, events):
+		self.loop = pyev.default_loop()
+		self.watchers = [pyev.Signal(sig, self.loop, self.__terminal_signal_cb) for sig in self.STOPSIGNALS]
+		
+		for sock in self.svrsockets:
+			sock.setblocking(0)
+			self.watchers.append(pyev.Io(sock._sock, pyev.EV_READ, self.loop, self.on_accept))
+	
+	def run(self):
+		
+		for sock in self.svrsockets:
+			sock.listen(socket.SOMAXCONN)
+		for watcher in self.watchers:
+			watcher.start()
+		
+		
+		# Launch loop
+		try:
+			self.loop.start()
+		finally:
+			for w in self.workers:
+#				w.join()
+				pass
+#				w.terminate
+
+
+		sys.exit(0)
+
+	def on_accept(self, watcher, events):
 		# Fist find relevant socket
 		sock = None
-		for s in self.socks:
+		for s in self.svrsockets:
 			if s.fileno() == watcher.fd:
 				sock = s
 				break
@@ -82,27 +90,23 @@ class Server(object):
 		while True:
 			try:
 				clisock, address = sock.accept()
+				
 			except socket.error as err:
 				if err.args[0] in self.NONBLOCKING:
 					break
 				else:
 					raise
 			else:
-#				if self.termstatus is not None: clisock.close() # Do not accept new connection when exiting
-				if clisock.family==socket.AF_UNIX and address=='': address = clisock.getsockname()
-				conn = connection(clisock, address, self)
-#				self.conns.add(conn)
+				worker = connection(clisock, address, self)
+				worker.start()
+				self.workers.append(worker)
 
-#		print "Serving event", events, "with socket", sock
-#		client = Client()
-#		client.start(watcher.loop, sock)
+	def __terminal_signal_cb(self, watcher, events):
+		watcher.loop.stop()
 
-def interrupt(watcher, events):
-	watcher.loop.stop()
 
-loop = pyev.default_loop()
-sigwatch = pyev.Signal(signal.SIGINT, loop, interrupt)
-sigwatch.start()
-srv = Server()
-srv.start(loop)
-loop.start()
+
+if __name__ == '__main__':
+	srv = Server()
+	srv.run()
+	
