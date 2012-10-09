@@ -440,7 +440,7 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 	
 	def serve_auth_headers(self):
 		self.send_response(httplib.UNAUTHORIZED)
-		self.send_header('WWW-Authenticate', 'Basic realm="Ramona HTTP frontend"')
+		self.send_header('WWW-Authenticate', 'Basic realm="Ramona HTTP frontend - {0}"'.format(config.get('general','appname')))
 		self.send_header('Content-type', 'text/html')
 		self.end_headers()
 		f = _get_static_file("401.tmpl.html")
