@@ -44,12 +44,12 @@ class send_mail(object):
 
 	def connection_test(self):
 		try: # Connection test
-			smtpcon = smtplib.SMTP(self.hostname, self.port)
+			s = smtplib.SMTP(self.hostname, self.port)
 			if self.params.get('tls', '1') == '1': s.starttls()
 			if self.username is not None and self.password is not None:
 				s.login(self.username, self.password)
 
-			smtpcon.quit()
+			s.quit()
 		except Exception, e:
 			L.warning("Given SMTP server ({1}/{2}) is not responding: {0}".format(e, self.hostname, self.port))
 			return False
