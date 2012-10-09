@@ -81,7 +81,12 @@ class httpfend_app(object):
 			sys.exit(1)
 
 		self.loop = pyev.default_loop()
-		self.watchers = [pyev.Signal(sig, self.loop, self.__terminal_signal_cb) for sig in self.STOPSIGNALS]
+		self.watchers = [
+			pyev.Signal(sig, self.loop, self.__terminal_signal_cb) for sig in self.STOPSIGNALS
+		]
+		self.watchers.append(
+			pyev.Periodic(0, 1, self.loop, self.__tick_cb)
+		)
 		
 		for sock in self.svrsockets:
 			sock.setblocking(0)
@@ -129,8 +134,22 @@ class httpfend_app(object):
 				worker.start()
 				self.workers.append(worker)
 	
+
 	def __terminal_signal_cb(self, watcher, events):
 		watcher.loop.stop()
+
+
+	def __tick_cb(self, _watcher, _events):
+		'''Iterate thru list of workers and remove dead threads'''
+		deads = collections.deque()
+		for w in self.workers:
+			if not w.is_alive():
+				deads.append(w)
+
+		while len(deads) > 0:
+			w = deads.pop()
+			w.join()
+			self.workers.remove(w)
 
 #
 
@@ -147,8 +166,6 @@ class RequestWorker(threading.Thread):
 			RamonaHttpReqHandler(self.sock, self.address, self.server)
 		except:
 			L.exception("Uncaught exception during worker thread execution:")
-		finally:
-			self.server.workers.remove(self)
 
 #
 
