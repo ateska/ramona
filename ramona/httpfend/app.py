@@ -106,8 +106,15 @@ class httpfend_app(object):
 		try:
 			self.loop.start()
 		finally:
-			for w in self.workers:
-				w.join(0.5)
+			# Join threads  ...
+			for i in range(len(self.workers)-1,-1,-1):
+				w = self.workers[i]
+				w.join(2)
+				if not w.is_alive(): del self.workers[i]
+
+			if len(self.workers) > 0:
+				L.warning("Not all workers threads exited nicely - expect hang during exit")
+
 
 	def __on_accept(self, watcher, events):
 		# Fist find relevant socket
