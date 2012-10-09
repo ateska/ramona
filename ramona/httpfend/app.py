@@ -63,7 +63,8 @@ class httpfend_app(object):
 		self.logmsgcnt = itertools.count()
 		self.logmsgs = dict()
 			
-		self.workers = collections.deque() 
+		self.workers = collections.deque()
+		self.dyingws = collections.deque() # Dying workers
 
 		self.svrsockets = []
 		
@@ -84,16 +85,15 @@ class httpfend_app(object):
 		self.watchers = [
 			pyev.Signal(sig, self.loop, self.__terminal_signal_cb) for sig in self.STOPSIGNALS
 		]
-		self.watchers.append(
-			pyev.Periodic(0, 1, self.loop, self.__tick_cb)
-		)
+		self.dyingwas = pyev.Async(self.loop, self.__wdied_cb) # Dying workers async. signaling
+		self.watchers.append(self.dyingwas)
 		
 		for sock in self.svrsockets:
 			sock.setblocking(0)
 			self.watchers.append(pyev.Io(sock._sock, pyev.EV_READ, self.loop, self.__on_accept))
+
 		
 	def run(self):
-		
 		for sock in self.svrsockets:
 			sock.listen(socket.SOMAXCONN)
 			L.debug("Ramona HTTP frontend is listening at {0}".format(sock.getsockname()))
@@ -149,15 +149,10 @@ class httpfend_app(object):
 		watcher.loop.stop()
 
 
-	def __tick_cb(self, _watcher, _events):
+	def __wdied_cb(self, _watcher, _events):
 		'''Iterate thru list of workers and remove dead threads'''
-		deads = collections.deque()
-		for w in self.workers:
-			if not w.is_alive():
-				deads.append(w)
-
-		while len(deads) > 0:
-			w = deads.pop()
+		while len(self.dyingws) > 0:
+			w = self.dyingws.pop()
 			w.join()
 			self.workers.remove(w)
 
@@ -176,6 +171,9 @@ class RequestWorker(threading.Thread):
 			RamonaHttpReqHandler(self.sock, self.address, self.server)
 		except:
 			L.exception("Uncaught exception during worker thread execution:")
+		finally:
+			self.server.dyingws.append(self)
+			self.server.dyingwas.send()
 
 #
 
