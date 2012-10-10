@@ -91,7 +91,8 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			conn = self.socket_connect()
 			params = {
 					"program": program,
-					"stream": stream, 
+					"stream": stream,
+					"tailf": False 
 			}
 			try:
 				ret = cnscom.svrcall(conn, cnscom.callid_tail, json.dumps(params))
