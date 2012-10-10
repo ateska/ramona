@@ -160,10 +160,10 @@ class RequestWorker(threading.Thread):
 	def run(self):
 		try:
 			RamonaHttpReqHandler(self.sock, self.address, self.server)
+			self.sock.close()
 		except:
 			L.exception("Uncaught exception during worker thread execution:")
 		finally:
-			self.sock.close()
 			self.server.dyingws.append(self)
 			self.server.dyingwas.send()
 
