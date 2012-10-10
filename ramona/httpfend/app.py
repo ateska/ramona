@@ -166,5 +166,3 @@ class RequestWorker(threading.Thread):
 			self.server.dyingws.append(self)
 			self.server.dyingwas.send()
 
-#
-
