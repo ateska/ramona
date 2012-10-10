@@ -428,7 +428,7 @@ class program(object):
 			elif watcher.data == 1: self.log_err.write(data)
 
 
-	def tail(self, cnscon, stream, tailf):
+	def tail(self, cnscon, stream, tailf=False):
 		if stream == 'stdout':
 			return self.log_out.tail(cnscon, tailf)
 		elif stream == 'stderr':
