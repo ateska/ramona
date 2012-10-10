@@ -2,6 +2,7 @@ import os, socket, errno, httplib, BaseHTTPServer, mimetypes, json, logging
 import time, cgi, pprint, urllib, urlparse, base64, hashlib, pkgutil, zipimport
 from .. import cnscom
 from ..config import config
+from ._tailf import tail_f_handler
 
 ###
 
@@ -75,7 +76,7 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 				self.send_header("Content-Type", "text/html; charset=utf-8")
 				self.end_headers()
 				self.wfile.write(self.buildStatusTable(json.loads(self.getStatuses())))
-		
+				
 		elif self.path.startswith("/log/"):
 			parsed = urlparse.urlparse(self.path)
 			logname = parsed.path[5:]
@@ -89,17 +90,31 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 				return
 			program = urllib.unquote_plus(parts[1].rpartition(".")[0])
 			conn = self.socket_connect()
+			tailf = True
 			params = {
 					"program": program,
 					"stream": stream,
-					"tailf": False 
+					"tailf": tailf 
 			}
 			try:
 				ret = cnscom.svrcall(conn, cnscom.callid_tail, json.dumps(params))
 				self.send_response(httplib.OK)
 				self.send_header("Content-Type", "text/plain; charset=utf-8")
 				self.end_headers()
-				self.wfile.write(ret)
+				
+				tailfhandler = tail_f_handler(self, conn)
+				tailfhandler.run()
+#				self.wfile.write(ret)
+#				if tailf:
+#					
+#					
+#					while 1:
+#						retype, params = cnscom.svrresp(conn, hang_detector=False)
+#						if retype == cnscom.resp_tailf_data:
+#							self.wfile.write(params)
+#						else:
+#							raise RuntimeError("Unknown/invalid server response: {0}".format(retype))
+				
 			except Exception, e:
 				self.send_error(httplib.INTERNAL_SERVER_ERROR, str(e))
 				return
