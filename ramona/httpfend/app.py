@@ -163,6 +163,7 @@ class RequestWorker(threading.Thread):
 		except:
 			L.exception("Uncaught exception during worker thread execution:")
 		finally:
+			self.sock.close()
 			self.server.dyingws.append(self)
 			self.server.dyingwas.send()
 
