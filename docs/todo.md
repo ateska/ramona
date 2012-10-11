@@ -54,7 +54,6 @@ Mailing to admin
 
 HTTP frontend
 -------------
-- Remove/optimize JQuery (following Bootstrap example)
 - Store static files in a way that py2exe will work correctly.
 - RESTful API
 - (low prio): HTTPS

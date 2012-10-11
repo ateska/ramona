@@ -34,39 +34,28 @@
 	</footer>
 	</div>
 
-	<script src="/static/jquery/jquery-1.8.1.min.js"></script>
-	<script type="text/javascript">
-	jQuery.ajaxSetup({{
-	  beforeSend: function() {{
-	     $('#loader').show();
-	  }},
-	  complete: function(){{
-	     $('#loader').hide();
-	  }},
-	  success: function() {{}}
-	}});
+	<script src="/static/miniajax/miniajax.js"></script>
 	
+	<script type="text/javascript">
 	function refreshStatuses() {{
-		$.get('/ajax/statusTable', function(data) {{
-		  $('#statusTable').html(data);
+		document.getElementById('loader').style.display = "inline";
+		ajax.get('/ajax/statusTable', function(data) {{
+		   document.getElementById('statusTable').innerHTML = data;
+		   document.getElementById('loader').style.display = "none";
 		}});
 	}}
 	
 	setInterval(function() {{
-		if($("#refreshAutomatically").is(":checked")) {{
+		if(document.getElementById('refreshAutomatically').checked) {{
 			refreshStatuses();
 		}}
 	}}, 5000);
 	
-	
-	$(document).ready(function() {{
-	  $("#refreshButton").click(function(event) {{
+	document.getElementById('refreshButton').onclick = function(event) {{
 		event.preventDefault();
 		refreshStatuses();
-	  }});
-	  $("#raform").show();
-		
-	}});
+	}}
+	document.getElementById('raform').style.display = "inline";
 	</script>
 	
 </body>
