@@ -108,8 +108,10 @@ Console application (base for custom implementations)
 		return self.ctlconsock
 
 
-	def svrcall(self, callid, params="", auto_connect=False, auto_server_start=False):
+	def cnssvrcall(self, callid, params="", auto_connect=False, auto_server_start=False):
 		'''
+		Console-server call (wrapper to cnscom.svrcall)
+
 		@param auto_connect: Automatically establish server connection if not present
 		@param auto_server_start: Automatically start server if not running and establish connection
 		'''

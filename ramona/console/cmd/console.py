@@ -93,7 +93,7 @@ class _console_cmd(cmd.Cmd):
 	def emptyline(self):
 		# Send 'ping' to server
 		try:
-			self.cnsapp.svrcall(cnscom.callid_ping, '', auto_connect=True)
+			self.cnsapp.cnssvrcall(cnscom.callid_ping, '', auto_connect=True)
 		except Exception, e:
 			L.error("{0}".format(e))
 	
