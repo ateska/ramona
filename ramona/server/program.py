@@ -2,7 +2,7 @@ import sys, os, time, logging, shlex, signal, errno, resource
 import pyev
 from ..config import config, get_boolean
 from ..utils import parse_signals, MAXFD, enable_nonblocking, disable_nonblocking
-from ..cnscom import program_state_enum
+from ..cnscom import program_state_enum, svrcall_error
 from .logmed import log_mediator
 
 #
@@ -439,6 +439,8 @@ class program(object):
 
 
 	def tail(self, cnscon, stream, lines=80, tailf=False):
+		if self.state == program_state_enum.CFGERROR:
+			raise svrcall_error("Program {0} is not correctly configured".format(self.ident))
 		if stream == 'stdout':
 			return self.log_out.tail(cnscon, lines, tailf)
 		elif stream == 'stderr':
