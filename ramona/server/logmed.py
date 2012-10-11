@@ -20,7 +20,8 @@ class log_mediator(object):
 		- seek for patterns in log stream and eventually trigger error mail
 	'''
 
-	maxtailbuflen = 64*1024 # 64Kb is max len. of tail buffer
+	maxlinelen = 0x7f00 # Connected to maximum IPC (console-server) data buffer
+	linehistory = 100 # Number of tail history (in lines)
 	rotlognamerg = re.compile('\.([0-9]+)$')
 
 	def __init__(self, prog_ident, stream_name, fname):
@@ -35,22 +36,22 @@ class log_mediator(object):
 		self.outf = None
 		self.scanners = []
 
-		self.tailbuf = collections.deque()
-		self.tailbuflen = 0
+		self.tailbuf = collections.deque() # Lines
+		self.tailbufnl = True
 		self.tailfset = weakref.WeakSet()
+
 
 		# Read last content of the file into tail buffer
 		if self.fname is not None and os.path.isfile(self.fname):
-			with io.open(self.fname, 'r') as logf:
-				if logf.seekable(): 
-					logf.seek(0, io.SEEK_END)
-					d = max(logf.tell() - self.maxtailbuflen, 0)
-					logf.seek(d, io.SEEK_SET) # Seek to tail start position (end of file - maxtailbuflen)
-					while True: # Read line by line into tail buffer
-						data = logf.readline(4096)
-						datalen = len(data)
-						if datalen == 0: break
-						self.__add_to_tailbuf(data)
+			with open(self.fname, "r") as logf:
+				logf.seek(0, os.SEEK_END)
+				fsize = logf.tell()
+				fsize -= self.linehistory * 512;
+				if fsize <0: fsize = 0
+				logf.seek(fsize, os.SEEK_SET)
+				
+				for line in logf:
+					self.__add_to_tailbuf(line)
 
 		# Configure log rotation
 		try:
@@ -138,21 +139,52 @@ class log_mediator(object):
 			self.outf = open(self.fname,'a')		
 
 
+	def __tailbuf_append(self, data, nlt):
+		if self.tailbufnl:
+			if len(data) <= self.maxlinelen:
+				self.tailbuf.append(data)
+			else:
+				self.tailbuf.extend(_chunker(data, self.maxlinelen))
+
+		else:
+			data = self.tailbuf.pop() + data
+			if len(data) <= self.maxlinelen:
+				self.tailbuf.append(data)
+			else:
+				self.tailbuf.extend(_chunker(data, self.maxlinelen))
+
+		self.tailbufnl = nlt
+
+		# Remove old tail lines
+		while len(self.tailbuf) > self.linehistory:
+			self.tailbuf.popleft()
+
+
 	def __add_to_tailbuf(self, data):
 		# Add data to tail buffer
-		datalen = len(data)
-		self.tailbuf.append((data, datalen))
-		self.tailbuflen += datalen
+		lendata = len(data)
+		if lendata == 0: return
 
-		# Clean tail buffer - data that exceeds max. length
-		while self.tailbuflen > self.maxtailbuflen:
-			try:
-				_, odatalen = self.tailbuf.popleft()
-			except IndexError:
-				self.tailbuflen = 0
+		datapos = 0
+		while datapos < lendata:
+			seppos = data.find('\n', datapos)
+			if seppos == -1:
+				# Last chunk & no \n at the end
+				if datapos == 0:
+					self.__tailbuf_append(data, False)
+				else:
+					self.__tailbuf_append(data[datapos:], False)
 				break
-
-			self.tailbuflen -= odatalen
+			elif seppos == lendata-1:
+				# Last chunk terminated with \n
+				if datapos == 0:
+					self.__tailbuf_append(data, True)
+				else:
+					self.__tailbuf_append(data[datapos:], True)
+				break
+			else:
+				self.__tailbuf_append(data[datapos:seppos+1], True)
+				datapos = seppos + 1
 
 		# Send tail to tailf clients
 		for cnscon in self.tailfset:
@@ -162,10 +194,10 @@ class log_mediator(object):
 	def tail(self, cnscon, tailf):
 		d = collections.deque()
 		dlen = 0
-		for data, datalen in reversed(self.tailbuf):
-			dlen += datalen
+		for line in reversed(self.tailbuf):
+			dlen += len(line)
 			if dlen >= 0x7fff: break #Protect maximum IPC data len
-			d.appendleft(data)
+			d.appendleft(line)
 
 		if tailf:
 			cnscon.tailf_enabled = True
@@ -184,6 +216,7 @@ class log_mediator(object):
 			_log_scanner(self.prog_ident, self.stream_name, pattern, target)
 		)
 
+#
 
 class _log_scanner(kmp_search):
 
@@ -193,4 +226,10 @@ class _log_scanner(kmp_search):
 		self.target = target
 		self.prog_ident = prog_ident
 		self.stream_name = stream_name
+
+#
+
+def _chunker(data, maxsize):
+	for i in xrange(0, len(data), maxsize):
+		yield data[i:i+maxsize]
 
