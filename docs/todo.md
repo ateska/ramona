@@ -28,7 +28,6 @@ Logging
 - Support for SIGHUP (reopen log files OR reset fully)
 - log rotate of Ramona server log (stdout/stderr redirection)
 - compress older (xxxx.log.2+) log rotated files
-- make tail buffer more line oriented
 
 Configuration
 -------------
