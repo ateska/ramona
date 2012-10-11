@@ -32,7 +32,7 @@ Logging
 
 Configuration
 -------------
-- optional alterative configuration for environment variables: https://github.com/ateska/ramona/issues/2
+- optional alternative configuration for environment variables: https://github.com/ateska/ramona/issues/2
 - environment variables expansion in configuration
 
 Watchdog
