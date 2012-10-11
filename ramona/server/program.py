@@ -17,6 +17,7 @@ class program(object):
 	DEFAULTS = {
 		'command': None,
 		'directory': None,
+		'umask': None,
 		'starttimeout': 0.5,
 		'stoptimeout': 3,
 		'killby': 'TERM,TERM,TERM,QUIT,QUIT,INT,INT,KILL',
@@ -118,6 +119,16 @@ class program(object):
 			L.error("Unknown 'processgroup' option '{0}' in {1} -> CFGERROR".format(self.config.get('processgroup','?'), config_section))
 			self.state = program_state_enum.CFGERROR
 			return
+
+		umask = self.config.get('umask')
+		if umask is not None:
+			try:
+				umask = int(umask, 8)
+			except:
+				L.error("Missing command option in {0} -> CFGERROR".format(config_section))
+				self.state = program_state_enum.CFGERROR
+				return
+			self.config['umask'] = umask
 
 
 		# Prepare log files
@@ -247,6 +258,15 @@ class program(object):
 			# Close all open file descriptors above standard ones.  This prevents the child from keeping
 			# open any file descriptors inherited from the parent.
 			os.closerange(3, MAXFD)
+
+			umask = self.config.get('umask')
+			if umask is not None:
+				try:
+					os.umask(umask)
+				except Exception, e:
+					os.write(2, "FATAL: Set umask {0} failed: {1}\n".format(umask, e))
+					raise
+
 
 			directory = self.config.get('directory')
 			if directory is not None:
