@@ -35,156 +35,185 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 	
 	def do_GET(self):
 		
+		# Static has to be handeled before authentication, as the static content is available
+		# even without authentication, because the static resources are used on the 401 page as well
 		if self.path.startswith("/static/"):
-			parts = self.path.split("/")
-			if not _static_file_exists(self.path):
-				self.send_error(httplib.NOT_FOUND)
-				return
-			try:
-				f = _get_static_file(self.path)
-			except IOError:
-				self.send_error(httplib.NOT_FOUND)
-				return
-			try:
-				self.send_response(httplib.OK)
-				self.send_header("Content-Type", mimetypes.guess_type(self.path)[0])
-				self.end_headers()
-				self.wfile.write(f.read())
-				return
-			finally:
-				f.close()
+			return self._handle_static()
 		
+		if not self._check_authentication(): return
+		
+		if self.path.startswith("/ajax/"):
+			return self._handle_ajax()
+				
+		elif self.path.startswith("/log/"):
+			return self._handle_log()
+
+		else:
+			return self._handler_other()
+	
+	
+	def _check_authentication(self):
+		'''Check if the authentication is enabled and if yes, check if the user is authenticated
+		   to access the httpfend or not.
+		   If authentication is turned on, but the user fails to authenticate, the authentication headers
+		   are sent to client (which triggers username and password prompt in the browser)
+		   @return: True if the authentication is turned off or the user is successfully authenticated
+		            False otherwise
+		'''
 		authheader = self.headers.getheader("Authorization", None)
 		if self.server.username is not None and authheader is None:
 			self.serve_auth_headers()
-			return
+			return False
 		
 		elif self.server.username is not None and authheader is not None:
 			method, authdata = authheader.split(" ") 
 			if method != "Basic":
 				self.send_error(httplib.NOT_IMPLEMENTED, "The authentication method '{0}' is not supported. Only Basic authnetication method is supported.".format(method))
-				return
+				return False
 			username, _, password = base64.b64decode(authdata).partition(":")
 			if self.server.password.startswith("{SHA}"):
 				password = "{SHA}" + hashlib.sha1(password).hexdigest()
 			
 			if username != self.server.username or password != self.server.password:
 				self.serve_auth_headers()
-				return
+				return False
+			
+		return True 
 		
-		if self.path.startswith("/ajax/"):
-			parsed = urlparse.urlparse(self.path)
-			action = parsed.path[6:]
-			if action == "statusTable":
-				self.send_response(httplib.OK)
-				self.send_header("Content-Type", "text/html; charset=utf-8")
-				self.end_headers()
-				self.wfile.write(self.buildStatusTable(json.loads(self.getStatuses())))
-				
-		elif self.path.startswith("/log/"):
-			parsed = urlparse.urlparse(self.path)
-			logname = parsed.path[5:]
-			parts = logname.split("/")
-			if len(parts) < 2:
-				self.send_error(httplib.NOT_FOUND, "Invalid URL.")
-				return
-			stream = parts[0]
-			if stream not in ("stdout", "stderr"):
-				self.send_error(httplib.NOT_FOUND, "'{0}' is not a valid type of stream. Only 'stdout' and 'stderr' are supported.".format(stream))
-				return
-			program = urllib.unquote_plus(parts[1].rpartition(".")[0])
-			cnsconn = self.socket_connect()
-			tailf = True
-			params = {
-					"program": program,
-					"stream": stream,
-					"tailf": tailf 
-			}
-			try:
-				ret = cnscom.svrcall(cnsconn, cnscom.callid_tail, json.dumps(params))
-				self.send_response(httplib.OK)
-				self.send_header("Content-Type", "text/plain; charset=utf-8")
-				self.end_headers()
-				
-				self.wfile.write(ret)
-				cnsconn.setblocking(0)
-				
-				tailfhandler = tail_f_handler(self, cnsconn)
-				tailfhandler.run()
-				
-				cnsconn.setblocking(1)
-				params = {
-					'program': program,
-					'stream': stream,
-				}
-				cnscom.svrcall(
-					cnsconn,
-					cnscom.callid_tailf_stop,
-					json.dumps(params)
-				)
-				
-			except Exception, e:
-				self.send_error(httplib.INTERNAL_SERVER_ERROR, str(e))
-				return
-
-		else:
-			parsed = urlparse.urlparse(self.path)
-			if parsed.path != "/":
-				self.send_error(httplib.NOT_FOUND)
-				return
-			
-			qs = urlparse.parse_qs(parsed.query)
-			action = None
-			actionList = qs.get('action')
-			if actionList is not None and len(actionList) > 0:
-				action = actionList[0]
-			if action in ("start", "stop", "restart"):
-				conn = self.socket_connect()
-				params = {
-					'immediate': True,
-				}
-				qsIdent = qs.get('ident')
-				if qsIdent is not None and len(qsIdent) > 0:
-					params['pfilter'] = [qsIdent[0]]
-				else:
-					params['pfilter'] = list(self.getAllPrograms(True))
-				
-				qsForce = qs.get('force')
-				if qsForce is not None and len(qsForce) > 0:
-					if qsForce[0] == "1":
-						params['force'] = True
-				
-				try:
-					cnscom.svrcall(conn, self.ActionToCallid[action], json.dumps(params))
-					msgid = self.addLogMessage("success", "Command '{0}' successfully triggered.".format(action))
-				except Exception, e:
-					msgid = self.addLogMessage("error", "Failed to trigger the command: {0}".format(e))
-				
-				self.send_response(httplib.SEE_OTHER)
-				self.send_header("Location", self.getAbsPath(msgid=msgid))
-				self.end_headers()
-				return
-			
+	
+	def _handle_static(self):
+		if not _static_file_exists(self.path):
+			self.send_error(httplib.NOT_FOUND)
+			return
+		try:
+			f = _get_static_file(self.path)
+		except IOError:
+			self.send_error(httplib.NOT_FOUND)
+			return
+		try:
+			self.send_response(httplib.OK)
+			self.send_header("Content-Type", mimetypes.guess_type(self.path)[0])
+			self.end_headers()
+			self.wfile.write(f.read())
+			return
+		finally:
+			f.close()
+		
+	
+	def _handle_ajax(self):
+		parsed = urlparse.urlparse(self.path)
+		action = parsed.path[6:]
+		if action == "statusTable":
 			self.send_response(httplib.OK)
 			self.send_header("Content-Type", "text/html; charset=utf-8")
 			self.end_headers()
+			self.wfile.write(self.buildStatusTable(json.loads(self.getStatuses())))
+	
+	def _handle_log(self):
+		parsed = urlparse.urlparse(self.path)
+		logname = parsed.path[5:]
+		parts = logname.split("/")
+		if len(parts) < 2:
+			self.send_error(httplib.NOT_FOUND, "Invalid URL.")
+			return
+		stream = parts[0]
+		if stream not in ("stdout", "stderr"):
+			self.send_error(httplib.NOT_FOUND, "'{0}' is not a valid type of stream. Only 'stdout' and 'stderr' are supported.".format(stream))
+			return
+		program = urllib.unquote_plus(parts[1].rpartition(".")[0])
+		cnsconn = self.socket_connect()
+		tailf = True
+		params = {
+				"program": program,
+				"stream": stream,
+				"tailf": tailf 
+		}
+		try:
+			ret = cnscom.svrcall(cnsconn, cnscom.callid_tail, json.dumps(params))
+			self.send_response(httplib.OK)
+			self.send_header("Content-Type", "text/plain; charset=utf-8")
+			self.end_headers()
 			
-			logmsg = ""
-			for msgid in qs.get('msgid', []):
-				m = self.server.logmsgs.pop(int(msgid), None)
-				if m is not None:
-					logmsg += '''<div class="alert alert-{0}">{1}</div>'''.format(*m)
-
-			f = _get_static_file("index.tmpl.html")
+			self.wfile.write(ret)
+			cnsconn.setblocking(0)
+			
+			tailfhandler = tail_f_handler(self, cnsconn)
+			tailfhandler.run()
+			
+			cnsconn.setblocking(1)
+			params = {
+				'program': program,
+				'stream': stream,
+			}
+			cnscom.svrcall(
+				cnsconn,
+				cnscom.callid_tailf_stop,
+				json.dumps(params)
+			)
+			
+		except Exception, e:
+			self.send_error(httplib.INTERNAL_SERVER_ERROR, str(e))
+			return
+	
+	def _handler_other(self):
+		parsed = urlparse.urlparse(self.path)
+		if parsed.path != "/":
+			self.send_error(httplib.NOT_FOUND)
+			return
+		
+		qs = urlparse.parse_qs(parsed.query)
+		action = None
+		actionList = qs.get('action')
+		if actionList is not None and len(actionList) > 0:
+			action = actionList[0]
+		if action in ("start", "stop", "restart"):
+			conn = self.socket_connect()
+			params = {
+				'immediate': True,
+			}
+			qsIdent = qs.get('ident')
+			if qsIdent is not None and len(qsIdent) > 0:
+				params['pfilter'] = [qsIdent[0]]
+			else:
+				params['pfilter'] = list(self.getAllPrograms(True))
+			
+			qsForce = qs.get('force')
+			if qsForce is not None and len(qsForce) > 0:
+				if qsForce[0] == "1":
+					params['force'] = True
+			
 			try:
-				sttable = self.buildStatusTable(json.loads(self.getStatuses()))
-				self.wfile.write(f.read().format(
-					statuses=sttable,
-					logmsg=logmsg,
-					appname=config.get('general','appname')
-				))
-			finally:
-				f.close()
+				cnscom.svrcall(conn, self.ActionToCallid[action], json.dumps(params))
+				msgid = self.addLogMessage("success", "Command '{0}' successfully triggered.".format(action))
+			except Exception, e:
+				msgid = self.addLogMessage("error", "Failed to trigger the command: {0}".format(e))
+			
+			self.send_response(httplib.SEE_OTHER)
+			self.send_header("Location", self.getAbsPath(msgid=msgid))
+			self.end_headers()
+			return
+		
+		self.send_response(httplib.OK)
+		self.send_header("Content-Type", "text/html; charset=utf-8")
+		self.end_headers()
+		
+		logmsg = ""
+		for msgid in qs.get('msgid', []):
+			m = self.server.logmsgs.pop(int(msgid), None)
+			if m is not None:
+				logmsg += '''<div class="alert alert-{0}">{1}</div>'''.format(*m)
+
+		f = _get_static_file("index.tmpl.html")
+		try:
+			sttable = self.buildStatusTable(json.loads(self.getStatuses()))
+			self.wfile.write(f.read().format(
+				statuses=sttable,
+				logmsg=logmsg,
+				appname=config.get('general','appname')
+			))
+		finally:
+			f.close()
+	
 	
 	def log_message(self, fmt, *args):
 		L.debug("{0} -- [{1}]: {2}".format(self.address_string(), self.log_date_time_string(), fmt % args))
