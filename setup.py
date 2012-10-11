@@ -20,7 +20,7 @@ setup(
 	package_data={
 		'ramona.httpfend': [
 			'*.html',
-			'static/jquery/*.js',
+			'static/miniajax/*.js',
 			'static/bootstrap/css/*.css',
 			'static/img/*.gif',
 			'static/img/*.ico',
