@@ -1,5 +1,5 @@
 import os, socket, errno, httplib, BaseHTTPServer, mimetypes, json, logging, time
-import time, cgi, pprint, urllib, urlparse, base64, hashlib, pkgutil, zipimport
+import cgi, pprint, urllib, urlparse, base64, hashlib, pkgutil, zipimport
 from .. import cnscom, socketuri
 from ..config import config
 from ._tailf import tail_f_handler
