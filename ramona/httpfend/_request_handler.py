@@ -1,6 +1,6 @@
 import os, socket, errno, httplib, BaseHTTPServer, mimetypes, json, logging, time
 import cgi, pprint, urllib, urlparse, base64, hashlib, pkgutil, zipimport
-from .. import cnscom, socketuri
+from .. import cnscom, socketuri, version as ramona_version
 from ..config import config
 from ._tailf import tail_f_handler
 
@@ -124,6 +124,7 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 		try:
 			self.wfile.write(f.read().format(
 				appname=config.get('general','appname'),
+				version=ramona_version,
 				logpath="/loginner/{0}".format(logname)
 			))
 		finally:
@@ -229,7 +230,8 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			self.wfile.write(f.read().format(
 				statuses=sttable,
 				logmsg=logmsg,
-				appname=config.get('general','appname')
+				appname=config.get('general','appname'),
+				version=ramona_version,
 			))
 		finally:
 			f.close()
