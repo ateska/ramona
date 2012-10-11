@@ -57,9 +57,7 @@ HTTP frontend
 - Remove/optimize JQuery (following Bootstrap example)
 - Store static files in a way that py2exe will work correctly.
 - RESTful API
-- Listen on multiple IP addresses
 - (low prio): HTTPS
-- (low prio): IPv6
 
 Deployment
 ----------
