@@ -16,7 +16,7 @@ class log_mediator(object):
 
 	It provides following functionality:
 		- log rotation
-		- tail buffer (TODO)
+		- tail buffer
 		- seek for patterns in log stream and eventually trigger error mail
 	'''
 
