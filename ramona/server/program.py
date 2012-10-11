@@ -16,6 +16,7 @@ class program(object):
 
 	DEFAULTS = {
 		'command': None,
+		'directory': None,
 		'starttimeout': 0.5,
 		'stoptimeout': 3,
 		'killby': 'TERM,TERM,TERM,QUIT,QUIT,INT,INT,KILL',
@@ -246,6 +247,15 @@ class program(object):
 			# Close all open file descriptors above standard ones.  This prevents the child from keeping
 			# open any file descriptors inherited from the parent.
 			os.closerange(3, MAXFD)
+
+			directory = self.config.get('directory')
+			if directory is not None:
+				directory = os.path.expandvars(directory)
+				try:
+					os.chdir(directory)
+				except Exception, e:
+					os.write(2, "FATAL: Change to directory {0} failed: {1}\n".format(directory, e))
+					raise
 
 			# Set ulimits
 			for k,v in self.ulimits.iteritems():

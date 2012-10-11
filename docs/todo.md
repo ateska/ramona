@@ -15,7 +15,6 @@ Generic
 	 - e.g. <on-platform linux:mac>
 - test Ramona how it runs in out-of-diskspace conditions
 - 'user' option - If ramona runs as root, this UNIX user account will be used as the account which runs the program. If ramona is not running as root, this option has no effect.
-- 'directory' option (change working directory prior program start)
 - 'umask' option
 
 Windows
@@ -28,6 +27,7 @@ Logging
 - Support for SIGHUP (reopen log files OR reset fully)
 - log rotate of Ramona server log (stdout/stderr redirection)
 - compress older (xxxx.log.2+) log rotated files
+- consider removing kmp search in favor to 'line-oriented find' 
 
 Configuration
 -------------
