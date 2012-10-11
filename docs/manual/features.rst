@@ -64,7 +64,7 @@ HTTP front end (Web console)
 - standalone process
 - displays states of programs 
 - allows to start/stop/restart each or all of them
-- allows displaying tail of log files 
+- allows displaying tail of log files in *forever* mode 
 - basic authentication
 
 Configuration:

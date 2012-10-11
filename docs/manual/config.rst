@@ -94,11 +94,8 @@ Example:
   [program:ramonahttpfend]
   command=<httpfend>
 
-  # IP address/hostname where the HTTP frontend will listen
-  host=127.0.0.1
-  
-  # Port where the HTTP frontend will listen
-  port=5588
+  # Where the HTTP frontend will listen
+  listen=tcp://localhost:5588
   
   # Use username and password options only if you want to enable basic authentication
   username=admin
@@ -107,21 +104,22 @@ Example:
   password=pass
 
 
-.. attribute:: host
+.. attribute:: listen
 	
-  IP address or hostname, where the Ramona HTTP frontend will listen.
-  Use ``0.0.0.0`` to make Ramona HTTP frontend listen on IP addresses of all network interfaces.
+  One or multiple 'socket URIs', where the Ramona HTTP frontend will listen. 
+  You can specify more network interfaces, protocols or ports, URIs are comma-separated.
+    
+  Supported connection variants:
 
-  *Default*:  ``localhost``
-
-  *Required*:  No
-
-
-.. attribute:: port
-
-  Port on which the Ramona HTTP frontend will listen.
+  - UNIX sockets
   
-  *Default*:  ``5588``
+    - optional parameter 'mode' specifies UNIX file permissions for created socket file system entry (in octal representation)
+
+  - TCP IPv4: For example: ``tcp://127.0.0.1:4455``
+  - TCP IPv6: For example: ``tcp://[::1]:8877``
+
+
+  *Default*:  ``tcp://localhost:5588``
 
   *Required*:  No
 
