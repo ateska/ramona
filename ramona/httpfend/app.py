@@ -47,9 +47,6 @@ class httpfend_app(object):
 			L.fatal("Configuration error: 'username' option is set, but 'password' option is not set. Please set 'password'")
 			sys.exit(1)
 		
-		# Prepare server connection factory
-		self.cnsconuri = socketuri.socket_uri(config.get('ramona:console','serveruri'))
-		
 		self.logmsgcnt = itertools.count()
 		self.logmsgs = dict()
 			
@@ -132,6 +129,7 @@ class httpfend_app(object):
 			else:
 				clisock.setblocking(1)
 				worker = RequestWorker(clisock, address, self)
+				L.debug("Request from client {0} is processed by thread {1}".format(address, worker.name))
 				worker.start()
 				self.workers.append(worker)
 	
@@ -144,6 +142,7 @@ class httpfend_app(object):
 		'''Iterate thru list of workers and remove dead threads'''
 		while len(self.dyingws) > 0:
 			w = self.dyingws.pop()
+			L.debug("Joining thread {0}".format(w.name))
 			w.join()
 			self.workers.remove(w)
 
@@ -152,7 +151,8 @@ class httpfend_app(object):
 class RequestWorker(threading.Thread):
 	
 	def __init__(self, sock, address, server):
-		threading.Thread.__init__(self, name="worker")
+		threading.Thread.__init__(self)
+		self.name = "RequestWorker-{0}".format(self.name)
 		self.sock = sock
 		self.address = address
 		self.server = server

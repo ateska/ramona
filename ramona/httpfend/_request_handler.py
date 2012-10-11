@@ -1,6 +1,6 @@
-import os, socket, errno, httplib, BaseHTTPServer, mimetypes, json, logging
+import os, socket, errno, httplib, BaseHTTPServer, mimetypes, json, logging, time
 import time, cgi, pprint, urllib, urlparse, base64, hashlib, pkgutil, zipimport
-from .. import cnscom
+from .. import cnscom, socketuri
 from ..config import config
 from ._tailf import tail_f_handler
 
@@ -23,9 +23,13 @@ if not mimetypes.inited:
 class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 	
 	def __init__(self, request, client_address, server):
-		BaseHTTPServer.BaseHTTPRequestHandler.__init__(self, request, client_address, server)
 		self.server = server
-	
+		self.cnsconn = None
+		try:
+			BaseHTTPServer.BaseHTTPRequestHandler.__init__(self, request, client_address, server)
+		except:
+			L.exception("Exception while requesthandler execution")
+		
 	ActionToCallid = {"start": cnscom.callid_start, "stop": cnscom.callid_stop, "restart": cnscom.callid_restart}
 	_scriptdir = os.path.dirname(__file__)
 	
@@ -89,7 +93,7 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 				self.send_error(httplib.NOT_FOUND, "'{0}' is not a valid type of stream. Only 'stdout' and 'stderr' are supported.".format(stream))
 				return
 			program = urllib.unquote_plus(parts[1].rpartition(".")[0])
-			conn = self.socket_connect()
+			cnsconn = self.socket_connect()
 			tailf = True
 			params = {
 					"program": program,
@@ -97,23 +101,27 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 					"tailf": tailf 
 			}
 			try:
-				ret = cnscom.svrcall(conn, cnscom.callid_tail, json.dumps(params))
+				ret = cnscom.svrcall(cnsconn, cnscom.callid_tail, json.dumps(params))
 				self.send_response(httplib.OK)
 				self.send_header("Content-Type", "text/plain; charset=utf-8")
 				self.end_headers()
 				
-				tailfhandler = tail_f_handler(self, conn)
+				self.wfile.write(ret)
+				cnsconn.setblocking(0)
+				
+				tailfhandler = tail_f_handler(self, cnsconn)
 				tailfhandler.run()
-#				self.wfile.write(ret)
-#				if tailf:
-#					
-#					
-#					while 1:
-#						retype, params = cnscom.svrresp(conn, hang_detector=False)
-#						if retype == cnscom.resp_tailf_data:
-#							self.wfile.write(params)
-#						else:
-#							raise RuntimeError("Unknown/invalid server response: {0}".format(retype))
+				
+				cnsconn.setblocking(1)
+				params = {
+					'program': program,
+					'stream': stream,
+				}
+				cnscom.svrcall(
+					cnsconn,
+					cnscom.callid_tailf_stop,
+					json.dumps(params)
+				)
 				
 			except Exception, e:
 				self.send_error(httplib.INTERNAL_SERVER_ERROR, str(e))
@@ -284,10 +292,13 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 		
 	
 	def socket_connect(self):
-		if hasattr(self, "socket_conn"): return self.socket_conn
+		if self.cnsconn is not None:
+			return self.cnsconn
 		try:
-			self.socket_conn = self.server.cnsconuri.create_socket_connect()
-			return self.socket_conn
+			# Prepare server connection factory
+			cnsconuri = socketuri.socket_uri(config.get('ramona:console','serveruri'))
+			self.cnsconn = cnsconuri.create_socket_connect()
+			return self.cnsconn
 		except socket.error, e:
 			if e.errno == errno.ECONNREFUSED: return None
 			if e.errno == errno.ENOENT and self.cnsconuri.protocol == 'unix': return None
