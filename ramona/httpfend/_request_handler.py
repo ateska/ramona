@@ -47,6 +47,9 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 				
 		elif self.path.startswith("/log/"):
 			return self._handle_log()
+		elif self.path.startswith("/loginner/"):
+			
+			return self._handle_log_inner()
 
 		else:
 			return self._handler_other()
@@ -109,9 +112,26 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			self.end_headers()
 			self.wfile.write(self.buildStatusTable(json.loads(self.getStatuses())))
 	
+	
 	def _handle_log(self):
 		parsed = urlparse.urlparse(self.path)
 		logname = parsed.path[5:]
+		
+		self.send_response(httplib.OK)
+		self.send_header("Content-Type", "text/html; charset=utf-8")
+		self.end_headers()
+		f = _get_static_file("log_frame.tmpl.html")
+		try:
+			self.wfile.write(f.read().format(
+				appname=config.get('general','appname'),
+				logpath="/loginner/{0}".format(logname)
+			))
+		finally:
+			f.close()
+	
+	def _handle_log_inner(self):
+		parsed = urlparse.urlparse(self.path)
+		logname = parsed.path[10:]
 		parts = logname.split("/")
 		if len(parts) < 2:
 			self.send_error(httplib.NOT_FOUND, "Invalid URL.")
