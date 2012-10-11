@@ -14,6 +14,8 @@ class httpfend_app(object):
 
 	STOPSIGNALS = [signal.SIGINT, signal.SIGTERM]
 	NONBLOCKING = frozenset([errno.EAGAIN, errno.EWOULDBLOCK])
+	# Maximum number of worker threads serving the client requests
+	MAX_WORKER_THREADS = 10
 	
 	def __init__(self):
 		# Read config
@@ -128,6 +130,12 @@ class httpfend_app(object):
 					raise
 			else:
 				clisock.setblocking(1)
+				num_workers = len(self.workers)
+				if num_workers >= self.MAX_WORKER_THREADS:
+					L.error("There are already {0} worker threads, which is >= MAX_WORKER_THREADS = {1}. Not creating a new thread for client {2}".format(
+						num_workers, self.MAX_WORKER_THREADS, address))
+					continue
+				
 				worker = RequestWorker(clisock, address, self)
 				L.debug("Request from client {0} is processed by thread {1}".format(address, worker.name))
 				worker.start()
