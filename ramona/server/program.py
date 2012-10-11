@@ -428,11 +428,11 @@ class program(object):
 			elif watcher.data == 1: self.log_err.write(data)
 
 
-	def tail(self, cnscon, stream, tailf=False):
+	def tail(self, cnscon, stream, lines=80, tailf=False):
 		if stream == 'stdout':
-			return self.log_out.tail(cnscon, tailf)
+			return self.log_out.tail(cnscon, lines, tailf)
 		elif stream == 'stderr':
-			return self.log_err.tail(cnscon, tailf)
+			return self.log_err.tail(cnscon, lines, tailf)
 		else:
 			raise ValueError("Unknown stream '{0}'".format(stream))
 

@@ -191,13 +191,15 @@ class log_mediator(object):
 			cnscon.send_tailf(data)
 
 
-	def tail(self, cnscon, tailf):
+	def tail(self, cnscon, lines, tailf):
 		d = collections.deque()
 		dlen = 0
 		for line in reversed(self.tailbuf):
 			dlen += len(line)
 			if dlen >= 0x7fff: break #Protect maximum IPC data len
 			d.appendleft(line)
+			lines -= 1
+			if lines <=0: break
 
 		if tailf:
 			cnscon.tailf_enabled = True
