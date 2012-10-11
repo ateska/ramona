@@ -29,7 +29,7 @@ def complete(cnsapp, text, line, begidx, endidx):
 def main(cnsapp, args):
 	params={}
 	if len(args.program) > 0: params['pfilter'] = args.program
-	ret = cnsapp.svrcall(
+	ret = cnsapp.cnssvrcall(
 		cnscom.callid_status, 
 		json.dumps(params),
 		auto_connect=True

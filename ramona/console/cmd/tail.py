@@ -36,7 +36,7 @@ def main(cnsapp, args):
 		'stream': args.log_stream,
 		'tailf': args.f,
 	}
-	ret = cnsapp.svrcall(
+	ret = cnsapp.cnssvrcall(
 		cnscom.callid_tail,
 		json.dumps(params),
 		auto_connect=True
@@ -66,7 +66,7 @@ def main(cnsapp, args):
 		'program': args.program,
 		'stream': args.log_stream,
 	}
-	ret = cnsapp.svrcall(
+	ret = cnsapp.cnssvrcall(
 		cnscom.callid_tailf_stop,
 		json.dumps(params)
 	)

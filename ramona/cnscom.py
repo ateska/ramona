@@ -6,13 +6,13 @@ Lmy = logging.getLogger("my")
 
 ###
 
-callid_ping = 7770
-callid_start = 7771
-callid_stop = 7772
-callid_restart = 7773
-callid_status = 7774
-callid_tail = 7775
-callid_tailf_stop = 7776 # Terminate previously initialized tailf mode
+callid_ping = 70
+callid_start = 71
+callid_stop = 72
+callid_restart = 73
+callid_status = 74
+callid_tail = 75
+callid_tailf_stop = 76 # Terminate previously initialized tailf mode
 
 #
 

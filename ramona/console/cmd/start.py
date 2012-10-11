@@ -39,7 +39,7 @@ def main(cnsapp, args):
 	}
 	if len(args.program) > 0: params['pfilter'] = args.program
 
-	cnsapp.svrcall(
+	cnsapp.cnssvrcall(
 		cnscom.callid_start,
 		json.dumps(params),
 		auto_connect=args.no_server_start,
