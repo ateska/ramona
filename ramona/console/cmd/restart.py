@@ -17,11 +17,11 @@ def init_parser(parser):
 
 ###
 
-def complete(cnsapp, text, line, begidx, endidx):
-        textst = text.strip()
-        ret = []
-        ret.extend(complete_ident(cnsapp, textst))
-        return ret
+def complete(console, text, line, begidx, endidx):
+	textst = text.strip()
+	ret = []
+	ret.extend(complete_ident(console, textst))
+	return ret
 
 ###
 
