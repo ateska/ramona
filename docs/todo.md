@@ -26,7 +26,6 @@ Logging
 - Support for SIGHUP (reopen log files OR reset fully)
 - log rotate of Ramona server log (stdout/stderr redirection)
 - compress older (xxxx.log.2+) log rotated files
-- consider removing kmp search in favor to 'line-oriented find' 
 
 Configuration
 -------------
@@ -36,6 +35,7 @@ Configuration
 Watchdog
 --------
 - watchdog functionality (child process is signaling that is alive periodically)
+- watchdog for non-managed programs (e.g. [watchdog:apache]) + restart commands
 
 Python specific
 ---------------
