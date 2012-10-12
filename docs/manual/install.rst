@@ -7,7 +7,7 @@ Prerequisites
 - Python 2.7+ (currently not compatible with Python 3)
 - pyev_ (install via ``pip install pyev`` or ``easy_install pyev``)
 
-.. _pyev: `http://pypi.python.org/pypi/pyev`
+.. _pyev: http://pypi.python.org/pypi/pyev
 
 
 Installation using **pip**
