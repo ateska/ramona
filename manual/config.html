@@ -116,11 +116,8 @@ You can specify more network interfaces, protocols or ports, URIs are comma-sepa
 <div class="highlight-ini"><div class="highlight"><pre><span class="k">[program:ramonahttpfend]</span>
 <span class="na">command</span><span class="o">=</span><span class="s">&lt;httpfend&gt;</span>
 
-<span class="c"># IP address/hostname where the HTTP frontend will listen</span>
-<span class="na">host</span><span class="o">=</span><span class="s">127.0.0.1</span>
-
-<span class="c"># Port where the HTTP frontend will listen</span>
-<span class="na">port</span><span class="o">=</span><span class="s">5588</span>
+<span class="c"># Where the HTTP frontend will listen</span>
+<span class="na">listen</span><span class="o">=</span><span class="s">tcp://localhost:5588</span>
 
 <span class="c"># Use username and password options only if you want to enable basic authentication</span>
 <span class="na">username</span><span class="o">=</span><span class="s">admin</span>
@@ -130,19 +127,20 @@ You can specify more network interfaces, protocols or ports, URIs are comma-sepa
 </pre></div>
 </div>
 <dl class="attribute">
-<dt id="host">
-<tt class="descname">host</tt><a class="headerlink" href="#host" title="Permalink to this definition">¶</a></dt>
-<dd><p>IP address or hostname, where the Ramona HTTP frontend will listen.
-Use <tt class="docutils literal"><span class="pre">0.0.0.0</span></tt> to make Ramona HTTP frontend listen on IP addresses of all network interfaces.</p>
-<p><em>Default</em>:  <tt class="docutils literal"><span class="pre">localhost</span></tt></p>
-<p><em>Required</em>:  No</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="port">
-<tt class="descname">port</tt><a class="headerlink" href="#port" title="Permalink to this definition">¶</a></dt>
-<dd><p>Port on which the Ramona HTTP frontend will listen.</p>
-<p><em>Default</em>:  <tt class="docutils literal"><span class="pre">5588</span></tt></p>
+<dt id="listen">
+<tt class="descname">listen</tt><a class="headerlink" href="#listen" title="Permalink to this definition">¶</a></dt>
+<dd><p>One or multiple &#8216;socket URIs&#8217;, where the Ramona HTTP frontend will listen.
+You can specify more network interfaces, protocols or ports, URIs are comma-separated.</p>
+<p>Supported connection variants:</p>
+<ul class="simple">
+<li>UNIX sockets<ul>
+<li>optional parameter &#8216;mode&#8217; specifies UNIX file permissions for created socket file system entry (in octal representation)</li>
+</ul>
+</li>
+<li>TCP IPv4: For example: <tt class="docutils literal"><span class="pre">tcp://127.0.0.1:4455</span></tt></li>
+<li>TCP IPv6: For example: <tt class="docutils literal"><span class="pre">tcp://[::1]:8877</span></tt></li>
+</ul>
+<p><em>Default</em>:  <tt class="docutils literal"><span class="pre">tcp://localhost:5588</span></tt></p>
 <p><em>Required</em>:  No</p>
 </dd></dl>
 
