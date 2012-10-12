@@ -34,7 +34,6 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 	_scriptdir = os.path.dirname(__file__)
 	
 	def do_GET(self):
-		
 		# Static has to be handeled before authentication, as the static content is available
 		# even without authentication, because the static resources are used on the 401 page as well
 		if self.path.startswith("/static/"):
@@ -54,6 +53,12 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 		else:
 			return self._handler_other()
 	
+	def send_header(self, keyword, value):
+		# TODO: Take this from configuration
+		prod = True
+		if prod and keyword.lower() == "server": return
+		
+		BaseHTTPServer.BaseHTTPRequestHandler.send_header(self, keyword, value)
 	
 	def _check_authentication(self):
 		'''Check if the authentication is enabled and if yes, check if the user is authenticated
