@@ -271,7 +271,10 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			
 			stlbl = cnscom.program_state_enum.labels.get(progState, "({0})".format(progState))
 			ret += '<td><span class="label {0}">{1}</span></td>'.format(labelCls, cgi.escape(stlbl))
-			ret += '<td><a href="/log/stdout/{0}.log" target="_blank">O</a> <a href="/log/stderr/{0}.log" target="_blank">E</a></td>'.format(urllib.quote_plus(ident))
+			if progState != cnscom.program_state_enum.CFGERROR:
+				ret += '<td><a href="/log/stdout/{0}.log" target="_blank">O</a> <a href="/log/stderr/{0}.log" target="_blank">E</a></td>'.format(urllib.quote_plus(ident))
+			else:
+				ret += '<td></td>'
 			pid = sp.pop('pid', "")
 			ret += '<td>{0}</td>'.format(pid)
 			ret += '<td>{0}</td>'.format(sp.pop('launch_cnt', ""))
