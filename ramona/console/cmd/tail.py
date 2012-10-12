@@ -1,7 +1,7 @@
 import sys, json, logging
 from ... import cnscom
 from .. import exception
-from ._completes import complete_ident
+from ._completions import complete_ident
 ###
 
 name = 'tail'

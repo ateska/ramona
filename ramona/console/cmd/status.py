@@ -1,6 +1,6 @@
 import json, time, itertools, collections, logging
 from ... import cnscom
-from ._completes import complete_ident
+from ._completions import complete_ident
 
 ###
 

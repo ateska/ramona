@@ -1,6 +1,6 @@
 import json
 from ... import cnscom
-from ._completes import complete_ident
+from ._completions import complete_ident
 
 ###
 
