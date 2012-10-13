@@ -1,5 +1,5 @@
-Raamona
-=======
+Ramona
+======
 
 Your next favorite supervisor component.
 
