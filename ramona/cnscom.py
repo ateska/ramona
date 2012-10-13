@@ -107,7 +107,9 @@ def svrresp(cnssocket, hang_detector=True, hang_message='details not provided'):
 	while len(resp) < 4:
 		rlist, _, _ = select.select([cnssocket],[],[], 5)
 		if len(rlist) == 0:
-			if hang_detector and time.time() - x > 2: L.error("Possible server hang detected - {0}".format(hang_message))
+			if hang_detector and time.time() - x > 5:
+				x = time.time()
+				L.warning("Possible server hang detected: {0} (continue waiting)".format(hang_message))
 			continue
 		ndata = cnssocket.recv(4 - len(resp))
 		if len(ndata) == 0:
