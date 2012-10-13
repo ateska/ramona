@@ -8,7 +8,7 @@ Configuration is build the way that user program(s) can share the same configura
 Application and site level configuration
 ----------------------------------------
 
-Configuration also supports split into *application level configuration* and *site level configuration*. In this concept application development team provides *application level configuration* as a part of source code and users are given an option to provide their own *site level configurations* that can override or enhance application level configurations.
+Ramona supports split of configuration options into *application* and *site* level configuration. In this concept application development team provides *application level configuration* as a part of source code and users are given an option to provide their own *site level configurations* that can override or enhance application level configurations.
 
 Practically application level configuration can specify file(s) to optionally include - these files can provide site level configuration.
 
@@ -17,6 +17,57 @@ Application and site level configuration as syntactically equal.
 
 [general] section
 -----------------
+
+TODO
+
+
+.. attribute:: appname
+
+  TODO
+
+
+.. attribute:: include
+
+  TODO
+
+
+.. attribute:: logdir
+
+  TODO
+
+
+.. attribute:: logmaxsize
+
+  TODO
+
+
+.. attribute:: logbackups
+
+  TODO
+
+
+
+[env] section
+-------------
+
+Environment section allows to specify `environment variables`_ that will be added to the environment variable set that applies to running Ramona server.
+
+These variables can be also used in other options via ``${VARNAME}`` placeholders.
+
+.. _`environment variables` : http://en.wikipedia.org/wiki/Environment_variable
+
+Environment variable section example:
+
+.. code-block:: ini
+
+  [env]
+  VARIABLE=value
+  PYTHONPATH=./mylibs
+  CLASSPATH=./myjars
+
+
+[ramona:server] section
+-----------------------
 
 TODO
 
@@ -43,31 +94,24 @@ TODO
 
   .. code-block:: ini
 
-    [general]
+    [ramona:server]
     consoleuri=unix:///tmp/demoramona.sock;mode=0600,tcp://localhost:5566
 
 
-[env] section
--------------
+.. attribute:: pidfile
 
-Environment section allows to specify `environment variables`_ that will be added to the environment variable set that applies to running Ramona server.
-
-.. _`environment variables` : http://en.wikipedia.org/wiki/Environment_variable
-
-Environment variable section example:
-
-.. code-block:: ini
-
-  [env]
-  VARIABLE=value
-  PYTHONPATH=./mylibs
-  CLASSPATH=./myjars
+  TODO
 
 
-[ramona:server] section
------------------------
+.. attribute:: log
 
-TODO
+  TODO
+
+
+.. attribute:: loglevel
+
+  TODO
+
 
 
 [ramona:notify] section
@@ -76,10 +120,106 @@ TODO
 TODO
 
 
+.. attribute:: delivery
+
+  TODO
+
+
+.. attribute:: sender
+
+  TODO
+
+
+.. attribute:: receiver
+
+  TODO
+
+
+
 [program:X] section
 -------------------
 
 TODO
+
+
+.. attribute:: command
+
+  TODO
+
+
+.. attribute:: directory
+
+  TODO
+
+
+.. attribute:: umask
+
+  TODO
+
+
+.. attribute:: starttimeout
+
+  TODO
+
+
+.. attribute:: stoptimeout
+
+  TODO
+
+
+.. attribute:: killby
+
+  TODO
+
+
+.. attribute:: stdin
+
+  TODO
+
+
+.. attribute:: stdout
+
+  TODO
+
+
+.. attribute:: stderr
+
+  TODO
+
+
+.. attribute:: priority
+
+  TODO
+
+
+.. attribute:: disabled
+
+  TODO
+
+
+.. attribute:: coredump
+
+  TODO
+
+
+.. attribute:: autorestart
+
+  TODO
+
+
+.. attribute:: processgroup
+
+  TODO
+
+
+.. attribute:: logscan_stdout
+
+  TODO
+
+
+.. attribute:: logscan_stderr
+
+  TODO
 
 
 .. _config-ramonahttpfend:

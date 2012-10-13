@@ -25,6 +25,7 @@ Contents:
    install.rst
    features.rst
    config.rst
+   cmdline.rst
    tools.rst
    credits.rst
 
