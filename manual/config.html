@@ -26,7 +26,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Ramona 0.9 beta 6 documentation" href="index.html" />
-    <link rel="next" title="Tools Cookbook" href="tools.html" />
+    <link rel="next" title="Command line" href="cmdline.html" />
     <link rel="prev" title="Features" href="features.html" /> 
   </head>
   <body>
@@ -37,7 +37,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="tools.html" title="Tools Cookbook"
+          <a href="cmdline.html" title="Command line"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="features.html" title="Features"
@@ -56,12 +56,58 @@
 <p>Configuration is build the way that user program(s) can share the same configuration file(s) with Ramona system. Configuration is compatible with Python <a class="reference external" href="http://docs.python.org/library/configparser.html">ConfigParser</a>. These are basic configuration files that use structure similar to what you would find on Microsoft Windows INI files.</p>
 <div class="section" id="application-and-site-level-configuration">
 <h2>Application and site level configuration<a class="headerlink" href="#application-and-site-level-configuration" title="Permalink to this headline">¶</a></h2>
-<p>Configuration also supports split into <em>application level configuration</em> and <em>site level configuration</em>. In this concept application development team provides <em>application level configuration</em> as a part of source code and users are given an option to provide their own <em>site level configurations</em> that can override or enhance application level configurations.</p>
+<p>Ramona supports split of configuration options into <em>application</em> and <em>site</em> level configuration. In this concept application development team provides <em>application level configuration</em> as a part of source code and users are given an option to provide their own <em>site level configurations</em> that can override or enhance application level configurations.</p>
 <p>Practically application level configuration can specify file(s) to optionally include - these files can provide site level configuration.</p>
 <p>Application and site level configuration as syntactically equal.</p>
 </div>
 <div class="section" id="general-section">
 <h2>[general] section<a class="headerlink" href="#general-section" title="Permalink to this headline">¶</a></h2>
+<p>TODO</p>
+<dl class="attribute">
+<dt id="appname">
+<tt class="descname">appname</tt><a class="headerlink" href="#appname" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="include">
+<tt class="descname">include</tt><a class="headerlink" href="#include" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="logdir">
+<tt class="descname">logdir</tt><a class="headerlink" href="#logdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="logmaxsize">
+<tt class="descname">logmaxsize</tt><a class="headerlink" href="#logmaxsize" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="logbackups">
+<tt class="descname">logbackups</tt><a class="headerlink" href="#logbackups" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO</p>
+</dd></dl>
+
+</div>
+<div class="section" id="env-section">
+<h2>[env] section<a class="headerlink" href="#env-section" title="Permalink to this headline">¶</a></h2>
+<p>Environment section allows to specify <a class="reference external" href="http://en.wikipedia.org/wiki/Environment_variable">environment variables</a> that will be added to the environment variable set that applies to running Ramona server.</p>
+<p>These variables can be also used in other options via <tt class="docutils literal"><span class="pre">${VARNAME}</span></tt> placeholders.</p>
+<p>Environment variable section example:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[env]</span>
+<span class="na">VARIABLE</span><span class="o">=</span><span class="s">value</span>
+<span class="na">PYTHONPATH</span><span class="o">=</span><span class="s">./mylibs</span>
+<span class="na">CLASSPATH</span><span class="o">=</span><span class="s">./myjars</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="ramona-server-section">
+<h2>[ramona:server] section<a class="headerlink" href="#ramona-server-section" title="Permalink to this headline">¶</a></h2>
 <p>TODO</p>
 <dl class="attribute">
 <dt id="consoleuri">
@@ -80,35 +126,152 @@ You can specify more network interfaces, protocols or ports, URIs are comma-sepa
 <p><em>Default</em>: <tt class="docutils literal"><span class="pre">unix://.ramona.sock</span></tt></p>
 <p><em>Required</em>: Yes (but default will work)</p>
 <p>Example:</p>
-<div class="highlight-ini"><div class="highlight"><pre><span class="k">[general]</span>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[ramona:server]</span>
 <span class="na">consoleuri</span><span class="o">=</span><span class="s">unix:///tmp/demoramona.sock;mode=0600,tcp://localhost:5566</span>
 </pre></div>
 </div>
 </dd></dl>
 
-</div>
-<div class="section" id="env-section">
-<h2>[env] section<a class="headerlink" href="#env-section" title="Permalink to this headline">¶</a></h2>
-<p>Environment section allows to specify <a class="reference external" href="http://en.wikipedia.org/wiki/Environment_variable">environment variables</a> that will be added to the environment variable set that applies to running Ramona server.</p>
-<p>Environment variable section example:</p>
-<div class="highlight-ini"><div class="highlight"><pre><span class="k">[env]</span>
-<span class="na">VARIABLE</span><span class="o">=</span><span class="s">value</span>
-<span class="na">PYTHONPATH</span><span class="o">=</span><span class="s">./mylibs</span>
-<span class="na">CLASSPATH</span><span class="o">=</span><span class="s">./myjars</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="ramona-server-section">
-<h2>[ramona:server] section<a class="headerlink" href="#ramona-server-section" title="Permalink to this headline">¶</a></h2>
-<p>TODO</p>
+<dl class="attribute">
+<dt id="pidfile">
+<tt class="descname">pidfile</tt><a class="headerlink" href="#pidfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="log">
+<tt class="descname">log</tt><a class="headerlink" href="#log" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="loglevel">
+<tt class="descname">loglevel</tt><a class="headerlink" href="#loglevel" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO</p>
+</dd></dl>
+
 </div>
 <div class="section" id="ramona-notify-section">
 <h2>[ramona:notify] section<a class="headerlink" href="#ramona-notify-section" title="Permalink to this headline">¶</a></h2>
 <p>TODO</p>
+<dl class="attribute">
+<dt id="delivery">
+<tt class="descname">delivery</tt><a class="headerlink" href="#delivery" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="sender">
+<tt class="descname">sender</tt><a class="headerlink" href="#sender" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="receiver">
+<tt class="descname">receiver</tt><a class="headerlink" href="#receiver" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO</p>
+</dd></dl>
+
 </div>
 <div class="section" id="program-x-section">
 <h2>[program:X] section<a class="headerlink" href="#program-x-section" title="Permalink to this headline">¶</a></h2>
 <p>TODO</p>
+<dl class="attribute">
+<dt id="command">
+<tt class="descname">command</tt><a class="headerlink" href="#command" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="directory">
+<tt class="descname">directory</tt><a class="headerlink" href="#directory" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="umask">
+<tt class="descname">umask</tt><a class="headerlink" href="#umask" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="starttimeout">
+<tt class="descname">starttimeout</tt><a class="headerlink" href="#starttimeout" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stoptimeout">
+<tt class="descname">stoptimeout</tt><a class="headerlink" href="#stoptimeout" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="killby">
+<tt class="descname">killby</tt><a class="headerlink" href="#killby" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stdin">
+<tt class="descname">stdin</tt><a class="headerlink" href="#stdin" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stdout">
+<tt class="descname">stdout</tt><a class="headerlink" href="#stdout" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stderr">
+<tt class="descname">stderr</tt><a class="headerlink" href="#stderr" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="priority">
+<tt class="descname">priority</tt><a class="headerlink" href="#priority" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="disabled">
+<tt class="descname">disabled</tt><a class="headerlink" href="#disabled" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coredump">
+<tt class="descname">coredump</tt><a class="headerlink" href="#coredump" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="autorestart">
+<tt class="descname">autorestart</tt><a class="headerlink" href="#autorestart" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="processgroup">
+<tt class="descname">processgroup</tt><a class="headerlink" href="#processgroup" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="logscan_stdout">
+<tt class="descname">logscan_stdout</tt><a class="headerlink" href="#logscan_stdout" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="logscan_stderr">
+<tt class="descname">logscan_stderr</tt><a class="headerlink" href="#logscan_stderr" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO</p>
+</dd></dl>
+
 </div>
 <div class="section" id="program-ramonahttpfend">
 <span id="config-ramonahttpfend"></span><h2>[program:ramonahttpfend]<a class="headerlink" href="#program-ramonahttpfend" title="Permalink to this headline">¶</a></h2>
@@ -201,8 +364,8 @@ you can use the following command (works on Linux):</p>
   <p class="topless"><a href="features.html"
                         title="previous chapter">Features</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="tools.html"
-                        title="next chapter">Tools Cookbook</a></p>
+  <p class="topless"><a href="cmdline.html"
+                        title="next chapter">Command line</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/config.txt"
@@ -232,7 +395,7 @@ you can use the following command (works on Linux):</p>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="tools.html" title="Tools Cookbook"
+          <a href="cmdline.html" title="Command line"
              >next</a> |</li>
         <li class="right" >
           <a href="features.html" title="Features"
