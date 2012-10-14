@@ -1,50 +1,48 @@
-Common command line interface
-=============================
-
-start
------
+Command line
+============
 
 TODO
 
+.. describe:: <console.py>
 
-stop
-----
-
-TODO
+  TODO
 
 
-restart
--------
+Generic options
+---------------
 
-TODO
+.. cmdoption:: -c CONFIGFILE
+               --config CONFIGFILE
 
-
-start
------
-
-TODO
+  TODO
 
 
-status
-------
+.. cmdoption:: -h
+               --help
 
-TODO
-
-
-tail
-----
-
-TODO
+  TODO
 
 
-console
--------
+.. cmdoption:: -d
+               --debug
 
-TODO
+  TODO
 
 
-server
-------
+.. cmdoption:: -s
+               --silent
 
-TODO
+  TODO
 
+
+Common commands
+---------------
+
+.. toctree::
+   cmdline-start.rst
+   cmdline-stop.rst
+   cmdline-restart.rst
+   cmdline-status.rst
+   cmdline-tail.rst
+   cmdline-console.rst
+   cmdline-server.rst
