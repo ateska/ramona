@@ -26,7 +26,8 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 		server_app_singleton.__init__(self)
 
 		# Create own process group
-		os.setpgrp()
+		if os.name == 'posix':
+			os.setpgrp()
 
 		# Parse command line arguments
 		parser = argparse.ArgumentParser()

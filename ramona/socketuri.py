@@ -25,6 +25,9 @@ class socket_uri(object):
 			if self.uri.path != '': raise RuntimeError("Path has to be empty in socket URI {0}".format(uri))
 
 		elif self.protocol == 'unix':
+			if os.name == 'nt':
+				os.error("UNIX sockets are not supported on this plaform")
+				raise RuntimeError("UNIX sockets are not supported on this plaform ({0})".format(uri))
 			if self.uri.netloc != '':
 				# Special case of situation when netloc is not empty (path is relative)
 				self.uri = self.uri._replace(netloc='', path=self.uri.netloc + self.uri.path)

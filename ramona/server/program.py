@@ -1,9 +1,16 @@
-import sys, os, time, logging, shlex, signal, errno, resource
+import sys, os, time, logging, shlex, signal, errno
 import pyev
 from ..config import config, get_boolean
-from ..utils import parse_signals, MAXFD, enable_nonblocking, disable_nonblocking
+from ..utils import parse_signals, close_fds, enable_nonblocking, disable_nonblocking
 from ..cnscom import program_state_enum, svrcall_error
 from .logmed import log_mediator
+
+#
+
+try:
+	import resource
+except ImportError:
+	resource = None
 
 #
 
@@ -104,7 +111,9 @@ class program(object):
 			L.error("Unknown 'coredump' option '{0}' in {1} -> CFGERROR".format(self.config.get('coredump','?'), config_section))
 			self.state = program_state_enum.CFGERROR
 			return
-		if coredump: self.ulimits[resource.RLIMIT_CORE] = (-1,-1)
+
+		if coredump and resource is not None:
+			self.ulimits[resource.RLIMIT_CORE] = (-1,-1)
 
 		try:
 			self.autorestart = get_boolean(self.config.get('autorestart',False))
@@ -255,9 +264,7 @@ class program(object):
 			os.dup2(stdout, 1) # Prepare stdout
 			os.dup2(stderr, 2) # Prepare stderr
 
-			# Close all open file descriptors above standard ones.  This prevents the child from keeping
-			# open any file descriptors inherited from the parent.
-			os.closerange(3, MAXFD)
+			close_fds()
 
 			umask = self.config.get('umask')
 			if umask is not None:
@@ -278,11 +285,12 @@ class program(object):
 					raise
 
 			# Set ulimits
-			for k,v in self.ulimits.iteritems():
-				try:
-					resource.setrlimit(k,v)
-				except Exception, e:
-					os.write(2, "WARNING: Setting ulimit '{1}' failed: {0}\n".format(e, k))
+			if resource is not None:
+				for k,v in self.ulimits.iteritems():
+					try:
+						resource.setrlimit(k,v)
+					except Exception, e:
+						os.write(2, "WARNING: Setting ulimit '{1}' failed: {0}\n".format(e, k))
 
 			try:
 				os.execvpe(cmd, args, self.env)
@@ -479,6 +487,10 @@ class program(object):
 
 
 	def charge_coredump(self):
+		if resource is None:
+			L.warning("This platform doesn't support core dumps.")
+			return
+
 		l = self.ulimits.get(resource.RLIMIT_CORE, (0,0))
 		if l == (0,0):
 			Lmy.warning("Program {0} is not configured to dump code".format(self.ident))

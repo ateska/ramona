@@ -11,13 +11,13 @@ config_defaults = {
 		'logbackups': '3',
 	},
 	'ramona:server' : {
-		'consoleuri': 'unix://.ramona.sock',
+		'consoleuri': 'unix://.ramona.sock' if os.name != 'nt' else 'tcp://localhost:7788',
 		'pidfile': '',
 		'log': '<logdir>',
 		'loglevel': 'INFO',
 	},
 	'ramona:console' : {
-		'serveruri': 'unix://.ramona.sock',
+		'serveruri': 'unix://.ramona.sock' if os.name != 'nt' else 'tcp://localhost:7788',
 		'history': '',
 	},
 	'ramona:notify' : {

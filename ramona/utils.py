@@ -1,4 +1,9 @@
-import os, sys, signal, resource, fcntl, logging
+import os, sys, signal, logging
+try:
+	import resource
+except ImportError:
+	resource = None
+
 ###
 
 L = logging.getLogger("utils")
@@ -13,15 +18,17 @@ and instead of that, current process will be replaced by launched server.
 All file descriptors above 2 are closed.
 	'''
 	from .config import config_files
+	os.environ['RAMONA_CONFIG'] = ':'.join(config_files)
 
-	env = os.environ.copy()
-	env['RAMONA_CONFIG'] = ':'.join(config_files)
-	
-	# Close all open file descriptors above standard ones.  This prevents the child from keeping
-	# open any file descriptors inherited from the parent.
-	os.closerange(3, MAXFD)
+	if sys.platform == 'win32':
+		# Windows specific code, os.exec* process replacement is not possible, so we try to mimic that
+		import subprocess
+		ret = subprocess.call("{0} -m ramona.server".format(sys.executable))
+		sys.exit(ret)
 
-	os.execle(sys.executable, sys.executable, "-m", "ramona.server", env)
+	else:
+		close_fds()
+		os.execl(sys.executable, sys.executable, "-m", "ramona.server")
 
 #
 
@@ -79,16 +86,38 @@ def parse_signals(signals):
 
 ###
 
-MAXFD = resource.getrlimit(resource.RLIMIT_NOFILE)[1]
-if (MAXFD == resource.RLIM_INFINITY): MAXFD = 1024
+def close_fds():
+	'''
+	Close all open file descriptors above standard ones. 
+	This prevents the child from keeping open any file descriptors inherited from the parent.
+
+	This function is executed only if platform supports that - otherwise it does nothing.
+	'''
+	if resource is None: return
+	
+	maxfd = resource.getrlimit(resource.RLIMIT_NOFILE)[1]
+	if (maxfd == resource.RLIM_INFINITY):
+		maxfd = 1024
+
+	os.closerange(3, maxfd)
 
 ###
 
-def enable_nonblocking(fd):
-	fl = fcntl.fcntl(fd, fcntl.F_GETFL)
-	fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
+if os.name == 'posix':
+	import fcntl
 
-def disable_nonblocking(fd):
-	fl = fcntl.fcntl(fd, fcntl.F_GETFL)
-	fcntl.fcntl(fd, fcntl.F_SETFL, fl ^ os.O_NONBLOCK)
+	def enable_nonblocking(fd):
+		fl = fcntl.fcntl(fd, fcntl.F_GETFL)
+		fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
 
+	def disable_nonblocking(fd):
+		fl = fcntl.fcntl(fd, fcntl.F_GETFL)
+		fcntl.fcntl(fd, fcntl.F_SETFL, fl ^ os.O_NONBLOCK)
+
+elif os.name == 'nt':
+
+	def enable_nonblocking(fd):
+		pass
+
+	def disable_nonblocking(fd):
+		pass
