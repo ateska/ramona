@@ -28,7 +28,7 @@ class program(object):
 		'starttimeout': 0.5,
 		'stoptimeout': 3,
 		'killby': 'TERM,TERM,TERM,QUIT,QUIT,INT,INT,KILL',
-		'stdin': '<null>',
+		'stdin': '<null>', # TODO: This can be very probably removed as there is no reasonable use
 		'stdout': '<stderr>',
 		'stderr': '<logdir>',
 		'priority': 100,
@@ -53,10 +53,12 @@ class program(object):
 		self.exit_status = None
 		self.coredump_enabled = None # If true, kill by SIGQUIT -> dump core
 
-		self.watchers = [
-			pyev.Io(0, 0, svrapp.loop, self.__read_stdfd, 0),
-			pyev.Io(0, 0, svrapp.loop, self.__read_stdfd, 1),
-		]
+		#TODO: Alternative for self.watchers on Windows ...
+		if sys.platform != 'win32':
+			self.watchers = [
+				pyev.Io(0, 0, svrapp.loop, self.__read_stdfd, 0),
+				pyev.Io(0, 0, svrapp.loop, self.__read_stdfd, 1),
+			]
 
 		# Build configuration
 		self.config = self.DEFAULTS.copy()
@@ -76,9 +78,12 @@ class program(object):
 			return
 
 		self.cmdline = shlex.split(cmd)
-		self.stopsignals = parse_signals(self.config['killby'])
-		if len(self.stopsignals) == 0: self.stopsignals = [signal.SIGTERM]
-		self.act_stopsignals = None
+
+		# Prepare stop signals
+		if sys.platform != 'win32':
+			self.stopsignals = parse_signals(self.config['killby'])
+			if len(self.stopsignals) == 0: self.stopsignals = [signal.SIGTERM]
+			self.act_stopsignals = None
 
 		if self.config['stdin'] != '<null>':
 			L.error("Unknown stdin option '{0}' in {1} -> CFGERROR".format(self.config['stdin'], config_section))
