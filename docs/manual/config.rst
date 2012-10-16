@@ -144,11 +144,13 @@ TODO
 
 .. attribute:: command
 
+  expandvars
   TODO
 
 
 .. attribute:: directory
 
+  expandvars
   TODO
 
 
