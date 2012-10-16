@@ -2,6 +2,7 @@ import unittest
 import logging
 from . import config
 from . import sendmail
+from . import utils
 ###
 '''
 To launch unit test:
@@ -55,3 +56,45 @@ class TestSendMail(unittest.TestCase):
 		self.assertEqual(u.username, 'user')
 		self.assertEqual(u.password, 'password')
 		self.assertDictEqual(u.params, {'tls':'1'})
+
+#
+
+class TestExpandVars(unittest.TestCase):
+
+	def test_expandvars_01(self):
+		env = {'FOO':'bar'}
+		
+		p = utils.expandvars('/testing/$FOO/there', env)
+		self.assertEqual(p, '/testing/bar/there')
+
+		p = utils.expandvars('$FOO/there', env)
+		self.assertEqual(p, 'bar/there')
+
+		p = utils.expandvars('/testing/$FOO', env)
+		self.assertEqual(p, '/testing/bar')
+
+
+	def test_expandvars_02(self):
+		env = {'FOO':'bar'}
+		
+		p = utils.expandvars('$XXX/testing/$FOO/there', env)
+		self.assertEqual(p, '$XXX/testing/bar/there')
+
+		p = utils.expandvars('$FOO/there$XXX', env)
+		self.assertEqual(p, 'bar/there$XXX')
+
+		p = utils.expandvars('/testing/$XX$FOO', env)
+		self.assertEqual(p, '/testing/$XXbar')
+
+
+	def test_expandvars_02(self):
+		env = {'FOO':'bar'}
+		
+		p = utils.expandvars('$XXX/testing/${FOO}/there', env)
+		self.assertEqual(p, '$XXX/testing/bar/there')
+
+		p = utils.expandvars('${FOO}/there$XXX', env)
+		self.assertEqual(p, 'bar/there$XXX')
+
+		p = utils.expandvars('/testing/$XX${FOO}', env)
+		self.assertEqual(p, '/testing/$XXbar')

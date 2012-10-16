@@ -1,4 +1,4 @@
-import os, sys, signal, logging
+import os, sys, re, signal, logging
 try:
 	import resource
 except ImportError:
@@ -121,3 +121,31 @@ elif os.name == 'nt':
 
 	def disable_nonblocking(fd):
 		pass
+
+###
+
+_varprog = re.compile(r'\$(\w+|\{[^}]*\})')
+
+def expandvars(path, env):
+	"""Expand shell variables of form $var and ${var}.  Unknown variables are left unchanged.
+	This is actually borrowed from os.path.expandvars (posixpath variant).
+	"""
+
+	if '$' not in path: return path
+	i = 0
+
+	while True:
+        	m = _varprog.search(path, i)
+        	if not m: break
+        	i, j = m.span(0)
+        	name = m.group(1)
+		if name.startswith('{') and name.endswith('}'): name = name[1:-1]
+		if name in env:
+			tail = path[j:]
+			path = path[:i] + env[name]
+			i = len(path)
+			path += tail
+		else:
+			i = j
+
+	return path
