@@ -136,7 +136,7 @@ class httpfend_app(object):
 						num_workers, self.MAX_WORKER_THREADS, address))
 					continue
 				
-				worker = RequestWorker(clisock, address, self)
+				worker = _request_worker(clisock, address, self)
 				L.debug("Request from client {0} is processed by thread {1}".format(address, worker.name))
 				worker.start()
 				self.workers.append(worker)
@@ -156,11 +156,11 @@ class httpfend_app(object):
 
 #
 
-class RequestWorker(threading.Thread):
+class _request_worker(threading.Thread):
 	
 	def __init__(self, sock, address, server):
 		threading.Thread.__init__(self)
-		self.name = "RequestWorker-{0}".format(self.name)
+		self.name = "HttpfendRequestWorker-{0}".format(self.name)
 		self.sock = sock
 		self.address = address
 		self.server = server
