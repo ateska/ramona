@@ -247,8 +247,8 @@ class program(object):
 				stdin=None,
 				stdout=subprocess.PIPE,
 				stderr=subprocess.PIPE,
-				preexec_fn=self.__preexec_fn,
-				close_fds=True,
+				preexec_fn=self.__preexec_fn if sys.platform != 'win32' else None,
+				close_fds=True if sys.platform != 'win32' else None,
 				shell=False, #TOOD: This can/should be configurable in [program:x] section
 				cwd=directory,
 				env=self.env
@@ -259,13 +259,14 @@ class program(object):
 			L.error("{0} failed to start: {1} -> FATAL".format(self, e))
 			return
 
-		enable_nonblocking(self.subproc.stdout)
-		self.watchers[0].set(self.subproc.stdout, pyev.EV_READ)
-		self.watchers[0].start()
+		if sys.platform != 'win32':
+			enable_nonblocking(self.subproc.stdout)
+			self.watchers[0].set(self.subproc.stdout, pyev.EV_READ)
+			self.watchers[0].start()
 
-		enable_nonblocking(self.subproc.stderr)
-		self.watchers[1].set(self.subproc.stderr, pyev.EV_READ)
-		self.watchers[1].start()
+			enable_nonblocking(self.subproc.stderr)
+			self.watchers[1].set(self.subproc.stderr, pyev.EV_READ)
+			self.watchers[1].start()
 
 		self.log_out.open()
 		self.log_err.open()
@@ -330,38 +331,39 @@ class program(object):
 		self.exit_status = status
 
 		# Close process stdout and stderr pipes (including vacuum of actual content)
-		self.watchers[0].stop()
-		self.watchers[0].set(0, 0)
-		disable_nonblocking(self.subproc.stdout)
-		while True:
-			signal.setitimer(signal.ITIMER_REAL, 0.5) # Set timeout for following operation
-			try:
-				data = os.read(self.subproc.stdout.fileno(), 4096)
-			except OSError, e:
-				if e.errno == errno.EINTR:
-					L.warning("We have stall recovery situation on stdout socket of {0}".format(self))
-					# This stall situation can happen when program shares stdout with its child
-					# e.g. command=bash -c "echo ahoj1; tail -f /dev/null"
-					break
-				raise
-			if len(data) == 0: break
-			self.log_out.write(data)
+		if sys.platform != 'win32':
+			self.watchers[0].stop()
+			self.watchers[0].set(0, 0)
+			disable_nonblocking(self.subproc.stdout)
+			while True:
+				signal.setitimer(signal.ITIMER_REAL, 0.5) # Set timeout for following operation
+				try:
+					data = os.read(self.subproc.stdout.fileno(), 4096)
+				except OSError, e:
+					if e.errno == errno.EINTR:
+						L.warning("We have stall recovery situation on stdout socket of {0}".format(self))
+						# This stall situation can happen when program shares stdout with its child
+						# e.g. command=bash -c "echo ahoj1; tail -f /dev/null"
+						break
+					raise
+				if len(data) == 0: break
+				self.log_out.write(data)
 
-		self.watchers[1].stop()
-		self.watchers[1].set(0, 0)
-		disable_nonblocking(self.subproc.stderr)
-		while True:
-			signal.setitimer(signal.ITIMER_REAL, 0.2) # Set timeout for following operation
-			try:
-				data = os.read(self.subproc.stderr.fileno(), 4096)
-			except OSError, e:
-				if e.errno == errno.EINTR:
-					L.warning("We have stall recovery situation on stderr socket of {0}".format(self))
-					# See comment above
-					break
-				raise
-			if len(data) == 0: break
-			self.log_err.write(data)
+			self.watchers[1].stop()
+			self.watchers[1].set(0, 0)
+			disable_nonblocking(self.subproc.stderr)
+			while True:
+				signal.setitimer(signal.ITIMER_REAL, 0.2) # Set timeout for following operation
+				try:
+					data = os.read(self.subproc.stderr.fileno(), 4096)
+				except OSError, e:
+					if e.errno == errno.EINTR:
+						L.warning("We have stall recovery situation on stderr socket of {0}".format(self))
+						# See comment above
+						break
+					raise
+				if len(data) == 0: break
+				self.log_err.write(data)
 
 		# Explicitly destroy subprocess object
 		self.subproc = None
