@@ -122,20 +122,23 @@ class log_mediator(object):
 		try:
 
 			fnames = set()
+			suffixes = dict()
 			for fname in glob.iglob(self.fname+'.*'):
 				if not os.path.isfile(fname): continue
 				x = self.rotlognamerg.search(fname)
 				if x is None: continue
+				idx = int(x.group(1))
 				suffix = x.group(2)
-				if suffix is None: suffix = ""
-				fnames.add((int(x.group(1)), suffix))
+				if suffix is not None: 
+					suffixes[idx] = suffix
+				fnames.add(idx)
 
-			for (k, suffix) in sorted(fnames, reverse=True, key=lambda x: x[0]):
+			for k in sorted(fnames, reverse=True):
 				if (self.logbackups > 0) and (k >= self.logbackups):
 					os.unlink("{0}.{1}{2}".format(self.fname, k, suffix))
 					continue
-				# TODO: Make this compatible with tuples in fnames
-#				if ((k-1) not in fnames) and (k > 1): continue # Move only files where there is one 'bellow'
+				if ((k-1) not in fnames) and (k > 1): continue # Move only files where there is one 'bellow'
+				suffix = suffixes.get(k, "")
 				os.rename("{0}.{1}{2}".format(self.fname, k, suffix), "{0}.{1}{2}".format(self.fname, k+1, suffix))
 				if self.logcompress and suffix != ".gz" and k+1 >= 2:
 					L.info("Compressing {0}.{1}".format(self.fname, k+1))
