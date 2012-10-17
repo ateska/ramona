@@ -9,6 +9,7 @@ config_defaults = {
 		'include' : '<siteconf>',
 		'logmaxsize': '{0}'.format(512*1024*1024), # 512Mb
 		'logbackups': '3',
+		'logcompress': '1'
 	},
 	'ramona:server' : {
 		'consoleuri': 'unix://.ramona.sock',

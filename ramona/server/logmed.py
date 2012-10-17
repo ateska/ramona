@@ -57,8 +57,10 @@ class log_mediator(object):
 		try:
 			self.logmaxsize = config.getint('general','logmaxsize')
 			self.logbackups = config.getint('general','logbackups')
+			self.logcompress = config.getboolean('general', 'logcompress')
 		except Exception, e:
 			self.logbackups = self.logmaxsize = 0
+			self.logcompress = False
 			L.warning("Invalid configuration of log rotation: {0} - log rotation disabled".format(e))
 
 
@@ -135,8 +137,7 @@ class log_mediator(object):
 				# TODO: Make this compatible with tuples in fnames
 #				if ((k-1) not in fnames) and (k > 1): continue # Move only files where there is one 'bellow'
 				os.rename("{0}.{1}{2}".format(self.fname, k, suffix), "{0}.{1}{2}".format(self.fname, k+1, suffix))
-				compress = True
-				if compress and suffix != ".gz" and k+1 >= 2:
+				if self.logcompress and suffix != ".gz" and k+1 >= 2:
 					L.info("Compressing {0}.{1}".format(self.fname, k+1))
 					self.__compress_logfile("{0}.{1}".format(self.fname, k+1))
 
