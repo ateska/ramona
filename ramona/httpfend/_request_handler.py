@@ -20,7 +20,7 @@ if not mimetypes.inited:
 
 ###
 
-class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+class ramona_http_req_handler(BaseHTTPServer.BaseHTTPRequestHandler):
 	
 	def __init__(self, request, client_address, server):
 		self.server = server

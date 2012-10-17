@@ -2,7 +2,7 @@ import sys, os, socket, ConfigParser, errno, logging, signal, threading, itertoo
 import pyev
 from ..config import config, read_config, get_numeric_loglevel
 from .. import socketuri
-from ._request_handler import RamonaHttpReqHandler
+from ._request_handler import ramona_http_req_handler
 
 ###
 
@@ -167,7 +167,7 @@ class _request_worker(threading.Thread):
 	
 	def run(self):
 		try:
-			RamonaHttpReqHandler(self.sock, self.address, self.server)
+			ramona_http_req_handler(self.sock, self.address, self.server)
 			self.sock.close()
 		except:
 			L.exception("Uncaught exception during worker thread execution:")
