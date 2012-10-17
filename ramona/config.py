@@ -1,4 +1,8 @@
-import os, sys, logging, ConfigParser
+import os, logging, ConfigParser
+###
+
+L = logging.getLogger("httpfendapp")
+
 ###
 
 # Defaults are stated in documentation, if you change them here, update documentation too!
