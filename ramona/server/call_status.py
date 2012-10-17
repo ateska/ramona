@@ -10,7 +10,7 @@ def main(svrapp, pfilter=None):
 			'state': p.state,
 			'launch_cnt': p.launch_cnt,
 		}
-		if p.pid is not None: i['pid'] = p.pid
+		if p.subproc is not None: i['pid'] = p.subproc.pid
 		if p.exit_status is not None: i['exit_status'] = p.exit_status
 		if p.exit_time is not None: i['exit_time'] = p.exit_time
 		if p.start_time is not None:

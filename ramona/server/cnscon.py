@@ -1,9 +1,16 @@
-import socket, errno, struct, weakref, json, select, logging
+import sys, socket, errno, struct, weakref, json, select, logging
 import pyev
 from .. import cnscom
 ###
 
 L = logging.getLogger("cnscon")
+
+###
+
+if sys.platform != 'win32':
+	BUFSIZE = select.PIPE_BUF
+else:
+	BUFSIZE = 512
 
 ###
 
@@ -38,7 +45,7 @@ class console_connection(object):
 
 	def reset(self, events):
 		self.watcher.stop()
-		self.watcher.set(self.sock, events)
+		self.watcher.set(self.sock._sock, events)
 		self.watcher.start()
 
 
@@ -96,7 +103,7 @@ class console_connection(object):
 
 	def handle_write(self):
 		try:
-			sent = self.sock.send(self.write_buf[:select.PIPE_BUF])
+			sent = self.sock.send(self.write_buf[:BUFSIZE])
 		except socket.error as err:
 			if err.args[0] not in self.NONBLOCKING:
 				#TODO: Log "error writing to {0}".format(self.sock)

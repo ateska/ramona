@@ -168,7 +168,8 @@ Program roaster is object that control all configured programs, their start/stop
 
 	def on_terminate_program(self, pid, status):
 		for p in self.roaster:
-			if pid != p.pid: continue
+			if p.subproc is None: continue
+			if pid != p.subproc.pid: continue
 			return p.on_terminate(status)
 		else:
 			L.warning("Unknown program died (pid={0}, status={1})".format(pid, status))

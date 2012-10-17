@@ -26,7 +26,8 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 		server_app_singleton.__init__(self)
 
 		# Create own process group
-		os.setpgrp()
+		if os.name == 'posix':
+			os.setpgrp()
 
 		# Parse command line arguments
 		parser = argparse.ArgumentParser()
@@ -67,19 +68,26 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 
 		self.loop = pyev.default_loop()
 		self.watchers = [pyev.Signal(sig, self.loop, self.__terminal_signal_cb) for sig in self.STOPSIGNALS]
-		self.watchers.append(pyev.Child(0, False, self.loop, self.__child_signal_cb))
 		self.watchers.append(pyev.Periodic(0, 1.0, self.loop, self.__tick_cb))
+
+		if sys.platform == 'win32':
+			# There is no pyev.Child watcher on Windows; periodic check is used instead
+			self.watchers.append(pyev.Periodic(0, 0.5, self.loop, self.__check_childs_cb))
+		else:
+			self.watchers.append(pyev.Child(0, False, self.loop, self.__child_signal_cb))
 
 		for sock in self.cnssockets:
 			sock.setblocking(0)
-			self.watchers.append(pyev.Io(sock._sock, pyev.EV_READ, self.loop, self.__accept_cb))
+			# Watcher data are used (instead logical watcher.fd due to Win32 mismatch)
+			self.watchers.append(pyev.Io(sock._sock, pyev.EV_READ, self.loop, self.__accept_cb, data=sock._sock.fileno()))
 
 		self.conns = weakref.WeakSet()
 		self.termstatus =  None
 		self.termstatus_change = None
 
 		# Enable non-terminating SIGALARM handler
-		signal.signal(signal.SIGALRM, _SIGALARM_handler)
+		if sys.platform != 'win32':
+			signal.signal(signal.SIGALRM, _SIGALARM_handler)
 
 		program_roaster.__init__(self)
 		idlework_appmixin.__init__(self)
@@ -136,7 +144,7 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 			# Fist find relevant socket
 			sock = None
 			for s in self.cnssockets:
-				if s.fileno() == watcher.fd:
+				if s.fileno() == watcher.data:
 					sock = s
 					break
 
@@ -155,7 +163,7 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 						raise
 				else:
 					if self.termstatus is not None: clisock.close() # Do not accept new connection when exiting
-					if clisock.family==socket.AF_UNIX and address=='': address = clisock.getsockname()
+					if sys.platform != 'win32' and clisock.family==socket.AF_UNIX and address=='': address = clisock.getsockname()
 					conn = console_connection(clisock, address, self)
 					self.conns.add(conn)
 
@@ -176,6 +184,21 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 		else:
 			self.__init_real_exit()
 			return
+
+
+	def __check_childs_cb(self, watcher, _revents):
+		'''This is alternative way of detecting subprocess exit - used on Windows'''
+		extra_tick = False
+		for p in self.roaster:
+			if p.subproc is None: continue
+			ret = p.subproc.poll()
+			if ret != None:
+				self.on_terminate_program(p.subproc.pid, ret)
+				extra_tick = True
+		
+		if extra_tick:
+			self.add_idlework(self.on_tick)
+
 
 
 	def __child_signal_cb(self, watcher, _revents):
