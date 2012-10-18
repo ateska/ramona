@@ -37,3 +37,4 @@ log
 .project
 .pydevproject
 .settings
+/log-test
