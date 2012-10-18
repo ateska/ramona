@@ -223,10 +223,10 @@ class program(object):
 		except:
 			alt_env = None
 		
-		env = alt_env if alt_env is not None else "env"
-		L.debug("Using environment from section {0}".format(env))	
-		if config.has_section(env):
-			for name, value in config.items(env):
+		env_section = alt_env if alt_env is not None else "env"
+		
+		if config.has_section(env_section):
+			for name, value in config.items(env_section):
 				if value != '':
 					self.env[name] = value
 				else:
