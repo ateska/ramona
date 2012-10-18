@@ -134,11 +134,11 @@ class log_mediator(object):
 				fnames.add(idx)
 
 			for k in sorted(fnames, reverse=True):
+				suffix = suffixes.get(k, "")
 				if (self.logbackups > 0) and (k >= self.logbackups):
 					os.unlink("{0}.{1}{2}".format(self.fname, k, suffix))
 					continue
 				if ((k-1) not in fnames) and (k > 1): continue # Move only files where there is one 'bellow'
-				suffix = suffixes.get(k, "")
 				os.rename("{0}.{1}{2}".format(self.fname, k, suffix), "{0}.{1}{2}".format(self.fname, k+1, suffix))
 				if self.logcompress and suffix != ".gz" and k+1 >= 2:
 					L.info("Compressing {0}.{1}".format(self.fname, k+1))
