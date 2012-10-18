@@ -29,6 +29,8 @@ Features
 - [program:x] command now can contain environment variable reference (e.g. ${HOME}) that will be expanded; also [env] is taken in account
 - [program:x]'directory' option (change working directory prior program start)
 - [program:x]'umask' option
+- optional alternative configuration for environment variables: https://github.com/ateska/ramona/issues/2
+
 
 Console
 -------
