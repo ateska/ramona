@@ -215,8 +215,18 @@ class program(object):
 
 		# Environment variables
 		self.env = os.environ.copy()
-		if config.has_section('env'):
-			for name, value in config.items('env'):
+		
+		
+		try:
+			alt_env = config.get(config_section, "env")
+			alt_env = "env:{0}".format(alt_env)
+		except:
+			alt_env = None
+		
+		env = alt_env if alt_env is not None else "env"
+		L.debug("Using environment from section {0}".format(env))	
+		if config.has_section(env):
+			for name, value in config.items(env):
 				if value != '':
 					self.env[name] = value
 				else:
