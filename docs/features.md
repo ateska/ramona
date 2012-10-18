@@ -139,3 +139,7 @@ password=pass
 # SHA example. To generate use for example: echo -n "secret" | sha1sum
 #password={SHA}e5e9fa1ba31ecd1ae84f75caaa474f3a663f05f4
 ```
+
+Windows
+-------
+- Running as Windows Service
