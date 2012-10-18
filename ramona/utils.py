@@ -18,7 +18,7 @@ and instead of that, current process will be replaced by launched server.
 All file descriptors above 2 are closed.
 	'''
 	from .config import config_files
-	os.environ['RAMONA_CONFIG'] = ':'.join(config_files)
+	os.environ['RAMONA_CONFIG'] = ';'.join(config_files)
 
 	if sys.platform == 'win32':
 		# Windows specific code, os.exec* process replacement is not possible, so we try to mimic that

@@ -30,6 +30,8 @@ TODO
 
   TODO
 
+Separator is ';'
+
 
 .. attribute:: logdir
 

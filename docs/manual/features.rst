@@ -48,11 +48,18 @@ TODO
 Ramona environment variables
 ----------------------------
 
-RAMONA_CONFIGS
-RAMONA_SECTION
-
 TODO
 
+.. attribute:: RAMONA_CONFIG
+
+  TODO
+
+  Separator is ';'
+
+
+.. attribute:: RAMONA_SECTION
+
+  TODO
 
 
 HTTP front end (Web console)

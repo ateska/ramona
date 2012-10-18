@@ -57,7 +57,7 @@ def read_config(configs=None, use_env=True):
 		# Configs from environment variables
 		config_envs = os.environ.get('RAMONA_CONFIG')
 		if config_envs is not None:
-			for config_file in config_envs.split(':'):
+			for config_file in config_envs.split(';'):
 				configs.append(config_file)
 
 	for cfile in  configs:
@@ -70,7 +70,7 @@ def read_config(configs=None, use_env=True):
 		includes = config.get('general','include')
 		if includes == '': break
 		config.set('general','include','')
-		includes = includes.split(':')
+		includes = includes.split(';')
 		for i in xrange(len(includes)-1,-1,-1):
 			include = includes[i] = includes[i].strip()
 			if include == '<siteconf>':
