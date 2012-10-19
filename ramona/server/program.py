@@ -269,8 +269,11 @@ class program(object):
 			self.watchers[1].set(self.subproc.stderr, pyev.EV_READ)
 			self.watchers[1].start()
 
+		# Open log files
+		#TODO: Following functions can fail - maybe termination of start sequence is proper reaction
 		self.log_out.open()
-		self.log_err.open()
+		if self.log_out != self.log_err: self.log_err.open()
+
 		self.log_err.write("\n-=[ STARTING by Ramona on {0} ]=-\n".format(time.strftime("%Y-%m-%d %H:%M:%S")))
 		self.state = program_state_enum.STARTING
 		self.start_time = time.time()

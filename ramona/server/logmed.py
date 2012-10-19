@@ -1,11 +1,13 @@
-import re, collections, io, os, glob, weakref, logging
+import re, collections, os, glob, weakref, logging
 from ..config import config
 from ..kmpsearch import kmp_search
+from ..cnscom import svrcall_error
 from .svrappsingl import get_svrapp
 
 ###
 
 L = logging.getLogger('logmed')
+Lmy = logging.getLogger("my") # Message yielding logger
 
 ###
 
@@ -32,7 +34,7 @@ class log_mediator(object):
 		'''
 		self.prog_ident = prog_ident
 		self.stream_name = stream_name
-		self.fname = fname
+		self.fname = os.path.normpath(fname) if fname is not None else None
 		self.outf = None
 		self.scanners = []
 
@@ -64,8 +66,16 @@ class log_mediator(object):
 
 	def open(self):
 		if self.outf is None and self.fname is not None:
-			self.outf = open(self.fname,'a')
-			
+			try:
+				self.outf = open(self.fname,'a')
+			except Exception, e:
+				L.warning("Cannot open log file '{0}' for {1}: {2}".format(self.fname, self.stream_name, e))
+				Lmy.warning("Cannot open log file '{0}' for {1}: {2}".format(self.fname, self.stream_name, e))
+				self.outf = None
+				return False
+
+		return True
+
 
 	def close(self):
 		if self.outf is not None:
