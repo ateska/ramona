@@ -1,7 +1,7 @@
 import sys, os, time, logging, shlex, signal, subprocess, errno
 import pyev
 from ..config import config, get_boolean
-from ..utils import parse_signals, close_fds, expandvars, enable_nonblocking, disable_nonblocking
+from ..utils import parse_signals, close_fds, expandvars, enable_nonblocking, disable_nonblocking, get_python_exec
 from ..cnscom import program_state_enum, svrcall_error
 from .logmed import log_mediator
 
@@ -71,12 +71,13 @@ class program(object):
 			return
 
 		if cmd == '<httpfend>':
-			cmd = '{0} -u -m ramona.httpfend'.format(sys.executable)
+			cmd = get_python_exec(cmdline="-u -m ramona.httpfend")
 		elif cmd[:1] == '<':
 			L.error("Unknown command option '{1}' in {0} -> CFGERROR".format(config_section, cmd))
 			self.state = program_state_enum.CFGERROR
 			return
 
+		cmd = cmd.replace('\\', '\\\\')
 		self.cmdline = shlex.split(cmd)
 
 		# Prepare stop signals
@@ -233,7 +234,7 @@ class program(object):
 		assert self.subproc is None
 		assert self.state in (program_state_enum.STOPPED, program_state_enum.FATAL)
 
-		L.debug("{0} -> STARTING".format(self))
+		L.debug("{0} ({1}) -> STARTING".format(self, self.cmdline))
 
 		# Prepare working directory
 		directory = self.config.get('directory')

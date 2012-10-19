@@ -23,12 +23,13 @@ All file descriptors above 2 are closed.
 	if sys.platform == 'win32':
 		# Windows specific code, os.exec* process replacement is not possible, so we try to mimic that
 		import subprocess
-		ret = subprocess.call("{0} -m ramona.server".format(sys.executable))
+		ret = subprocess.call(get_python_exec("-m ramona.server"))
 		sys.exit(ret)
 
 	else:
 		close_fds()
-		os.execl(sys.executable, sys.executable, "-m", "ramona.server")
+		pythonexec = get_python_exec()
+		os.execl(pythonexec, os.path.basename(pythonexec), "-m", "ramona.server")
 
 #
 
@@ -149,3 +150,15 @@ def expandvars(path, env):
 			i = j
 
 	return path
+
+###
+
+def get_python_exec(cmdline=None):
+	"Return path for Python executable - similar to sys.executable but also handles corner cases on Win32"
+	if sys.executable.lower().endswith('pythonservice.exe'):
+		pythonexec = os.path.join(sys.exec_prefix, 'python.exe')
+	else:
+		pythonexec = sys.executable
+
+	if cmdline is None: return pythonexec
+	else: return  pythonexec + ' ' + cmdline
