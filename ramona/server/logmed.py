@@ -1,4 +1,4 @@
-import re, collections, os, glob, weakref, logging
+import re, collections, os, glob, weakref, logging, gzip
 from ..config import config
 from ..kmpsearch import kmp_search
 from ..cnscom import svrcall_error
@@ -24,7 +24,7 @@ class log_mediator(object):
 
 	maxlinelen = 0x7f00 # Connected to maximum IPC (console-server) data buffer
 	linehistory = 100 # Number of tail history (in lines)
-	rotlognamerg = re.compile('\.([0-9]+)$')
+	rotlognamerg = re.compile('\.([0-9]+)(\.gz)?$')
 
 	def __init__(self, prog_ident, stream_name, fname):
 		'''
@@ -59,8 +59,10 @@ class log_mediator(object):
 		try:
 			self.logmaxsize = config.getint('general','logmaxsize')
 			self.logbackups = config.getint('general','logbackups')
+			self.logcompress = config.getboolean('general', 'logcompress')
 		except Exception, e:
 			self.logbackups = self.logmaxsize = 0
+			self.logcompress = False
 			L.warning("Invalid configuration of log rotation: {0} - log rotation disabled".format(e))
 
 
@@ -130,24 +132,37 @@ class log_mediator(object):
 		try:
 
 			fnames = set()
+			suffixes = dict()
 			for fname in glob.iglob(self.fname+'.*'):
 				if not os.path.isfile(fname): continue
 				x = self.rotlognamerg.search(fname)
 				if x is None: continue
-				fnames.add(int(x.group(1)))
+				idx = int(x.group(1))
+				suffix = x.group(2)
+				if suffix is not None: 
+					suffixes[idx] = suffix
+				fnames.add(idx)
 
 			for k in sorted(fnames, reverse=True):
+				suffix = suffixes.get(k, "")
 				if (self.logbackups > 0) and (k >= self.logbackups):
-					os.unlink("{0}.{1}".format(self.fname, k))
+					os.unlink("{0}.{1}{2}".format(self.fname, k, suffix))
 					continue
 				if ((k-1) not in fnames) and (k > 1): continue # Move only files where there is one 'bellow'
-				os.rename("{0}.{1}".format(self.fname, k), "{0}.{1}".format(self.fname, k+1))
+				os.rename("{0}.{1}{2}".format(self.fname, k, suffix), "{0}.{1}{2}".format(self.fname, k+1, suffix))
+				if self.logcompress and suffix != ".gz" and k+1 >= 2:
+					L.info("Compressing {0}.{1}".format(self.fname, k+1))
+					self.__compress_logfile("{0}.{1}".format(self.fname, k+1))
 
 			os.rename("{0}".format(self.fname), "{0}.1".format(self.fname))
 
 		finally:
 			self.outf = open(self.fname,'a')		
-
+	
+	def __compress_logfile(self, fname):
+		with open(fname, 'rb') as f_in, gzip.open('{0}.gz'.format(fname), 'wb') as f_out:
+			f_out.writelines(f_in)
+		os.unlink(fname)
 
 	def __tailbuf_append(self, data, nlt):
 		if self.tailbufnl:

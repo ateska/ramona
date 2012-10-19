@@ -48,6 +48,18 @@ Separator is ';'
   TODO
 
 
+.. attribute:: logcompress
+
+  If `logcompress` configuration option is set to 1, the log files `xxx.log.2+` will be compressed
+  using gzip compression.
+
+  *Type*: boolean -- use "1", "yes", "true", and "on" for True, "0", "no", "false", and "off" for False
+  
+  *Default*: 1
+
+  *Required*: No
+
+
 
 [env] section
 -------------

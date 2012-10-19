@@ -1,4 +1,8 @@
-import os, sys, logging, ConfigParser
+import os, logging, ConfigParser
+###
+
+L = logging.getLogger("config")
+
 ###
 
 # Defaults are stated in documentation, if you change them here, update documentation too!
@@ -9,6 +13,7 @@ config_defaults = {
 		'include' : '<siteconf>',
 		'logmaxsize': '{0}'.format(512*1024*1024), # 512Mb
 		'logbackups': '3',
+		'logcompress': '1'
 	},
 	'ramona:server' : {
 		'consoleuri': 'unix://.ramona.sock' if os.name != 'nt' else 'tcp://localhost:7788',

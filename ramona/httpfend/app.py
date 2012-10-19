@@ -2,7 +2,7 @@ import sys, os, socket, ConfigParser, errno, logging, signal, threading, itertoo
 import pyev
 from ..config import config, read_config, get_numeric_loglevel
 from .. import socketuri
-from ._request_handler import RamonaHttpReqHandler
+from ._request_handler import ramona_http_req_handler
 
 ###
 
@@ -136,7 +136,7 @@ class httpfend_app(object):
 						num_workers, self.MAX_WORKER_THREADS, address))
 					continue
 				
-				worker = RequestWorker(clisock, address, self)
+				worker = _request_worker(clisock, address, self)
 				L.debug("Request from client {0} is processed by thread {1}".format(address, worker.name))
 				worker.start()
 				self.workers.append(worker)
@@ -156,18 +156,18 @@ class httpfend_app(object):
 
 #
 
-class RequestWorker(threading.Thread):
+class _request_worker(threading.Thread):
 	
 	def __init__(self, sock, address, server):
 		threading.Thread.__init__(self)
-		self.name = "RequestWorker-{0}".format(self.name)
+		self.name = "HttpfendRequestWorker-{0}".format(self.name)
 		self.sock = sock
 		self.address = address
 		self.server = server
 	
 	def run(self):
 		try:
-			RamonaHttpReqHandler(self.sock, self.address, self.server)
+			ramona_http_req_handler(self.sock, self.address, self.server)
 			self.sock.close()
 		except:
 			L.exception("Uncaught exception during worker thread execution:")

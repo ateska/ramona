@@ -20,7 +20,9 @@ if not mimetypes.inited:
 
 ###
 
-class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+class ramona_http_req_handler(BaseHTTPServer.BaseHTTPRequestHandler):
+	
+	ActionToCallid = {"start": cnscom.callid_start, "stop": cnscom.callid_stop, "restart": cnscom.callid_restart}
 	
 	def __init__(self, request, client_address, server):
 		self.server = server
@@ -29,9 +31,6 @@ class RamonaHttpReqHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			BaseHTTPServer.BaseHTTPRequestHandler.__init__(self, request, client_address, server)
 		except:
 			L.exception("Exception while requesthandler execution")
-		
-	ActionToCallid = {"start": cnscom.callid_start, "stop": cnscom.callid_stop, "restart": cnscom.callid_restart}
-	_scriptdir = os.path.dirname(__file__)
 	
 	def do_GET(self):
 		# Static has to be handeled before authentication, as the static content is available
@@ -385,6 +384,7 @@ def _is_egg():
 	ret = isinstance(pkgutil.get_loader(__name__), zipimport.zipimporter)
 	return ret
 
+
 _scriptdir = os.path.dirname(__file__)
 def _static_file_exists(path):
 	if _is_egg():
@@ -396,6 +396,7 @@ def _static_file_exists(path):
 		fname = os.path.join(_scriptdir, *[x for x in parts if len(x) > 0])
 		return os.path.isfile(fname)
 	return True
+
 
 def _get_static_file(path):
 	if _is_egg():
