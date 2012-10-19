@@ -40,7 +40,7 @@ Watchdog
 
 Python specific
 ---------------
-- native python program execution (using sys.executable - substitute for STRIGAPYTHON)
+- native python program execution (using utils.get_python_exec - substitute for STRIGAPYTHON)
 - python version (minimal) check
 
 Mailing to admin
