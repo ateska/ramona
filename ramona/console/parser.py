@@ -54,8 +54,8 @@ class _parser_base(argparse.ArgumentParser):
 		yield tail
 
 		if os.name == 'nt':
-			from .cmd import w32install
-			yield w32install
+			from .cmd import wininstall
+			yield wininstall
 
 
 	def parse(self, argv):
