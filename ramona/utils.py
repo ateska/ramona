@@ -115,13 +115,13 @@ if os.name == 'posix':
 		fl = fcntl.fcntl(fd, fcntl.F_GETFL)
 		fcntl.fcntl(fd, fcntl.F_SETFL, fl ^ os.O_NONBLOCK)
 
-elif os.name == 'nt':
+elif sys.platform == 'win32':
 
 	def enable_nonblocking(fd):
-		pass
+		raise NotImplementedError("utils.enable_nonblocking() not implementerd on Windows")
 
 	def disable_nonblocking(fd):
-		pass
+		raise NotImplementedError("utils.disable_nonblocking() not implementerd on Windows")
 
 ###
 

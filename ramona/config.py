@@ -1,4 +1,4 @@
-import os, logging, ConfigParser
+import os, sys, logging, ConfigParser
 ###
 
 L = logging.getLogger("config")
@@ -16,13 +16,13 @@ config_defaults = {
 		'logcompress': '1'
 	},
 	'ramona:server' : {
-		'consoleuri': 'unix://.ramona.sock' if os.name != 'nt' else 'tcp://localhost:7788',
+		'consoleuri': 'unix://.ramona.sock' if sys.platform != 'win32' else 'tcp://localhost:7788',
 		'pidfile': '',
 		'log': '<logdir>',
 		'loglevel': 'INFO',
 	},
 	'ramona:console' : {
-		'serveruri': 'unix://.ramona.sock' if os.name != 'nt' else 'tcp://localhost:7788',
+		'serveruri': 'unix://.ramona.sock' if sys.platform != 'win32' else 'tcp://localhost:7788',
 		'history': '',
 	},
 	'ramona:notify' : {
