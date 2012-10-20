@@ -115,6 +115,14 @@ TODO
 .. attribute:: pidfile
 
   TODO
+  You can use environment variables in form of ${var-name}.
+  
+  Example:
+
+  .. code-block:: ini
+
+    [ramona:server]
+    pidfile=${TMP}/testramona.pid
 
 
 .. attribute:: log
