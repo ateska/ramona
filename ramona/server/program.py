@@ -23,6 +23,7 @@ class program(object):
 
 	DEFAULTS = {
 		'command': None,
+		'command_win': None,
 		'directory': None,
 		'umask': None,
 		'starttimeout': 0.5,
@@ -64,7 +65,14 @@ class program(object):
 		self.config = self.DEFAULTS.copy()
 		self.config.update(config.items(config_section))
 
-		cmd = self.config.get('command')
+		# Prepare program command line
+		if sys.platform == 'win32':
+			# If there is Windows specific command (on Windows), use it
+			cmd = self.config.get('command_win')
+			if cmd is None: cmd = self.config.get('command')
+		else:
+			cmd = self.config.get('command')
+
 		if cmd is None:
 			L.error("Missing command option in {0} -> CFGERROR".format(config_section))
 			self.state = program_state_enum.CFGERROR
@@ -252,9 +260,10 @@ class program(object):
 			directory = expandvars(directory, self.env)
 
 		# Launch subprocess
+		cmdline = [expandvars(arg, self.env) for arg in self.cmdline]
 		try:
 			self.subproc = subprocess.Popen(
-				[expandvars(arg, self.env) for arg in self.cmdline],
+				cmdline,
 				stdin=None,
 				stdout=subprocess.PIPE,
 				stderr=subprocess.PIPE,

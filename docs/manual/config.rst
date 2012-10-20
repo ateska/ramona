@@ -170,6 +170,13 @@ TODO
   TODO
 
 
+.. attribute:: command_win
+
+  expandvars
+  TODO
+  Overrides `command` option on Windows
+
+
 .. attribute:: directory
 
   expandvars
