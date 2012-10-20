@@ -141,6 +141,7 @@ def expandvars(path, env):
         	i, j = m.span(0)
         	name = m.group(1)
 		if name.startswith('{') and name.endswith('}'): name = name[1:-1]
+		name=name.upper() # Use upper-case form for environment variables (e.g. Windows ${comspec})
 		if name in env:
 			tail = path[j:]
 			path = path[:i] + env[name]
