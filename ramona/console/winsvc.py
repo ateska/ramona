@@ -19,7 +19,6 @@ class w32_ramona_service(win32serviceutil.ServiceFramework):
 	_svc_name_ = None
 	_svc_display_name_ = 'Ramona Demo Service'
 
-
 	@classmethod
 	def configure(cls):
 		assert cls._svc_name_ is None
@@ -31,6 +30,8 @@ class w32_ramona_service(win32serviceutil.ServiceFramework):
 	def __init__(self, *args):
 		assert self._svc_name_ is None
 
+		self.log('Ramona service is starting')
+
 		# Read working directory from registry and change to it
 		directory = win32serviceutil.GetServiceCustomOption(args[0], 'directory')
 		os.chdir(directory)
@@ -38,10 +39,12 @@ class w32_ramona_service(win32serviceutil.ServiceFramework):
 		# Set Ramona config environment variable to ensure proper configuration files load
 		os.environ['RAMONA_CONFIG'] =  win32serviceutil.GetServiceCustomOption(args[0], 'config')
 
+		# Discard command-line parameters ... they confuses argparses in server_app
+		sys.argv = sys.argv[:1]
+
 		from ..server.svrapp import server_app
 		self.svrapp = server_app()
 		self.configure()
-		self.log(">>> {0}".format(config_files))
 
 		win32serviceutil.ServiceFramework.__init__(self, *args)
 		self.stop_event = win32event.CreateEvent(None, 0, 0, None)
@@ -85,8 +88,11 @@ class w32_ramona_service(win32serviceutil.ServiceFramework):
 
 ###
 
-def w32_install_svc():
-	''' Install Win32 Ramona Service'''
+def w32_install_svc(start=False):
+	''' Install Windows Ramona Service'''
+
+	import logging
+	L = logging.getLogger('winsvc')
 
 	directory = abspath(dirname(sys.argv[0])) # Find where console python prog is launched from ...
 
@@ -116,9 +122,11 @@ def w32_install_svc():
 	win32serviceutil.SetServiceCustomOption(cls._svc_name_, 'directory', directory)
 	win32serviceutil.SetServiceCustomOption(cls._svc_name_, 'config', ';'.join(config_files))
 
-	return cls
+	L.debug("Service {0} installed".format(cls._svc_name_))
 
-		# print 'Install ok'
-		# win32serviceutil.StartService(
-		# 	cls._svc_name_
-		# )
+	if start:
+		x = win32serviceutil.StartService(cls._svc_name_)
+		#TODO: Wait for service start to check start status ...
+		L.debug("Service {0} started".format(cls._svc_name_))
+
+	return cls
