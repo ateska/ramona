@@ -4,13 +4,13 @@ from ..w32svc import w32_install_svc
 
 ###
 
-name = 'w32install'
+name = 'wininstall'
 cmdhelp = 'Install Ramona as Windows Service (Windows only)'
 
 ###
 
 
-L = logging.getLogger('w32install')
+L = logging.getLogger('wininstall')
 
 ###
 
