@@ -55,6 +55,17 @@ HTTP frontend
 - RESTful API
 - (low prio): HTTPS
 
+Cron
+----
+- Ramona can be used to trigger tasks (tools) by given time - emulating functionality of cron
+
 Deployment
 ----------
 - Consider https://help.github.com/articles/splitting-a-subpath-out-into-a-new-repo for embedded deployments (for released versions)
+
+Cluster
+-------
+- Ramona can be used as cluster controller - running on every node and managing application there.
+- Ramona cluster controller needs to be built to allow single point of control
+- Fail-over scenarion support
+- Amazon ECS integration (e.g. use of Amazon variables that are passed to the box)
