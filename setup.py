@@ -35,7 +35,7 @@ setup(
 		'License :: OSI Approved :: BSD License',
 		'Natural Language :: English',
 		'Operating System :: MacOS :: MacOS X',
-#TODO: Not yet ... 'Operating System :: Microsoft :: Windows',
+		'Operating System :: Microsoft :: Windows',
 		'Operating System :: POSIX',
 		'Operating System :: Unix',
 		'Programming Language :: Python :: 2.7',
