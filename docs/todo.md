@@ -17,11 +17,6 @@ Generic
 - test Ramona how it runs in out-of-diskspace conditions
 - 'user' option - If ramona runs as root, this UNIX user account will be used as the account which runs the program. If ramona is not running as root, this option has no effect.
 
-Windows
--------
-- working on Windows (based on pyev / libev?)
-- daemonizing is not available on Windows - provide Windows Service option instead
-
 Logging
 -------
 - Support for SIGHUP (reopen log files OR reset fully)

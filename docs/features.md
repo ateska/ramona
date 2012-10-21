@@ -145,3 +145,4 @@ password=pass
 Windows
 -------
 - Running as Windows Service
+- working on Windows using pyev & Python Win32
