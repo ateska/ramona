@@ -259,7 +259,7 @@ Platform selector
 
 TODO
 
-Syntax is ``commandname@selector``.
+Syntax is ``option@selector``.
 
 List of selectors:
 
@@ -270,6 +270,10 @@ List of selectors:
    Windows               ``windows``
    Mac OS X              ``darwin``
    ===================== ================
+
+.. note:: Platform names are based on Python ``platform.system()`` call.
+  Lowercase form is used.
+
 
 
 .. _config-ramonahttpfend:
