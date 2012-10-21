@@ -30,6 +30,8 @@ TODO
 
   TODO
 
+Separator is ';'
+
 
 .. attribute:: logdir
 
@@ -44,6 +46,18 @@ TODO
 .. attribute:: logbackups
 
   TODO
+
+
+.. attribute:: logcompress
+
+  If `logcompress` configuration option is set to 1, the log files `xxx.log.2+` will be compressed
+  using gzip compression.
+
+  *Type*: boolean -- use "1", "yes", "true", and "on" for True, "0", "no", "false", and "off" for False
+  
+  *Default*: 1
+
+  *Required*: No
 
 
 
@@ -101,6 +115,14 @@ TODO
 .. attribute:: pidfile
 
   TODO
+  You can use environment variables in form of ${var-name}.
+  
+  Example:
+
+  .. code-block:: ini
+
+    [ramona:server]
+    pidfile=${TMP}/testramona.pid
 
 
 .. attribute:: log
@@ -144,11 +166,21 @@ TODO
 
 .. attribute:: command
 
+  expandvars
   TODO
+
+  Example:
+
+  .. code-block:: ini
+
+    [ramona:server]
+    command=ls -l /
+    command@windows=dir c:\
 
 
 .. attribute:: directory
 
+  expandvars
   TODO
 
 
@@ -220,6 +252,36 @@ TODO
 .. attribute:: logscan_stderr
 
   TODO
+
+
+Platform selector
+~~~~~~~~~~~~~~~~~
+
+TODO
+
+Syntax is ``option@selector``.
+
+Example:
+
+.. code-block:: ini
+
+  [program:foolinux]
+  disabled@windows=True
+
+
+List of selectors:
+
+   ===================== ================
+   System                Selector
+   ===================== ================
+   Linux                 ``linux``
+   Windows               ``windows``
+   Mac OS X              ``darwin``
+   ===================== ================
+
+.. note:: Platform names are based on Python ``platform.system()`` call.
+  Lowercase form is used.
+
 
 
 .. _config-ramonahttpfend:
@@ -299,3 +361,4 @@ Example:
 
   *Required*:  No
   
+

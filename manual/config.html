@@ -75,6 +75,7 @@
 <dd><p>TODO</p>
 </dd></dl>
 
+<p>Separator is &#8216;;&#8217;</p>
 <dl class="attribute">
 <dt id="logdir">
 <tt class="descname">logdir</tt><a class="headerlink" href="#logdir" title="Permalink to this definition">¶</a></dt>
@@ -91,6 +92,16 @@
 <dt id="logbackups">
 <tt class="descname">logbackups</tt><a class="headerlink" href="#logbackups" title="Permalink to this definition">¶</a></dt>
 <dd><p>TODO</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="logcompress">
+<tt class="descname">logcompress</tt><a class="headerlink" href="#logcompress" title="Permalink to this definition">¶</a></dt>
+<dd><p>If <cite>logcompress</cite> configuration option is set to 1, the log files <cite>xxx.log.2+</cite> will be compressed
+using gzip compression.</p>
+<p><em>Type</em>: boolean &#8211; use &#8220;1&#8221;, &#8220;yes&#8221;, &#8220;true&#8221;, and &#8220;on&#8221; for True, &#8220;0&#8221;, &#8220;no&#8221;, &#8220;false&#8221;, and &#8220;off&#8221; for False</p>
+<p><em>Default</em>: 1</p>
+<p><em>Required</em>: No</p>
 </dd></dl>
 
 </div>
@@ -135,7 +146,13 @@ You can specify more network interfaces, protocols or ports, URIs are comma-sepa
 <dl class="attribute">
 <dt id="pidfile">
 <tt class="descname">pidfile</tt><a class="headerlink" href="#pidfile" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dd><p>TODO
+You can use environment variables in form of ${var-name}.</p>
+<p>Example:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[ramona:server]</span>
+<span class="na">pidfile</span><span class="o">=</span><span class="s">${TMP}/testramona.pid</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="attribute">
@@ -179,13 +196,21 @@ You can specify more network interfaces, protocols or ports, URIs are comma-sepa
 <dl class="attribute">
 <dt id="command">
 <tt class="descname">command</tt><a class="headerlink" href="#command" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dd><p>expandvars
+TODO</p>
+<p>Example:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[ramona:server]</span>
+<span class="na">command</span><span class="o">=</span><span class="s">ls -l /</span>
+<span class="na">command@windows</span><span class="o">=</span><span class="s">dir c:\</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="directory">
 <tt class="descname">directory</tt><a class="headerlink" href="#directory" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dd><p>expandvars
+TODO</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -272,6 +297,46 @@ You can specify more network interfaces, protocols or ports, URIs are comma-sepa
 <dd><p>TODO</p>
 </dd></dl>
 
+<div class="section" id="platform-selector">
+<h3>Platform selector<a class="headerlink" href="#platform-selector" title="Permalink to this headline">¶</a></h3>
+<p>TODO</p>
+<p>Syntax is <tt class="docutils literal"><span class="pre">option&#64;selector</span></tt>.</p>
+<p>Example:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[program:foolinux]</span>
+<span class="na">disabled@windows</span><span class="o">=</span><span class="s">True</span>
+</pre></div>
+</div>
+<p>List of selectors:</p>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="57%" />
+<col width="43%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">System</th>
+<th class="head">Selector</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Linux</td>
+<td><tt class="docutils literal"><span class="pre">linux</span></tt></td>
+</tr>
+<tr class="row-odd"><td>Windows</td>
+<td><tt class="docutils literal"><span class="pre">windows</span></tt></td>
+</tr>
+<tr class="row-even"><td>Mac OS X</td>
+<td><tt class="docutils literal"><span class="pre">darwin</span></tt></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Platform names are based on Python <tt class="docutils literal"><span class="pre">platform.system()</span></tt> call.
+Lowercase form is used.</p>
+</div>
+</div>
 </div>
 <div class="section" id="program-ramonahttpfend">
 <span id="config-ramonahttpfend"></span><h2>[program:ramonahttpfend]<a class="headerlink" href="#program-ramonahttpfend" title="Permalink to this headline">¶</a></h2>
@@ -354,7 +419,10 @@ you can use the following command (works on Linux):</p>
 <li><a class="reference internal" href="#env-section">[env] section</a></li>
 <li><a class="reference internal" href="#ramona-server-section">[ramona:server] section</a></li>
 <li><a class="reference internal" href="#ramona-notify-section">[ramona:notify] section</a></li>
-<li><a class="reference internal" href="#program-x-section">[program:X] section</a></li>
+<li><a class="reference internal" href="#program-x-section">[program:X] section</a><ul>
+<li><a class="reference internal" href="#platform-selector">Platform selector</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#program-ramonahttpfend">[program:ramonahttpfend]</a></li>
 </ul>
 </li>
