@@ -5,6 +5,10 @@ from ..utils import parse_signals, close_fds, expandvars, enable_nonblocking, di
 from ..cnscom import program_state_enum, svrcall_error
 from .logmed import log_mediator
 
+
+if sys.platform == 'win32':
+	import msvcrt
+	import win32file, win32pipe, pywintypes, winerror # from Python Win32
 #
 
 try:
@@ -337,15 +341,20 @@ class program(object):
 		assert self.state in (program_state_enum.RUNNING, program_state_enum.STARTING)
 
 		L.debug("{0} -> STOPPING".format(self))
-		self.act_stopsignals = self.stopsignals[:]
-		signal = self.get_next_stopsignal()
-		try:
-			if get_boolean(self.config.get('processgroup',True)):
-				os.kill(-self.subproc.pid, signal) # Killing whole process group
-			else:
-				os.kill(self.subproc.pid, signal)
-		except:
-			pass
+		if sys.platform == 'win32':
+			self.subproc.terminate()
+		else:
+			self.act_stopsignals = self.stopsignals[:]
+			signal = self.get_next_stopsignal()
+			try:
+				if get_boolean(self.config.get('processgroup',True)):
+					os.kill(-self.subproc.pid, signal) # Killing whole process group
+				else:
+					os.kill(self.subproc.pid, signal)
+			except:
+				pass
+			
+
 		self.state = program_state_enum.STOPPING
 		self.stop_time = time.time()
 
@@ -388,6 +397,9 @@ class program(object):
 					raise
 				if len(data) == 0: break
 				self.log_err.write(data)
+
+		elif sys.platform == 'win32':
+			self.win32_read_stdfd()
 
 		# Explicitly destroy subprocess object
 		self.subproc = None
@@ -465,6 +477,45 @@ class program(object):
 			
 			if watcher.data == 0: self.log_out.write(data)
 			elif watcher.data == 1: self.log_err.write(data)
+
+
+	def win32_read_stdfd(self):
+		'''Alternative implementation of stdout/stderr non-blocking read for Windows
+		For details see:
+
+		http://code.activestate.com/recipes/440554/
+		http://msdn.microsoft.com/en-us/library/windows/desktop/aa365779(v=vs.85).aspx
+		'''
+		assert self.subproc is not None
+
+		if self.subproc.stdout is not None:
+			while 1:
+				x = msvcrt.get_osfhandle(self.subproc.stdout.fileno())
+				try:
+					(read, nAvail, nMessage) = win32pipe.PeekNamedPipe(x, 0)
+				except pywintypes.error, e:
+					if e.winerror == winerror.ERROR_BROKEN_PIPE: break
+					raise
+				if nAvail > 4096: nAvail = 4096
+				if nAvail == 0: break
+				
+				(errCode, data) = win32file.ReadFile(x, nAvail, None)
+				self.log_out.write(data)
+
+
+		if self.subproc.stderr is not None:
+			while 1:
+				x = msvcrt.get_osfhandle(self.subproc.stderr.fileno())
+				try:
+					(read, nAvail, nMessage) = win32pipe.PeekNamedPipe(x, 0)
+				except pywintypes.error, e:
+					if e.winerror == winerror.ERROR_BROKEN_PIPE: break
+					raise
+				if nAvail > 4096: nAvail = 4096
+				if nAvail == 0: break
+
+				(errCode, data) = win32file.ReadFile(x, nAvail, None)
+				self.log_err.write(data)
 
 
 	def tail(self, cnscon, stream, lines=80, tailf=False):

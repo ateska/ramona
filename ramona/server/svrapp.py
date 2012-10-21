@@ -200,7 +200,11 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 			if ret != None:
 				self.on_terminate_program(p.subproc.pid, ret)
 				extra_tick = True
-		
+
+			if p.subproc is not None:
+				p.win32_read_stdfd()	
+
+
 		if extra_tick:
 			self.add_idlework(self.on_tick)
 
