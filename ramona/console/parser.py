@@ -1,4 +1,4 @@
-import argparse
+import sys, os, argparse
 
 ###
 
@@ -52,6 +52,10 @@ class _parser_base(argparse.ArgumentParser):
 
 		from .cmd import tail
 		yield tail
+
+		if sys.platform == 'win32':
+			from .cmd import wininstall
+			yield wininstall
 
 
 	def parse(self, argv):

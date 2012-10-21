@@ -1,10 +1,14 @@
-import sys, os, time, logging, shlex, signal, subprocess, errno
+import sys, os, time, logging, shlex, signal, subprocess, re, errno, platform
 import pyev
 from ..config import config, get_boolean
-from ..utils import parse_signals, close_fds, expandvars, enable_nonblocking, disable_nonblocking
+from ..utils import parse_signals, close_fds, expandvars, enable_nonblocking, disable_nonblocking, get_python_exec
 from ..cnscom import program_state_enum, svrcall_error
 from .logmed import log_mediator
 
+
+if sys.platform == 'win32':
+	import msvcrt
+	import win32file, win32pipe, pywintypes, winerror # from Python Win32
 #
 
 try:
@@ -62,8 +66,17 @@ class program(object):
 
 		# Build configuration
 		self.config = self.DEFAULTS.copy()
-		self.config.update(config.items(config_section))
+		platform_selector = platform.system().lower()
 
+		self.config.update(config.items(config_section))
+		if platform_selector is not None and platform_selector != '':
+			psrg = re.compile('^(.*)@{0}$'.format(platform_selector))
+			for k in self.config.keys():
+				r = psrg.match(k)
+				if not r: continue
+				self.config[r.group(1)] = self.config.pop(k)
+
+		# Prepare program command line
 		cmd = self.config.get('command')
 		if cmd is None:
 			L.error("Missing command option in {0} -> CFGERROR".format(config_section))
@@ -71,12 +84,13 @@ class program(object):
 			return
 
 		if cmd == '<httpfend>':
-			cmd = '{0} -u -m ramona.httpfend'.format(sys.executable)
+			cmd = get_python_exec(cmdline="-u -m ramona.httpfend")
 		elif cmd[:1] == '<':
 			L.error("Unknown command option '{1}' in {0} -> CFGERROR".format(config_section, cmd))
 			self.state = program_state_enum.CFGERROR
 			return
 
+		cmd = cmd.replace('\\', '\\\\')
 		self.cmdline = shlex.split(cmd)
 
 		# Prepare stop signals
@@ -243,7 +257,7 @@ class program(object):
 		assert self.subproc is None
 		assert self.state in (program_state_enum.STOPPED, program_state_enum.FATAL)
 
-		L.debug("{0} -> STARTING".format(self))
+		L.debug("{0} ({1}) -> STARTING".format(self, self.cmdline))
 
 		# Prepare working directory
 		directory = self.config.get('directory')
@@ -251,14 +265,15 @@ class program(object):
 			directory = expandvars(directory, self.env)
 
 		# Launch subprocess
+		cmdline = [expandvars(arg, self.env) for arg in self.cmdline]
 		try:
 			self.subproc = subprocess.Popen(
-				[expandvars(arg, self.env) for arg in self.cmdline],
+				cmdline,
 				stdin=None,
 				stdout=subprocess.PIPE,
 				stderr=subprocess.PIPE,
-				preexec_fn=self.__preexec_fn,
-				close_fds=True,
+				preexec_fn=self.__preexec_fn if sys.platform != 'win32' else None,
+				close_fds=True if sys.platform != 'win32' else None,
 				shell=False, #TOOD: This can/should be configurable in [program:x] section
 				cwd=directory,
 				env=self.env
@@ -269,16 +284,20 @@ class program(object):
 			L.error("{0} failed to start: {1} -> FATAL".format(self, e))
 			return
 
-		enable_nonblocking(self.subproc.stdout)
-		self.watchers[0].set(self.subproc.stdout, pyev.EV_READ)
-		self.watchers[0].start()
+		if sys.platform != 'win32':
+			enable_nonblocking(self.subproc.stdout)
+			self.watchers[0].set(self.subproc.stdout, pyev.EV_READ)
+			self.watchers[0].start()
 
-		enable_nonblocking(self.subproc.stderr)
-		self.watchers[1].set(self.subproc.stderr, pyev.EV_READ)
-		self.watchers[1].start()
+			enable_nonblocking(self.subproc.stderr)
+			self.watchers[1].set(self.subproc.stderr, pyev.EV_READ)
+			self.watchers[1].start()
 
+		# Open log files
+		#TODO: Following functions can fail - maybe termination of start sequence is proper reaction
 		self.log_out.open()
-		self.log_err.open()
+		if self.log_out != self.log_err: self.log_err.open()
+
 		self.log_err.write("\n-=[ STARTING by Ramona on {0} ]=-\n".format(time.strftime("%Y-%m-%d %H:%M:%S")))
 		self.state = program_state_enum.STARTING
 		self.start_time = time.time()
@@ -322,15 +341,20 @@ class program(object):
 		assert self.state in (program_state_enum.RUNNING, program_state_enum.STARTING)
 
 		L.debug("{0} -> STOPPING".format(self))
-		self.act_stopsignals = self.stopsignals[:]
-		signal = self.get_next_stopsignal()
-		try:
-			if get_boolean(self.config.get('processgroup',True)):
-				os.kill(-self.subproc.pid, signal) # Killing whole process group
-			else:
-				os.kill(self.subproc.pid, signal)
-		except:
-			pass
+		if sys.platform == 'win32':
+			self.subproc.terminate()
+		else:
+			self.act_stopsignals = self.stopsignals[:]
+			signal = self.get_next_stopsignal()
+			try:
+				if get_boolean(self.config.get('processgroup',True)):
+					os.kill(-self.subproc.pid, signal) # Killing whole process group
+				else:
+					os.kill(self.subproc.pid, signal)
+			except:
+				pass
+			
+
 		self.state = program_state_enum.STOPPING
 		self.stop_time = time.time()
 
@@ -340,38 +364,42 @@ class program(object):
 		self.exit_status = status
 
 		# Close process stdout and stderr pipes (including vacuum of actual content)
-		self.watchers[0].stop()
-		self.watchers[0].set(0, 0)
-		disable_nonblocking(self.subproc.stdout)
-		while True:
-			signal.setitimer(signal.ITIMER_REAL, 0.5) # Set timeout for following operation
-			try:
-				data = os.read(self.subproc.stdout.fileno(), 4096)
-			except OSError, e:
-				if e.errno == errno.EINTR:
-					L.warning("We have stall recovery situation on stdout socket of {0}".format(self))
-					# This stall situation can happen when program shares stdout with its child
-					# e.g. command=bash -c "echo ahoj1; tail -f /dev/null"
-					break
-				raise
-			if len(data) == 0: break
-			self.log_out.write(data)
+		if sys.platform != 'win32':
+			self.watchers[0].stop()
+			self.watchers[0].set(0, 0)
+			disable_nonblocking(self.subproc.stdout)
+			while True:
+				signal.setitimer(signal.ITIMER_REAL, 0.5) # Set timeout for following operation
+				try:
+					data = os.read(self.subproc.stdout.fileno(), 4096)
+				except OSError, e:
+					if e.errno == errno.EINTR:
+						L.warning("We have stall recovery situation on stdout socket of {0}".format(self))
+						# This stall situation can happen when program shares stdout with its child
+						# e.g. command=bash -c "echo ahoj1; tail -f /dev/null"
+						break
+					raise
+				if len(data) == 0: break
+				self.log_out.write(data)
 
-		self.watchers[1].stop()
-		self.watchers[1].set(0, 0)
-		disable_nonblocking(self.subproc.stderr)
-		while True:
-			signal.setitimer(signal.ITIMER_REAL, 0.2) # Set timeout for following operation
-			try:
-				data = os.read(self.subproc.stderr.fileno(), 4096)
-			except OSError, e:
-				if e.errno == errno.EINTR:
-					L.warning("We have stall recovery situation on stderr socket of {0}".format(self))
-					# See comment above
-					break
-				raise
-			if len(data) == 0: break
-			self.log_err.write(data)
+			self.watchers[1].stop()
+			self.watchers[1].set(0, 0)
+			disable_nonblocking(self.subproc.stderr)
+			while True:
+				signal.setitimer(signal.ITIMER_REAL, 0.2) # Set timeout for following operation
+				try:
+					data = os.read(self.subproc.stderr.fileno(), 4096)
+				except OSError, e:
+					if e.errno == errno.EINTR:
+						L.warning("We have stall recovery situation on stderr socket of {0}".format(self))
+						# See comment above
+						break
+					raise
+				if len(data) == 0: break
+				self.log_err.write(data)
+
+		elif sys.platform == 'win32':
+			self.win32_read_stdfd()
 
 		# Explicitly destroy subprocess object
 		self.subproc = None
@@ -449,6 +477,45 @@ class program(object):
 			
 			if watcher.data == 0: self.log_out.write(data)
 			elif watcher.data == 1: self.log_err.write(data)
+
+
+	def win32_read_stdfd(self):
+		'''Alternative implementation of stdout/stderr non-blocking read for Windows
+		For details see:
+
+		http://code.activestate.com/recipes/440554/
+		http://msdn.microsoft.com/en-us/library/windows/desktop/aa365779(v=vs.85).aspx
+		'''
+		assert self.subproc is not None
+
+		if self.subproc.stdout is not None:
+			while 1:
+				x = msvcrt.get_osfhandle(self.subproc.stdout.fileno())
+				try:
+					(read, nAvail, nMessage) = win32pipe.PeekNamedPipe(x, 0)
+				except pywintypes.error, e:
+					if e.winerror == winerror.ERROR_BROKEN_PIPE: break
+					raise
+				if nAvail > 4096: nAvail = 4096
+				if nAvail == 0: break
+				
+				(errCode, data) = win32file.ReadFile(x, nAvail, None)
+				self.log_out.write(data)
+
+
+		if self.subproc.stderr is not None:
+			while 1:
+				x = msvcrt.get_osfhandle(self.subproc.stderr.fileno())
+				try:
+					(read, nAvail, nMessage) = win32pipe.PeekNamedPipe(x, 0)
+				except pywintypes.error, e:
+					if e.winerror == winerror.ERROR_BROKEN_PIPE: break
+					raise
+				if nAvail > 4096: nAvail = 4096
+				if nAvail == 0: break
+
+				(errCode, data) = win32file.ReadFile(x, nAvail, None)
+				self.log_err.write(data)
 
 
 	def tail(self, cnscon, stream, lines=80, tailf=False):

@@ -30,6 +30,8 @@ TODO
 
   TODO
 
+Separator is ';'
+
 
 .. attribute:: logdir
 
@@ -113,6 +115,14 @@ TODO
 .. attribute:: pidfile
 
   TODO
+  You can use environment variables in form of ${var-name}.
+  
+  Example:
+
+  .. code-block:: ini
+
+    [ramona:server]
+    pidfile=${TMP}/testramona.pid
 
 
 .. attribute:: log
@@ -158,6 +168,14 @@ TODO
 
   expandvars
   TODO
+
+  Example:
+
+  .. code-block:: ini
+
+    [ramona:server]
+    command=ls -l /
+    command@windows=dir c:\
 
 
 .. attribute:: directory
@@ -234,6 +252,36 @@ TODO
 .. attribute:: logscan_stderr
 
   TODO
+
+
+Platform selector
+~~~~~~~~~~~~~~~~~
+
+TODO
+
+Syntax is ``option@selector``.
+
+Example:
+
+.. code-block:: ini
+
+  [program:foolinux]
+  disabled@windows=True
+
+
+List of selectors:
+
+   ===================== ================
+   System                Selector
+   ===================== ================
+   Linux                 ``linux``
+   Windows               ``windows``
+   Mac OS X              ``darwin``
+   ===================== ================
+
+.. note:: Platform names are based on Python ``platform.system()`` call.
+  Lowercase form is used.
+
 
 
 .. _config-ramonahttpfend:
@@ -313,3 +361,4 @@ Example:
 
   *Required*:  No
   
+

@@ -76,6 +76,7 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 		else:
 			self.watchers.append(pyev.Child(0, False, self.loop, self.__child_signal_cb))
 
+
 		for sock in self.cnssockets:
 			sock.setblocking(0)
 			# Watcher data are used (instead logical watcher.fd due to Win32 mismatch)
@@ -88,6 +89,9 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 		# Enable non-terminating SIGALARM handler
 		if sys.platform != 'win32':
 			signal.signal(signal.SIGALRM, _SIGALARM_handler)
+
+		# Prepare also exit watcher - can be used to 'simulate' terminal signal (useful on Win32)
+		self.exitwatcher = pyev.Async(self.loop, self.__terminal_signal_cb)
 
 		program_roaster.__init__(self)
 		idlework_appmixin.__init__(self)
@@ -105,6 +109,7 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 		# Create pid file
 		pidfile = config.get('ramona:server','pidfile')
 		if pidfile !='':
+			pidfile = os.path.expandvars(pidfile)
 			try:
 				open(pidfile,'w').write("{0}\n".format(os.getpid()))
 			except Exception, e:
@@ -195,7 +200,11 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 			if ret != None:
 				self.on_terminate_program(p.subproc.pid, ret)
 				extra_tick = True
-		
+
+			if p.subproc is not None:
+				p.win32_read_stdfd()	
+
+
 		if extra_tick:
 			self.add_idlework(self.on_tick)
 
