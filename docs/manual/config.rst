@@ -169,12 +169,13 @@ TODO
   expandvars
   TODO
 
+  Example:
 
-.. attribute:: command_win
+  .. code-block:: ini
 
-  expandvars
-  TODO
-  Overrides `command` option on Windows
+    [ramona:server]
+    command=ls -l /
+    command@windows=dir c:\
 
 
 .. attribute:: directory
@@ -251,6 +252,24 @@ TODO
 .. attribute:: logscan_stderr
 
   TODO
+
+
+Platform selector
+~~~~~~~~~~~~~~~~~
+
+TODO
+
+Syntax is ``commandname@selector``.
+
+List of selectors:
+
+   ===================== ================
+   System                Selector
+   ===================== ================
+   Linux                 ``linux``
+   Windows               ``windows``
+   Mac OS X              ``darwin``
+   ===================== ================
 
 
 .. _config-ramonahttpfend:
@@ -330,3 +349,4 @@ Example:
 
   *Required*:  No
   
+

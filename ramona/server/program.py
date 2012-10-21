@@ -1,4 +1,4 @@
-import sys, os, time, logging, shlex, signal, subprocess, errno
+import sys, os, time, logging, shlex, signal, subprocess, re, errno, platform
 import pyev
 from ..config import config, get_boolean
 from ..utils import parse_signals, close_fds, expandvars, enable_nonblocking, disable_nonblocking, get_python_exec
@@ -23,7 +23,6 @@ class program(object):
 
 	DEFAULTS = {
 		'command': None,
-		'command_win': None,
 		'directory': None,
 		'umask': None,
 		'starttimeout': 0.5,
@@ -63,16 +62,18 @@ class program(object):
 
 		# Build configuration
 		self.config = self.DEFAULTS.copy()
+		platform_selector = platform.system().lower()
+
 		self.config.update(config.items(config_section))
+		if platform_selector is not None and platform_selector != '':
+			psrg = re.compile('^(.*)@{0}$'.format(platform_selector))
+			for k in self.config.keys():
+				r = psrg.match(k)
+				if not r: continue
+				self.config[r.group(1)] = self.config.pop(k)
 
 		# Prepare program command line
-		if sys.platform == 'win32':
-			# If there is Windows specific command (on Windows), use it
-			cmd = self.config.get('command_win')
-			if cmd is None: cmd = self.config.get('command')
-		else:
-			cmd = self.config.get('command')
-
+		cmd = self.config.get('command')
 		if cmd is None:
 			L.error("Missing command option in {0} -> CFGERROR".format(config_section))
 			self.state = program_state_enum.CFGERROR
