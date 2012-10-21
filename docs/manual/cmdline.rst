@@ -46,3 +46,4 @@ Common commands
    cmdline-tail.rst
    cmdline-console.rst
    cmdline-server.rst
+   cmdline-wininstall.rst
