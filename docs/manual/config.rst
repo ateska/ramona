@@ -261,6 +261,14 @@ TODO
 
 Syntax is ``option@selector``.
 
+Example:
+
+.. code-block:: ini
+
+  [program:foolinux]
+  disabled@windows=True
+
+
 List of selectors:
 
    ===================== ================
