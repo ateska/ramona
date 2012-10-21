@@ -100,7 +100,7 @@ def w32_install_svc():
 		from sys import executable
 		module_path=executable
 	module_file = splitext(abspath(join(module_path,'..','..', '..')))[0]
-	cls._svc_reg_class_ = '{0}\\ramona.console.w32svc.{1}'.format(module_file, cls.__name__)
+	cls._svc_reg_class_ = '{0}\\ramona.console.winsvc.{1}'.format(module_file, cls.__name__)
 
 	win32api.SetConsoleCtrlHandler(lambda x: True, True) #  Service will stop on logout if False
 

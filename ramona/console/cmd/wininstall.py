@@ -1,6 +1,6 @@
 import logging
 import pywintypes # from Python Win32
-from ..w32svc import w32_install_svc
+from ..winsvc import w32_install_svc
 
 ###
 
