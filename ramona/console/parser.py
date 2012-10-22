@@ -57,6 +57,9 @@ class _parser_base(argparse.ArgumentParser):
 			from .cmd import wininstall
 			yield wininstall
 
+			from .cmd import winuninstall
+			yield winuninstall
+
 
 	def parse(self, argv):
 		self.args = None # This is to allow re-entrant parsing

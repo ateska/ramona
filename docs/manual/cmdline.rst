@@ -47,3 +47,4 @@ Common commands
    cmdline-console.rst
    cmdline-server.rst
    cmdline-wininstall.rst
+   cmdline-winuninstall.rst

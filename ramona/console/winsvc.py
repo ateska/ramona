@@ -86,7 +86,7 @@ class w32_ramona_service(win32serviceutil.ServiceFramework):
 ###
 
 def w32_install_svc(start=False):
-	''' Install Windows Ramona Service'''
+	'''Install Windows Ramona Service'''
 
 	import logging
 	L = logging.getLogger('winsvc')
@@ -94,7 +94,7 @@ def w32_install_svc(start=False):
 	directory = abspath(dirname(sys.argv[0])) # Find where console python prog is launched from ...
 
 	cls = w32_ramona_service
-	cls.configure()
+	if cls._svc_name_ is None: cls.configure()
 
 	try:
 		module_path=modules[cls.__module__].__file__
@@ -123,7 +123,29 @@ def w32_install_svc(start=False):
 
 	if start:
 		x = win32serviceutil.StartService(cls._svc_name_)
+		L.debug("Service {0} is starting ...".format(cls._svc_name_))
 		#TODO: Wait for service start to check start status ...
 		L.debug("Service {0} started".format(cls._svc_name_))
+
+	return cls
+
+
+def w32_uninstall_svc():
+	'''Uninstall (remove) Windows Ramona Service'''
+
+	import logging
+	L = logging.getLogger('winsvc')
+
+	cls = w32_ramona_service
+	if cls._svc_name_ is None: cls.configure()
+
+	scvType, svcState, svcControls, err, svcErr, svcCP, svcWH = win32serviceutil.QueryServiceStatus(cls._svc_name_)
+
+	if svcState == win32service.SERVICE_RUNNING:
+		L.debug("Service {0} is stopping ...".format(cls._svc_name_))
+		win32serviceutil.StopService(cls._svc_name_)
+		L.debug("Service {0} is stopped.".format(cls._svc_name_))
+
+	win32serviceutil.RemoveService(cls._svc_name_)
 
 	return cls
