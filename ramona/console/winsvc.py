@@ -1,12 +1,11 @@
 #See http://code.activestate.com/recipes/551780/ for details 
 
-import os, sys
+import os, sys, time
 from os.path import splitext, abspath, join, dirname
 from sys import modules
 
 import win32serviceutil
 import win32service
-import win32event
 import win32api
 
 from ..config import config, config_files
@@ -47,7 +46,6 @@ class w32_ramona_service(win32serviceutil.ServiceFramework):
 		self.configure()
 
 		win32serviceutil.ServiceFramework.__init__(self, *args)
-		self.stop_event = win32event.CreateEvent(None, 0, 0, None)
 
 
 	def log(self, msg):
@@ -62,29 +60,28 @@ class w32_ramona_service(win32serviceutil.ServiceFramework):
 			self.ReportServiceStatus(win32service.SERVICE_RUNNING)
 			self.log('Ramona service {0} is running'.format(self._svc_name_))
 			self.svrapp.run()
-			win32event.WaitForSingleObject(self.stop_event, win32event.INFINITE)
+			self.log('Quak')
 
 		except SystemExit, e:
-			self.svrapp = None
-			self.SvcStop()
+			self.log('SystemExit: {0}'.format(e))
 
 		except Exception, e:
-			self.svrapp = None
-			self.log('Exception : {0}'.format(e))
-			self.SvcStop()
+			self.log('Exception: {0}'.format(e))
+
+		self.svrapp = None
+		#self.ReportServiceStatus(win32service.SERVICE_STOPPED)
 
 
 	def SvcStop(self):
 		self.ReportServiceStatus(win32service.SERVICE_STOP_PENDING)
-		self.stop()
-		self.log('Ramona service {0} is stopped'.format(self._svc_name_))
-		win32event.SetEvent(self.stop_event)
-		self.ReportServiceStatus(win32service.SERVICE_STOPPED)
 
-
-	def stop(self):
 		if self.svrapp is not None:
 			self.svrapp.exitwatcher.send()
+			while self.svrapp is not None:
+				time.sleep(1)
+
+		self.log('Ramona service {0} is stopped'.format(self._svc_name_))
+		#self.ReportServiceStatus(win32service.SERVICE_STOPPED)
 
 ###
 

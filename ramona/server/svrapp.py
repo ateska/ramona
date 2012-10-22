@@ -92,6 +92,7 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 
 		# Prepare also exit watcher - can be used to 'simulate' terminal signal (useful on Win32)
 		self.exitwatcher = pyev.Async(self.loop, self.__terminal_signal_cb)
+		self.exitwatcher.start()
 
 		program_roaster.__init__(self)
 		idlework_appmixin.__init__(self)
@@ -116,7 +117,7 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 				L.critical("Cannot create pidfile: {0}".format(e)) 
 				del self.cnssockets # Make sure that socket is explicitly closed (and eventual UNIX socket file deleted)
 				sys.exit(1)
-				
+
 		# Launch loop
 		try:
 			self.loop.start()
@@ -177,12 +178,16 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 
 
 	def __terminal_signal_cb(self, watcher, _revents):
-		if watcher.signum == signal.SIGINT:
-			# Print ENTER when Ctrl-C is pressed
-			print
+		if hasattr(watcher, 'signum'):
+			if watcher.signum == signal.SIGINT:
+				# Print ENTER when Ctrl-C is pressed
+				print
 
 		if self.termstatus is None:
-			L.info("Exit request received (by signal {0})".format(watcher.signum))
+			if hasattr(watcher, 'signum'):
+				L.info("Exit request received (by signal {0})".format(watcher.signum))
+			else:
+				L.info("Exit request received")
 			self.__init_soft_exit()
 			return
 
