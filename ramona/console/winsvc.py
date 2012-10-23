@@ -1,5 +1,8 @@
 #See http://code.activestate.com/recipes/551780/ for details 
 
+# To debug use:
+# > c:\Python27\Lib\site-packages\win32\pythonservice.exe -debug ramona-test ramonahttpfend
+
 import os, sys, time
 from os.path import splitext, abspath, join, dirname
 from sys import modules
@@ -28,18 +31,16 @@ class w32_ramona_service(win32serviceutil.ServiceFramework):
 
 	def __init__(self, *args):
 		assert self._svc_name_ is None
+		servicename = args[0][0]
 
-		self.log('Ramona service is starting')
+		self.log("Ramona service '{0}' is starting".format(servicename))
 
 		# Read working directory from registry and change to it
-		directory = win32serviceutil.GetServiceCustomOption(args[0], 'directory')
+		directory = win32serviceutil.GetServiceCustomOption(servicename, 'directory')
 		os.chdir(directory)
 
 		# Set Ramona config environment variable to ensure proper configuration files load
-		os.environ['RAMONA_CONFIG'] =  win32serviceutil.GetServiceCustomOption(args[0], 'config')
-
-		# Discard command-line parameters ... they confuses argparses in server_app
-		sys.argv = sys.argv[:1]
+		os.environ['RAMONA_CONFIG'] =  win32serviceutil.GetServiceCustomOption(servicename, 'config')
 
 		from ..server.svrapp import server_app
 		self.svrapp = server_app()
@@ -85,7 +86,7 @@ class w32_ramona_service(win32serviceutil.ServiceFramework):
 
 ###
 
-def w32_install_svc(start=False):
+def w32_install_svc(start=False, server_only=True, programs=None):
 	'''Install Windows Ramona Service'''
 
 	import logging
@@ -107,12 +108,18 @@ def w32_install_svc(start=False):
 
 	win32api.SetConsoleCtrlHandler(lambda x: True, True) #  Service will stop on logout if False
 
-	#TODO: Add eventual list of config files as 'exeArgs' to pass this info to server
+	# Prepare command line
+	cmdline = []
+	if server_only: cmdline.append('-S')
+	elif programs is not None: cmdline.extend(programs)
+
+	# Install service
 	win32serviceutil.InstallService(
 		cls._svc_reg_class_,
 		cls._svc_name_,
 		cls._svc_display_name_,
 		startType = win32service.SERVICE_AUTO_START,
+		exeArgs = ' '.join(cmdline),
 	)
 
 	# Set directory from which Ramona server should be launched ...
