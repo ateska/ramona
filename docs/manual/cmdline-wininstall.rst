@@ -1,3 +1,5 @@
+.. _cmdline-wininstall:
+
 wininstall (command-line)
 =========================
 
