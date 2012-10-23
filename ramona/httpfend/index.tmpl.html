@@ -39,8 +39,12 @@
 	<script type="text/javascript">
 	function refreshStatuses() {{
 		document.getElementById('loader').style.display = "inline";
-		ajax.get('/ajax/statusTable', function(data) {{
-		   document.getElementById('statusTable').innerHTML = data;
+		ajax.get('/ajax/statusTable', function(data, response) {{
+		   if(response.status == 200) {{
+			   document.getElementById('statusTable').innerHTML = data;
+		   }} else {{
+			   document.getElementById('statusTable').innerHTML = '<div class="alert alert-error"><h4>Error loading program statuses!</h4> Please check that Ramona server is running and that the Ramona HTTP frontend is accessible.</div>';
+		   }}
 		   document.getElementById('loader').style.display = "none";
 		}});
 	}}
