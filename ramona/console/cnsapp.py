@@ -90,8 +90,13 @@ Console application (base for custom implementations)
 			ec = e.exitcode
 		except KeyboardInterrupt, e:
 			ec = 0
+		except AssertionError, e:
+			L.exception("Assertion failed:")
+			ec = 101 # Assertion failed exit code
 		except Exception, e:
-			L.error("{0}".format(e))
+			errstr = "{0}".format(e)
+			if len(errstr) == 0: errstr=e.__repr__()
+			L.error(errstr)
 			ec = 100 # Generic error exit code
 		sys.exit(ec if ec is not None else 0)
 
