@@ -1,4 +1,4 @@
-import os, sys, logging, ConfigParser
+import os, sys, logging, re, platform, ConfigParser
 ###
 
 L = logging.getLogger("config")
@@ -16,13 +16,15 @@ config_defaults = {
 		'logcompress': '1'
 	},
 	'ramona:server' : {
-		'consoleuri': 'unix://.ramona.sock' if sys.platform != 'win32' else 'tcp://localhost:7788',
+		'consoleuri': 'unix://.ramona.sock',
+		'consoleuri@windows': 'tcp://localhost:7788',
 		'pidfile': '',
 		'log': '<logdir>',
 		'loglevel': 'INFO',
 	},
 	'ramona:console' : {
-		'serveruri': 'unix://.ramona.sock' if sys.platform != 'win32' else 'tcp://localhost:7788',
+		'serveruri': 'unix://.ramona.sock',
+		'serveruri@windows': 'tcp://localhost:7788',
 		'history': '',
 	},
 	'ramona:notify' : {
@@ -93,6 +95,16 @@ def read_config(configs=None, use_env=True):
 
 	else:
 		raise RuntimeError("FATAL: It looks like we have loop in configuration includes!")
+
+	# Threat platform selector alternatives
+	platform_selector = platform.system().lower()
+	if platform_selector is not None and platform_selector != '':
+		psrg = re.compile('^(.*)@{0}$'.format(platform_selector))
+		for section in config.sections():
+			for name, value in config.items(section):
+		 		r = psrg.match(name)
+		 		if not r: continue
+		 		config.set(section, r.group(1), value)
 
 	# Special treatment of some values
 	if config.get('general', 'logdir') == '<none>':
