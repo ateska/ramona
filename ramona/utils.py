@@ -32,7 +32,7 @@ All file descriptors above 2 are closed.
 	if sys.platform == 'win32':
 		# Windows specific code, os.exec* process replacement is not possible, so we try to mimic that
 		import subprocess
-		ret = subprocess.call(get_python_exec(" ".join(cmdline)))
+		ret = subprocess.call(get_python_exec(cmdline))
 		sys.exit(ret)
 
 	else:
@@ -164,12 +164,17 @@ def expandvars(path, env):
 ###
 
 def get_python_exec(cmdline=None):
-	"Return path for Python executable - similar to sys.executable but also handles corner cases on Win32"
+	"""
+	Return path for Python executable - similar to sys.executable but also handles corner cases on Win32
+
+	@param cmdline: Optional command line arguments that will be added to python executable, can be None, string or list
+	"""
+
 	if sys.executable.lower().endswith('pythonservice.exe'):
 		pythonexec = os.path.join(sys.exec_prefix, 'python.exe')
 	else:
 		pythonexec = sys.executable
 
 	if cmdline is None: return pythonexec
-	else: return  pythonexec + ' ' + cmdline
-
+	elif isinstance(cmdline, basestring): return pythonexec + ' ' + cmdline
+	else: return " ".join([pythonexec] + cmdline)

@@ -84,7 +84,7 @@ class program(object):
 			return
 
 		if cmd == '<httpfend>':
-			cmd = get_python_exec(cmdline="-u -m ramona.httpfend")
+			cmd = get_python_exec(cmdline=["-u","-m","ramona.httpfend"])
 		elif cmd[:1] == '<':
 			L.error("Unknown command option '{1}' in {0} -> CFGERROR".format(config_section, cmd))
 			self.state = program_state_enum.CFGERROR
