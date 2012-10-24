@@ -17,7 +17,7 @@ and instead of that, current process will be replaced by launched server.
 
 All file descriptors above 2 are closed.
 	'''
-	assert server_only == (len(programs) == 0) # XNOR operator ...
+	if server_only: assert (programs is None or len(programs) == 0)
 
 	# Prepare environment variable RAMONA_CONFIG
 	from .config import config_files
