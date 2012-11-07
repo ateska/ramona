@@ -3,6 +3,7 @@ TODO list
 
 Generic
 -------
+- add version check to console-server communication handshake (and print warning if not matching)
 - split demo to demo&test (code that is more about testing and intentionally fails should not be in demo)
 - exitcodes option for autorestart (autorestart=1,2,3)
 - (low prio): SSL (optional) for protecting console-server channel
