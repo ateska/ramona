@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Features &mdash; Ramona 0.9 beta 6 documentation</title>
+    <title>Features &mdash; Ramona 0.9 beta 7 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.9 beta 6',
+        VERSION:     '0.9 beta 7',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Ramona 0.9 beta 6 documentation" href="index.html" />
+    <link rel="top" title="Ramona 0.9 beta 7 documentation" href="index.html" />
     <link rel="next" title="Configuration" href="config.html" />
     <link rel="prev" title="Installation" href="install.html" /> 
   </head>
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="install.html" title="Installation"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Ramona 0.9 beta 6 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Ramona 0.9 beta 7 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -106,7 +106,7 @@ Program life cycle (statuses)</p>
 <li>standalone process</li>
 <li>displays states of programs</li>
 <li>allows to start/stop/restart each or all of them</li>
-<li>allows displaying tail of log files in <em>forever</em> mode</li>
+<li>allows displaying tail of log files in &#8220;follow&#8221; mode</li>
 <li>basic authentication</li>
 </ul>
 <p>Configuration:</p>
@@ -119,6 +119,16 @@ Program life cycle (statuses)</p>
 </pre></div>
 </div>
 <p>For all configuration options see <a class="reference internal" href="config.html#config-ramonahttpfend"><em>[program:ramonahttpfend]</em></a>.</p>
+</div>
+<div class="section" id="windows-service">
+<h2>Windows service<a class="headerlink" href="#windows-service" title="Permalink to this headline">¶</a></h2>
+<p>Ramona is using <a class="reference external" href="http://en.wikipedia.org/wiki/Windows_service">Window Services</a> for background execution on Windows platform.
+It also depends on <tt class="docutils literal"><span class="pre">pythonservice.exe</span></tt> tool from <a class="reference external" href="http://sourceforge.net/projects/pywin32/">Python for Windows extensions</a> package. Therefore it is possible to install Ramona equipped application as Windows Service via commands that are provided by Ramona system. This can be used for automatic start-up after system (re)boot or to enable smooth development on Windows machine.</p>
+<p>For more details continue to:</p>
+<ul class="simple">
+<li><a class="reference internal" href="cmdline-wininstall.html#cmdline-wininstall"><em>wininstall (command-line)</em></a></li>
+<li><a class="reference internal" href="cmdline-winuninstall.html#cmdline-winuninstall"><em>winuninstall (command-line)</em></a></li>
+</ul>
 </div>
 </div>
 
@@ -140,6 +150,7 @@ Program life cycle (statuses)</p>
 <li><a class="reference internal" href="#log-scanning">Log scanning</a></li>
 <li><a class="reference internal" href="#ramona-environment-variables">Ramona environment variables</a></li>
 <li><a class="reference internal" href="#http-front-end-web-console">HTTP front end (Web console)</a></li>
+<li><a class="reference internal" href="#windows-service">Windows service</a></li>
 </ul>
 </li>
 </ul>
@@ -184,7 +195,7 @@ Program life cycle (statuses)</p>
         <li class="right" >
           <a href="install.html" title="Installation"
              >previous</a> |</li>
-        <li><a href="index.html">Ramona 0.9 beta 6 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Ramona 0.9 beta 7 documentation</a> &raquo;</li> 
       </ul>
     </div>
 

@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>tail (command-line) &mdash; Ramona 0.9 beta 7 documentation</title>
+    <title>wininstall (command-line) &mdash; Ramona 0.9 beta 7 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -27,8 +27,8 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Ramona 0.9 beta 7 documentation" href="index.html" />
     <link rel="up" title="Command line" href="cmdline.html" />
-    <link rel="next" title="console (command-line)" href="cmdline-console.html" />
-    <link rel="prev" title="status (command-line)" href="cmdline-status.html" /> 
+    <link rel="next" title="winuninstall (command-line)" href="cmdline-winuninstall.html" />
+    <link rel="prev" title="server (command-line)" href="cmdline-server.html" /> 
   </head>
   <body>
     <div class="related">
@@ -38,10 +38,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="cmdline-console.html" title="console (command-line)"
+          <a href="cmdline-winuninstall.html" title="winuninstall (command-line)"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="cmdline-status.html" title="status (command-line)"
+          <a href="cmdline-server.html" title="server (command-line)"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Ramona 0.9 beta 7 documentation</a> &raquo;</li>
           <li><a href="cmdline.html" accesskey="U">Command line</a> &raquo;</li> 
@@ -53,12 +53,13 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="tail-command-line">
-<h1>tail (command-line)<a class="headerlink" href="#tail-command-line" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="wininstall-command-line">
+<span id="cmdline-wininstall"></span><h1>wininstall (command-line)<a class="headerlink" href="#wininstall-command-line" title="Permalink to this headline">¶</a></h1>
 <p>TODO</p>
-<div class="highlight-bash"><div class="highlight"><pre>&lt;console.py&gt; tail <span class="o">[</span>-h<span class="o">]</span> <span class="o">[</span>-l <span class="o">{</span>stdout,stderr<span class="o">}]</span> <span class="o">[</span>-f<span class="o">]</span> <span class="o">[</span>-n N<span class="o">]</span> program
+<div class="highlight-bash"><div class="highlight"><pre>&lt;console.py&gt; wininstall <span class="o">[</span>-h<span class="o">]</span> <span class="o">[</span>-d<span class="o">]</span> <span class="o">[</span>-S<span class="o">]</span> <span class="o">[</span>program <span class="o">[</span>program ...<span class="o">]]</span>
 </pre></div>
 </div>
+<p>Windows only !</p>
 <dl class="describe">
 <dt>
 <tt class="descname">program</tt></dt>
@@ -66,26 +67,18 @@
 </dd></dl>
 
 <dl class="cmdoption">
-<dt id="cmdoption-l">
-<tt class="descname">-l</tt><tt class="descclassname"> {stdout,stderr}</tt><a class="headerlink" href="#cmdoption-l" title="Permalink to this definition">¶</a></dt>
-<dt id="cmdoption--log-stream">
-<tt class="descname">--log-stream</tt><tt class="descclassname"> {stdout,stderr}</tt><a class="headerlink" href="#cmdoption--log-stream" title="Permalink to this definition">¶</a></dt>
+<dt id="cmdoption-S">
+<tt class="descname">-S</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-S" title="Permalink to this definition">¶</a></dt>
+<dt id="cmdoption--server-only">
+<tt class="descname">--server-only</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption--server-only" title="Permalink to this definition">¶</a></dt>
 <dd><p>TODO</p>
 </dd></dl>
 
 <dl class="cmdoption">
-<dt id="cmdoption-f">
-<tt class="descname">-f</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-f" title="Permalink to this definition">¶</a></dt>
-<dt id="cmdoption--follow">
-<tt class="descname">--follow</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption--follow" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
-</dd></dl>
-
-<dl class="cmdoption">
-<dt id="cmdoption-n">
-<tt class="descname">-n</tt><tt class="descclassname"> N</tt><a class="headerlink" href="#cmdoption-n" title="Permalink to this definition">¶</a></dt>
-<dt id="cmdoption--lines">
-<tt class="descname">--lines</tt><tt class="descclassname"> N</tt><a class="headerlink" href="#cmdoption--lines" title="Permalink to this definition">¶</a></dt>
+<dt id="cmdoption-d">
+<tt class="descname">-d</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-d" title="Permalink to this definition">¶</a></dt>
+<dt id="cmdoption--dont-start">
+<tt class="descname">--dont-start</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption--dont-start" title="Permalink to this definition">¶</a></dt>
 <dd><p>TODO</p>
 </dd></dl>
 
@@ -98,14 +91,14 @@
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="cmdline-status.html"
-                        title="previous chapter">status (command-line)</a></p>
+  <p class="topless"><a href="cmdline-server.html"
+                        title="previous chapter">server (command-line)</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="cmdline-console.html"
-                        title="next chapter">console (command-line)</a></p>
+  <p class="topless"><a href="cmdline-winuninstall.html"
+                        title="next chapter">winuninstall (command-line)</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
-    <li><a href="_sources/cmdline-tail.txt"
+    <li><a href="_sources/cmdline-wininstall.txt"
            rel="nofollow">Show Source</a></li>
   </ul>
 <div id="searchbox" style="display: none">
@@ -132,10 +125,10 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="cmdline-console.html" title="console (command-line)"
+          <a href="cmdline-winuninstall.html" title="winuninstall (command-line)"
              >next</a> |</li>
         <li class="right" >
-          <a href="cmdline-status.html" title="status (command-line)"
+          <a href="cmdline-server.html" title="server (command-line)"
              >previous</a> |</li>
         <li><a href="index.html">Ramona 0.9 beta 7 documentation</a> &raquo;</li>
           <li><a href="cmdline.html" >Command line</a> &raquo;</li> 

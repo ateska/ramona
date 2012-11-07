@@ -15,6 +15,35 @@ Practically application level configuration can specify file(s) to optionally in
 Application and site level configuration as syntactically equal.
 
 
+Platform selector
+-----------------
+
+TODO
+
+Syntax is ``option@selector``.
+
+Example:
+
+.. code-block:: ini
+
+  [program:foolinux]
+  disabled@windows=True
+
+
+List of selectors:
+
+   ===================== ================
+   System                Selector
+   ===================== ================
+   Linux                 ``linux``
+   Windows               ``windows``
+   Mac OS X              ``darwin``
+   ===================== ================
+
+.. note:: Platform names are based on Python ``platform.system()`` call.
+  Lowercase form is used.
+
+
 [general] section
 -----------------
 
@@ -252,36 +281,6 @@ TODO
 .. attribute:: logscan_stderr
 
   TODO
-
-
-Platform selector
-~~~~~~~~~~~~~~~~~
-
-TODO
-
-Syntax is ``option@selector``.
-
-Example:
-
-.. code-block:: ini
-
-  [program:foolinux]
-  disabled@windows=True
-
-
-List of selectors:
-
-   ===================== ================
-   System                Selector
-   ===================== ================
-   Linux                 ``linux``
-   Windows               ``windows``
-   Mac OS X              ``darwin``
-   ===================== ================
-
-.. note:: Platform names are based on Python ``platform.system()`` call.
-  Lowercase form is used.
-
 
 
 .. _config-ramonahttpfend:
