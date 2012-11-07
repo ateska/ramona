@@ -6,7 +6,7 @@ recursive-include ramona *.py
 
 include ramona/httpfend/index.tmpl.html
 recursive-include ramona/httpfend/static/bootstrap *.css
-recursive-include ramona/httpfend/static/jquery *.js
+recursive-include ramona/httpfend/static/miniajax *.js
 recursive-include ramona/httpfend/static/img *.ico *.gif
 
 exclude ramona/server/__utest__.py

@@ -1,6 +1,6 @@
 import sys, os, socket, signal, errno, weakref, logging, argparse, itertools, time
 import pyev
-from .. import cnscom
+from .. import cnscom, socketuri
 from ..config import config, read_config, config_files, config_includes, get_numeric_loglevel
 from ..cnscom import program_state_enum, svrcall_error
 from .cnscon import console_connection, message_yield_loghandler, deffered_return
@@ -26,10 +26,18 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 		server_app_singleton.__init__(self)
 
 		# Create own process group
-		os.setpgrp()
+		if os.name == 'posix':
+			os.setpgrp()
 
 		# Parse command line arguments
 		parser = argparse.ArgumentParser()
+		parser.add_argument('-S','--server-only', action='store_true', help='Start only server, programs are not launched')
+		parser.add_argument('program', nargs='*', help='Optionally specify program(s) in scope of the command (if nothing is specified, all enabled programs will be launched)')
+
+		# This is to support debuging of pythonservice.exe on Windows
+		if sys.platform == 'win32':
+			parser.add_argument('-debug', action='store', help=argparse.SUPPRESS)
+
 		self.args = parser.parse_args()
 
 		# Read configuration
@@ -50,27 +58,48 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 		my_logger.addHandler(message_yield_loghandler(self))
 		my_logger.propagate = False
 
-		# Open console communication socket (listen mode)
-		socket_factory = cnscom.socket_uri(config.get("ramona:server", "consoleuri"))
-		try:
-			self.sock = socket_factory.create_socket_listen()
-		except socket.error, e:
-			L.fatal("It looks like that server is already running: {0}".format(e))
+		# Open console communication sockets (listen mode)
+		self.cnssockets = []
+		consoleuri = config.get("ramona:server", "consoleuri")
+		for cnsuri in consoleuri.split(','):
+			socket_factory = socketuri.socket_uri(cnsuri)
+			try:
+				socks = socket_factory.create_socket_listen()
+			except socket.error, e:
+				L.fatal("It looks like that server is already running: {0}".format(e))
+				sys.exit(1)
+			self.cnssockets.extend(socks)
+		if len(self.cnssockets) == 0:
+			L.fatal("There is no console socket configured - considering this as fatal error")
 			sys.exit(1)
-		self.sock.setblocking(0)
 
 		self.loop = pyev.default_loop()
 		self.watchers = [pyev.Signal(sig, self.loop, self.__terminal_signal_cb) for sig in self.STOPSIGNALS]
-		self.watchers.append(pyev.Child(0, False, self.loop, self.__child_signal_cb))
-		self.watchers.append(pyev.Io(self.sock._sock, pyev.EV_READ, self.loop, self.__accept_cb))
 		self.watchers.append(pyev.Periodic(0, 1.0, self.loop, self.__tick_cb))
-		
+
+		if sys.platform == 'win32':
+			# There is no pyev.Child watcher on Windows; periodic check is used instead
+			self.watchers.append(pyev.Periodic(0, 0.5, self.loop, self.__check_childs_cb))
+		else:
+			self.watchers.append(pyev.Child(0, False, self.loop, self.__child_signal_cb))
+
+
+		for sock in self.cnssockets:
+			sock.setblocking(0)
+			# Watcher data are used (instead logical watcher.fd due to Win32 mismatch)
+			self.watchers.append(pyev.Io(sock._sock, pyev.EV_READ, self.loop, self.__accept_cb, data=sock._sock.fileno()))
+
 		self.conns = weakref.WeakSet()
 		self.termstatus =  None
 		self.termstatus_change = None
 
 		# Enable non-terminating SIGALARM handler
-		signal.signal(signal.SIGALRM, _SIGALARM_handler)
+		if sys.platform != 'win32':
+			signal.signal(signal.SIGALRM, _SIGALARM_handler)
+
+		# Prepare also exit watcher - can be used to 'simulate' terminal signal (useful on Win32)
+		self.exitwatcher = pyev.Async(self.loop, self.__terminal_signal_cb)
+		self.exitwatcher.start()
 
 		program_roaster.__init__(self)
 		idlework_appmixin.__init__(self)
@@ -80,21 +109,27 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 
 
 	def run(self):
-		self.sock.listen(socket.SOMAXCONN)
+		for sock in self.cnssockets:
+			sock.listen(socket.SOMAXCONN)
 		for watcher in self.watchers:
 			watcher.start()
 
 		# Create pid file
 		pidfile = config.get('ramona:server','pidfile')
 		if pidfile !='':
+			pidfile = os.path.expandvars(pidfile)
 			try:
 				open(pidfile,'w').write("{0}\n".format(os.getpid()))
 			except Exception, e:
 				L.critical("Cannot create pidfile: {0}".format(e)) 
-				del self.sock # Make sure that socket is explicitly closed (and eventual UNIX socket file deleted)
+				del self.cnssockets # Make sure that socket is explicitly closed (and eventual UNIX socket file deleted)
 				sys.exit(1)
-				
-		# Launch loop
+
+		# Launch start sequence
+		if not self.args.server_only:
+			self.start_program(pfilter=self.args.program if len(self.args.program) > 0 else None)
+
+		# Start heartbeat loop
 		try:
 			self.loop.start()
 		finally:
@@ -111,27 +146,42 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 					os.unlink(pidfile)
 				except Exception, e:
 					L.error("Cannot remove pidfile: {0}".format(e))
-					self.sock.close()
-					del self.sock # Make sure that socket is explicitly closed (and eventual UNIX socket file deleted)
+					while len(self.cnssockets) > 0:
+						sock = self.cnssockets.pop()
+						sock.close()
+						del sock # Make sure that socket is explicitly closed (and eventual UNIX socket file deleted)
 					sys.exit(1)
 
 		sys.exit(0)
 
 
 	def __accept_cb(self, watcher, revents):
+		'''Accept incomming console connection'''
 		try:
+			# Fist find relevant socket
+			sock = None
+			for s in self.cnssockets:
+				if s.fileno() == watcher.data:
+					sock = s
+					break
+
+			if sock is None:
+				L.warning("Received accept request on unknown socket {0}".format(watcher.fd))
+				return
+
+			# Accept all connection that are pending in listen backlog
 			while True:
 				try:
-					sock, address = self.sock.accept()
+					clisock, address = sock.accept()
 				except socket.error as err:
 					if err.args[0] in self.NONBLOCKING:
 						break
 					else:
 						raise
 				else:
-					if self.termstatus is not None: self.sock.close() # Do not accept new connection when exiting
-					if sock.family==socket.AF_UNIX and address=='': address = sock.getsockname()
-					conn = console_connection(sock, address, self)
+					if self.termstatus is not None: clisock.close() # Do not accept new connection when exiting
+					if sys.platform != 'win32' and clisock.family==socket.AF_UNIX and address=='': address = clisock.getsockname()
+					conn = console_connection(clisock, address, self)
 					self.conns.add(conn)
 
 		except:
@@ -139,18 +189,41 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 
 
 	def __terminal_signal_cb(self, watcher, _revents):
-		if watcher.signum == signal.SIGINT:
-			# Print ENTER when Ctrl-C is pressed
-			print
+		if hasattr(watcher, 'signum'):
+			if watcher.signum == signal.SIGINT:
+				# Print ENTER when Ctrl-C is pressed
+				print
 
 		if self.termstatus is None:
-			L.info("Exit request received (by signal {0})".format(watcher.signum))
+			if hasattr(watcher, 'signum'):
+				L.info("Exit request received (by signal {0})".format(watcher.signum))
+			else:
+				L.info("Exit request received")
 			self.__init_soft_exit()
 			return
 
 		else:
 			self.__init_real_exit()
 			return
+
+
+	def __check_childs_cb(self, watcher, _revents):
+		'''This is alternative way of detecting subprocess exit - used on Windows'''
+		extra_tick = False
+		for p in self.roaster:
+			if p.subproc is None: continue
+			ret = p.subproc.poll()
+			if ret != None:
+				self.on_terminate_program(p.subproc.pid, ret)
+				extra_tick = True
+
+			if p.subproc is not None:
+				p.win32_read_stdfd()	
+
+
+		if extra_tick:
+			self.add_idlework(self.on_tick)
+
 
 
 	def __child_signal_cb(self, watcher, _revents):
@@ -173,7 +246,8 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 		Stop internal loop and exit.
 		'''
 		self.loop.stop(pyev.EVBREAK_ALL)
-		self.sock.close()
+		for sock in self.cnssockets:
+			sock.close()
 		while self.watchers:
 			self.watchers.pop().stop()
 
@@ -191,6 +265,7 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 				cnscon.yield_enabled=True
 				self.start_program(cnscon=cnscon, **kwargs)
 				return deffered_return
+
 
 		elif callid == cnscom.callid_stop:
 			kwargs = cnscom.parse_json_kwargs(params)
@@ -242,7 +317,17 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 			except KeyError, e:
 				raise svrcall_error("{0}".format(e.message))
 			
-			return program.tail(**kwargs)
+			return program.tail(cnscon, **kwargs)
+
+		elif callid == cnscom.callid_tailf_stop:
+			kwargs = cnscom.parse_json_kwargs(params)
+			program = kwargs.pop('program')
+			try:
+				program = self.get_program(program)
+			except KeyError, e:
+				raise svrcall_error("{0}".format(e.message))
+			
+			return program.tailf_stop(cnscon, **kwargs)
 
 		else:
 			L.error("Received unknown callid: {0}".format(callid))

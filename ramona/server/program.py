@@ -1,13 +1,24 @@
-import sys, os, time, logging, shlex, signal, errno, resource
+import sys, os, time, logging, shlex, signal, subprocess, errno
 import pyev
 from ..config import config, get_boolean
-from ..utils import parse_signals, MAXFD, enable_nonblocking, disable_nonblocking
-from ..cnscom import program_state_enum
+from ..utils import parse_signals, close_fds, expandvars, enable_nonblocking, disable_nonblocking, get_python_exec
+from ..cnscom import program_state_enum, svrcall_error
 from .logmed import log_mediator
+
+
+if sys.platform == 'win32':
+	import msvcrt
+	import win32file, win32pipe, pywintypes, winerror # from Python Win32
+#
+
+try:
+	import resource
+except ImportError:
+	resource = None
 
 #
 
-L = logging.getLogger("subproc")
+L = logging.getLogger("program")
 Lmy = logging.getLogger("my") # Message yielding logger
 
 #
@@ -16,10 +27,12 @@ class program(object):
 
 	DEFAULTS = {
 		'command': None,
+		'directory': None,
+		'umask': None,
 		'starttimeout': 0.5,
 		'stoptimeout': 3,
 		'killby': 'TERM,TERM,TERM,QUIT,QUIT,INT,INT,KILL',
-		'stdin': '<null>',
+		'stdin': '<null>', # TODO: This can be very probably removed as there is no reasonable use
 		'stdout': '<stderr>',
 		'stderr': '<logdir>',
 		'priority': 100,
@@ -34,7 +47,7 @@ class program(object):
 	def __init__(self, svrapp, config_section):
 		_, self.ident = config_section.split(':', 2)
 		self.state = program_state_enum.STOPPED
-		self.pid = None
+		self.subproc = None
 
 		self.launch_cnt = 0
 		self.autorestart_cnt = 0
@@ -44,17 +57,18 @@ class program(object):
 		self.exit_status = None
 		self.coredump_enabled = None # If true, kill by SIGQUIT -> dump core
 
-		self.stdout = None
-		self.stderr = None
-		self.watchers = [
-			pyev.Io(0, 0, svrapp.loop, self.__read_stdfd, 0),
-			pyev.Io(0, 0, svrapp.loop, self.__read_stdfd, 1),
-		]
+		if sys.platform != 'win32':
+			# On Windows we are using periodic pipe check in win32_read_stdfd
+			self.watchers = [
+				pyev.Io(0, 0, svrapp.loop, self.__read_stdfd, 0),
+				pyev.Io(0, 0, svrapp.loop, self.__read_stdfd, 1),
+			]
 
 		# Build configuration
 		self.config = self.DEFAULTS.copy()
 		self.config.update(config.items(config_section))
 
+		# Prepare program command line
 		cmd = self.config.get('command')
 		if cmd is None:
 			L.error("Missing command option in {0} -> CFGERROR".format(config_section))
@@ -62,16 +76,20 @@ class program(object):
 			return
 
 		if cmd == '<httpfend>':
-			cmd = '{0} -u -m ramona.httpfend'.format(sys.executable)
+			cmd = get_python_exec(cmdline=["-u","-m","ramona.httpfend"])
 		elif cmd[:1] == '<':
 			L.error("Unknown command option '{1}' in {0} -> CFGERROR".format(config_section, cmd))
 			self.state = program_state_enum.CFGERROR
 			return
 
+		cmd = cmd.replace('\\', '\\\\')
 		self.cmdline = shlex.split(cmd)
-		self.stopsignals = parse_signals(self.config['killby'])
-		if len(self.stopsignals) == 0: self.stopsignals = [signal.SIGTERM]
-		self.act_stopsignals = None
+
+		# Prepare stop signals
+		if sys.platform != 'win32':
+			self.stopsignals = parse_signals(self.config['killby'])
+			if len(self.stopsignals) == 0: self.stopsignals = [signal.SIGTERM]
+			self.act_stopsignals = None
 
 		if self.config['stdin'] != '<null>':
 			L.error("Unknown stdin option '{0}' in {1} -> CFGERROR".format(self.config['stdin'], config_section))
@@ -102,7 +120,9 @@ class program(object):
 			L.error("Unknown 'coredump' option '{0}' in {1} -> CFGERROR".format(self.config.get('coredump','?'), config_section))
 			self.state = program_state_enum.CFGERROR
 			return
-		if coredump: self.ulimits[resource.RLIMIT_CORE] = (-1,-1)
+
+		if coredump and resource is not None:
+			self.ulimits[resource.RLIMIT_CORE] = (-1,-1)
 
 		try:
 			self.autorestart = get_boolean(self.config.get('autorestart',False))
@@ -117,6 +137,16 @@ class program(object):
 			L.error("Unknown 'processgroup' option '{0}' in {1} -> CFGERROR".format(self.config.get('processgroup','?'), config_section))
 			self.state = program_state_enum.CFGERROR
 			return
+
+		umask = self.config.get('umask')
+		if umask is not None:
+			try:
+				umask = int(umask, 8)
+			except:
+				L.error("Invalid umask option ({1}) in {0} -> CFGERROR".format(config_section, umask))
+				self.state = program_state_enum.CFGERROR
+				return
+			self.config['umask'] = umask
 
 
 		# Prepare log files
@@ -191,8 +221,18 @@ class program(object):
 
 		# Environment variables
 		self.env = os.environ.copy()
-		if config.has_section('env'):
-			for name, value in config.items('env'):
+		
+		
+		try:
+			alt_env = config.get(config_section, "env")
+			alt_env = "env:{0}".format(alt_env)
+		except:
+			alt_env = None
+		
+		env_section = alt_env if alt_env is not None else "env"
+		
+		if config.has_section(env_section):
+			for name, value in config.items(env_section):
 				if value != '':
 					self.env[name] = value
 				else:
@@ -201,81 +241,56 @@ class program(object):
 
 
 	def __repr__(self):
-		return "<{0} {1} state={2} pid={3}>".format(self.__class__.__name__, self.ident, program_state_enum.labels[self.state],self.pid if self.pid is not None else '?')
-
-
-	def spawn(self, cmd, args):
-		self.stdout, stdout = os.pipe()
-		self.stderr, stderr = os.pipe()
-
-		pid = os.fork()
-		if pid !=0:
-			os.close(stdout)
-			os.close(stderr)
-
-			enable_nonblocking(self.stdout)
-			self.watchers[0].set(self.stdout, pyev.EV_READ)
-			self.watchers[0].start()
-
-			enable_nonblocking(self.stderr)
-			self.watchers[1].set(self.stderr, pyev.EV_READ)
-			self.watchers[1].start()
-
-			return pid
-
-		try:
-			# Expand environment variables in command and arguments
-			os.environ = self.env
-			cmd = os.path.expandvars(cmd)
-			args = map(os.path.expandvars, args)
-
-			# Launch in dedicated process group (optionally)
-			if get_boolean(self.config.get('processgroup',True)):
-				os.setsid()
-
-			# Stdin/stdout/stderr
-			if self.config['stdin'] == '<null>':
-				stdin = os.open(os.devnull, os.O_RDONLY) # Open stdin
-			else:
-				# Default is to open /dev/null
-				stdin = os.open(os.devnull, os.O_RDONLY) # Open stdin
-			os.dup2(stdin, 0)
-			os.dup2(stdout, 1) # Prepare stdout
-			os.dup2(stderr, 2) # Prepare stderr
-
-			# Close all open file descriptors above standard ones.  This prevents the child from keeping
-			# open any file descriptors inherited from the parent.
-			os.closerange(3, MAXFD)
-
-			# Set ulimits
-			for k,v in self.ulimits.iteritems():
-				try:
-					resource.setrlimit(k,v)
-				except Exception, e:
-					os.write(2, "WARNING: Setting ulimit '{1}' failed: {0}\n".format(e, k))
-
-			try:
-				os.execvpe(cmd, args, self.env)
-			except Exception, e:
-				os.close(1)
-				os.write(2, "FATAL: Execution of command '{1}' failed: {0}\n".format(e, cmd))
-				os.close(2)
-
-		finally:
-			# No pasaran
-			os._exit(3)
+		return "<{0} {1} state={2} pid={3}>".format(self.__class__.__name__, self.ident, program_state_enum.labels[self.state],self.subproc.pid if self.subproc is not None else '?')
 
 
 	def start(self, reset_autorestart_cnt=True):
 		'''Transition to state STARTING'''
+		assert self.subproc is None
 		assert self.state in (program_state_enum.STOPPED, program_state_enum.FATAL)
 
-		L.debug("{0} -> STARTING".format(self))
+		L.debug("{0} ({1}) -> STARTING".format(self, self.cmdline))
 
-		self.pid = self.spawn(self.cmdline[0], self.cmdline) #TODO: self.cmdline[0] can be substituted by self.ident or any arbitrary string
+		# Prepare working directory
+		directory = self.config.get('directory')
+		if directory is not None:
+			directory = expandvars(directory, self.env)
+
+		# Launch subprocess
+		cmdline = [expandvars(arg, self.env) for arg in self.cmdline]
+		try:
+			self.subproc = subprocess.Popen(
+				cmdline,
+				stdin=None,
+				stdout=subprocess.PIPE,
+				stderr=subprocess.PIPE,
+				preexec_fn=self.__preexec_fn if sys.platform != 'win32' else None,
+				close_fds=True if sys.platform != 'win32' else None,
+				shell=False, #TOOD: This can/should be configurable in [program:x] section
+				cwd=directory,
+				env=self.env
+			)
+		except Exception, e:
+			self.state = program_state_enum.FATAL
+			Lmy.error("{0} failed to start (now in FATAL state): {1}".format(self.ident, e))
+			L.error("{0} failed to start: {1} -> FATAL".format(self, e))
+			return
+
+		if sys.platform != 'win32':
+			enable_nonblocking(self.subproc.stdout)
+			self.watchers[0].set(self.subproc.stdout, pyev.EV_READ)
+			self.watchers[0].start()
+
+			enable_nonblocking(self.subproc.stderr)
+			self.watchers[1].set(self.subproc.stderr, pyev.EV_READ)
+			self.watchers[1].start()
+
+		# Open log files
+		#TODO: Following functions can fail - maybe termination of start sequence is proper reaction
 		self.log_out.open()
-		self.log_err.open()
-		self.log_err.write("\n------[ STARTING by Ramona on {0} ]------\n".format(time.strftime("%Y-%m-%d %H:%M:%S")))
+		if self.log_out != self.log_err: self.log_err.open()
+
+		self.log_err.write("\n-=[ STARTING by Ramona on {0} ]=-\n".format(time.strftime("%Y-%m-%d %H:%M:%S")))
 		self.state = program_state_enum.STARTING
 		self.start_time = time.time()
 		self.stop_time = None
@@ -286,23 +301,52 @@ class program(object):
 		if reset_autorestart_cnt: self.autorestart_cnt = 0
 
 
+	def __preexec_fn(self):
+		# Launch in dedicated process group (optionally)
+		if get_boolean(self.config.get('processgroup',True)):
+			os.setsid()
+
+		# Set umask
+		umask = self.config.get('umask')
+		if umask is not None:
+			try:
+				os.umask(umask)
+			except Exception, e:
+				os.write(2, "FATAL: Set umask {0} failed: {1}\n".format(umask, e))
+				raise
+
+
+		# Set ulimits
+		if resource is not None:
+			for k,v in self.ulimits.iteritems():
+				try:
+					resource.setrlimit(k,v)
+				except Exception, e:
+					os.write(2, "WARNING: Setting ulimit '{1}' failed: {0}\n".format(e, k))
+
+
 	def stop(self):
 		'''Transition to state STOPPING'''
 		if self.state == program_state_enum.FATAL: return # This can happen and it is probably OK
 
-		assert self.pid is not None, "Stopping: {0}".format(self)
+		assert self.subproc is not None
 		assert self.state in (program_state_enum.RUNNING, program_state_enum.STARTING)
 
 		L.debug("{0} -> STOPPING".format(self))
-		self.act_stopsignals = self.stopsignals[:]
-		signal = self.get_next_stopsignal()
-		try:
-			if get_boolean(self.config.get('processgroup',True)):
-				os.kill(-self.pid, signal) # Killing whole process group
-			else:
-				os.kill(self.pid, signal)
-		except:
-			pass
+		if sys.platform == 'win32':
+			self.subproc.terminate()
+		else:
+			self.act_stopsignals = self.stopsignals[:]
+			signal = self.get_next_stopsignal()
+			try:
+				if get_boolean(self.config.get('processgroup',True)):
+					os.kill(-self.subproc.pid, signal) # Killing whole process group
+				else:
+					os.kill(self.subproc.pid, signal)
+			except:
+				pass
+			
+
 		self.state = program_state_enum.STOPPING
 		self.stop_time = time.time()
 
@@ -310,16 +354,16 @@ class program(object):
 	def on_terminate(self, status):
 		self.exit_time = time.time()
 		self.exit_status = status
-		self.pid = None
 
 		# Close process stdout and stderr pipes (including vacuum of actual content)
-		self.watchers[0].stop()
-		if self.stdout is not None:
-			disable_nonblocking(self.stdout)
+		if sys.platform != 'win32':
+			self.watchers[0].stop()
+			self.watchers[0].set(0, 0)
+			disable_nonblocking(self.subproc.stdout)
 			while True:
 				signal.setitimer(signal.ITIMER_REAL, 0.5) # Set timeout for following operation
 				try:
-					data = os.read(self.stdout, 4096)
+					data = os.read(self.subproc.stdout.fileno(), 4096)
 				except OSError, e:
 					if e.errno == errno.EINTR:
 						L.warning("We have stall recovery situation on stdout socket of {0}".format(self))
@@ -329,16 +373,14 @@ class program(object):
 					raise
 				if len(data) == 0: break
 				self.log_out.write(data)
-			os.close(self.stdout)
-			self.stdout = None
 
-		self.watchers[1].stop()
-		if self.stderr is not None:
-			disable_nonblocking(self.stderr)
+			self.watchers[1].stop()
+			self.watchers[1].set(0, 0)
+			disable_nonblocking(self.subproc.stderr)
 			while True:
 				signal.setitimer(signal.ITIMER_REAL, 0.2) # Set timeout for following operation
 				try:
-					data = os.read(self.stderr, 4096)
+					data = os.read(self.subproc.stderr.fileno(), 4096)
 				except OSError, e:
 					if e.errno == errno.EINTR:
 						L.warning("We have stall recovery situation on stderr socket of {0}".format(self))
@@ -347,11 +389,15 @@ class program(object):
 					raise
 				if len(data) == 0: break
 				self.log_err.write(data)
-			os.close(self.stderr)
-			self.stderr = None
+
+		elif sys.platform == 'win32':
+			self.win32_read_stdfd()
+
+		# Explicitly destroy subprocess object
+		self.subproc = None
 
 		# Close log files
-		self.log_err.write("\n------[ EXITED on {0} with status {1} ]------\n".format(time.strftime("%Y-%m-%d %H:%M:%S"), status))
+		self.log_err.write("\n-=[ EXITED on {0} with status {1} ]=-\n".format(time.strftime("%Y-%m-%d %H:%M:%S"), status))
 		self.log_out.close()
 		self.log_err.close()
 
@@ -393,9 +439,9 @@ class program(object):
 				signal = self.get_next_stopsignal()
 				try:
 					if get_boolean(self.config.get('processgroup',True)):
-						os.kill(-self.pid, signal) # Killing whole process group
+						os.kill(-self.subproc.pid, signal) # Killing whole process group
 					else:
-						os.kill(self.pid, signal)
+						os.kill(self.subproc.pid, signal)
 				except:
 					pass
 
@@ -419,25 +465,76 @@ class program(object):
 
 			if len(data) == 0: # File descriptor is closed
 				watcher.stop()
-				os.close(watcher.fd)
-				if watcher.data == 0: self.stdout = None
-				elif watcher.data == 1: self.stderr = None
 				return 
 			
 			if watcher.data == 0: self.log_out.write(data)
 			elif watcher.data == 1: self.log_err.write(data)
 
 
-	def tail(self, stream):
+	def win32_read_stdfd(self):
+		'''Alternative implementation of stdout/stderr non-blocking read for Windows
+		For details see:
+
+		http://code.activestate.com/recipes/440554/
+		http://msdn.microsoft.com/en-us/library/windows/desktop/aa365779(v=vs.85).aspx
+		'''
+		assert self.subproc is not None
+
+		if self.subproc.stdout is not None:
+			while 1:
+				x = msvcrt.get_osfhandle(self.subproc.stdout.fileno())
+				try:
+					(read, nAvail, nMessage) = win32pipe.PeekNamedPipe(x, 0)
+				except pywintypes.error, e:
+					if e.winerror == winerror.ERROR_BROKEN_PIPE: break
+					raise
+				if nAvail > 4096: nAvail = 4096
+				if nAvail == 0: break
+				
+				(errCode, data) = win32file.ReadFile(x, nAvail, None)
+				self.log_out.write(data)
+
+
+		if self.subproc.stderr is not None:
+			while 1:
+				x = msvcrt.get_osfhandle(self.subproc.stderr.fileno())
+				try:
+					(read, nAvail, nMessage) = win32pipe.PeekNamedPipe(x, 0)
+				except pywintypes.error, e:
+					if e.winerror == winerror.ERROR_BROKEN_PIPE: break
+					raise
+				if nAvail > 4096: nAvail = 4096
+				if nAvail == 0: break
+
+				(errCode, data) = win32file.ReadFile(x, nAvail, None)
+				self.log_err.write(data)
+
+
+	def tail(self, cnscon, stream, lines=80, tailf=False):
+		if self.state == program_state_enum.CFGERROR:
+			raise svrcall_error("Program {0} is not correctly configured".format(self.ident))
 		if stream == 'stdout':
-			return self.log_out.tail()
+			return self.log_out.tail(cnscon, lines, tailf)
 		elif stream == 'stderr':
-			return self.log_err.tail()
+			return self.log_err.tail(cnscon, lines, tailf)
+		else:
+			raise ValueError("Unknown stream '{0}'".format(stream))
+
+
+	def tailf_stop(self, cnscon, stream):
+		if stream == 'stdout':
+			return self.log_out.tailf_stop(cnscon)
+		elif stream == 'stderr':
+			return self.log_err.tailf_stop(cnscon)
 		else:
 			raise ValueError("Unknown stream '{0}'".format(stream))
 
 
 	def charge_coredump(self):
+		if resource is None:
+			L.warning("This platform doesn't support core dumps.")
+			return
+
 		l = self.ulimits.get(resource.RLIMIT_CORE, (0,0))
 		if l == (0,0):
 			Lmy.warning("Program {0} is not configured to dump code".format(self.ident))

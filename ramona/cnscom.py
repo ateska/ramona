@@ -1,4 +1,4 @@
-import os, urlparse, socket, struct, time, json, select, logging
+import os, struct, time, json, select, logging
 ###
 
 L = logging.getLogger("cnscom")
@@ -6,12 +6,13 @@ Lmy = logging.getLogger("my")
 
 ###
 
-callid_ping = 0
-callid_start = 1
-callid_stop = 2
-callid_restart = 3
-callid_status = 4
-callid_tail = 5
+callid_ping = 70
+callid_start = 71
+callid_stop = 72
+callid_restart = 73
+callid_status = 74
+callid_tail = 75
+callid_tailf_stop = 76 # Terminate previously initialized tailf mode
 
 #
 
@@ -24,6 +25,7 @@ resp_struct_fmt = '!ccH'
 resp_return = 'R'
 resp_exception = 'E'
 resp_yield_message = 'M' # Used to propagate message from server to console
+resp_tailf_data = 'T' # Used to send data in tail -f mode
 
 ###
 
@@ -55,7 +57,7 @@ def svrcall(cnssocket, callid, params=""):
 	'''
 	Client side of console communication IPC call (kind of RPC / Remote procedure call).
 
-	@param cnssocket: Socket to server (created by socket_uri factory bellow)
+	@param cnssocket: Socket to server (created by socket_uri factory)
 	@param callid: one of callid_* identification
 	@param params: string representing parameters that will be passed to server call
 	@return: String returned by server or raises exception if server call failed
@@ -68,29 +70,7 @@ def svrcall(cnssocket, callid, params=""):
 	cnssocket.send(struct.pack(call_struct_fmt, call_magic, callid, paramlen)+params)
 
 	while 1:
-		x = time.time()
-		resp = ""
-		while len(resp) < 4:
-			rlist, _, _ = select.select([cnssocket],[],[], 5)
-			if len(rlist) == 0:
-				if time.time() - x > 2: L.error("Looping detected")
-				continue
-			ndata = cnssocket.recv(4 - len(resp))
-			if len(ndata) == 0:
-				raise EOFError("It looks like server closed connection")
-
-			resp += ndata
-
-		magic, retype, paramlen = struct.unpack(resp_struct_fmt, resp)
-		assert magic == resp_magic
-
-		# Read rest of the response (size given by paramlen)
-		params = ""
-		while paramlen > 0:
-			ndata = cnssocket.recv(paramlen)
-			params += ndata
-			paramlen -= len(ndata)
-
+		retype, params = svrresp(cnssocket, hang_message="callid : {0}".format(callid))
 
 		if retype == resp_return:
 			# Remote server call returned normally
@@ -109,112 +89,45 @@ def svrcall(cnssocket, callid, params=""):
 			continue
 
 		else:
-			raise RuntimeError("Unknown server response: {0}".format(retype))
+			raise RuntimeError("Unknown/invalid server response: {0}".format(retype))
 
 ###
 
-class socket_uri(object):
-	'''
-	Socket factory that is configured using socket URI.
-	This is actually quite generic implementation - not specific to console-server IPC communication.
-	'''
+def svrresp(cnssocket, hang_detector=True, hang_message='details not provided'):
+	'''Receive and parse one server response - used inherently by svrcall.
 
-	# Configure urlparce
-	if 'unix' not in urlparse.uses_params: urlparse.uses_params.append('unix')
-
-	def __init__(self, uri):
-		self.uri = urlparse.urlparse(uri)
-		self.uriparams = dict(urlparse.parse_qsl(self.uri.params))
-
-		self.protocol = self.uri.scheme.lower()
-		if self.protocol == 'tcp':
-			try:
-				_port = self.uri.port
-			except ValueError:
-				raise RuntimeError("Invalid port number in socket URI {0}".format(uri))
-
-			if self.uri.path != '': raise RuntimeError("Path has to be empty in socket URI {0}".format(uri))
-
-		elif self.protocol == 'unix':
-			if self.uri.netloc != '':
-				# Special case of situation when netloc is not empty (path is relative)
-				self.uri = self.uri._replace(netloc='', path=self.uri.netloc + self.uri.path)
-
-		else:
-			raise RuntimeError("Unknown/unsuported protocol '{0}' in socket URI {1}".format(self.protocol, uri))
-
-
-	def create_socket_listen(self):
-		if self.protocol == 'tcp':
-			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-			s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-			s.bind((self.uri.hostname, self.uri.port))
-
-		elif self.protocol == 'unix':
-			mode = self.uriparams.get('mode',None)
-			if mode is None: mode = 0o600
-			else: mode = int(mode,8)
-			oldmask = os.umask(mode ^ 0o777)
-			s = deleteing_unix_socket()
-			s.bind(self.uri.path)
-			os.umask(oldmask)
-
-		else:
-			raise RuntimeError("Unknown/unsuported protocol '{0}'".format(self.protocol))
-		
-		return s
-
-
-	def create_socket_connect(self):
-		if self.protocol == 'tcp':
-			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-			s.connect((self.uri.hostname, self.uri.port))
-
-		elif self.protocol == 'unix':
-			s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-			s.connect(self.uri.path)
-
-		else:
-			raise RuntimeError("Unknown/unsuported protocol '{0}'".format(self.protocol))
-		
-		return s
-
-###
-
-class deleteing_unix_socket(socket.socket):
-	'''
-This class is used as wrapper to socket object that represent listening UNIX socket.
-It added ability to delete socket file when destroyed.
-
-It is basically used only on server side of UNIX socket.
+	@param cnssocket: Socket to server (created by socket_uri factory)
+	@param hang_detector: If set to True, logs warning when server is not responding in 2 seconds	
+	@param hang_message: Details about server call to be included in eventual hang message
+	@return: tuple(retype, params) - retype is cnscom.resp_* integer and params are data attached to given response
 	'''
 
-	def __init__(self):
-		socket.socket.__init__(self, socket.AF_UNIX, socket.SOCK_STREAM)
-		self.__sockfile = None
+	x = time.time()
+	resp = ""
+	while len(resp) < 4:
+		rlist, _, _ = select.select([cnssocket],[],[], 5)
+		if len(rlist) == 0:
+			if hang_detector and time.time() - x > 5:
+				x = time.time()
+				L.warning("Possible server hang detected: {0} (continue waiting)".format(hang_message))
+			continue
+		ndata = cnssocket.recv(4 - len(resp))
+		if len(ndata) == 0:
+			raise EOFError("It looks like server closed connection")
 
+		resp += ndata
 
-	def __del__(self):
-		self.__delsockfile()
+	magic, retype, paramlen = struct.unpack(resp_struct_fmt, resp)
+	assert magic == resp_magic
 
+	# Read rest of the response (size given by paramlen)
+	params = ""
+	while paramlen > 0:
+		ndata = cnssocket.recv(paramlen)
+		params += ndata
+		paramlen -= len(ndata)
 
-	def close(self):
-		socket.socket.close(self)
-		self.__delsockfile()
-
-
-	def bind(self, fname):
-		socket.socket.bind(self, fname)
-		self.__sockfile = fname
-
-
-	def __delsockfile(self):
-		if self.__sockfile is not None:
-			fname = self.__sockfile
-			self.__sockfile = None
-			os.unlink(fname)
-			assert not os.path.isfile(fname)
-
+	return retype, params
 
 ###
 

@@ -1,6 +1,11 @@
-import os, sys, logging, ConfigParser
+import os, sys, logging, re, platform, ConfigParser
 ###
 
+L = logging.getLogger("config")
+
+###
+
+# Defaults are stated in documentation, if you change them here, update documentation too!
 config_defaults = {
 	'general' : {
 		'appname' : 'ramona-driven-app',
@@ -8,15 +13,18 @@ config_defaults = {
 		'include' : '<siteconf>',
 		'logmaxsize': '{0}'.format(512*1024*1024), # 512Mb
 		'logbackups': '3',
+		'logcompress': '1'
 	},
 	'ramona:server' : {
 		'consoleuri': 'unix://.ramona.sock',
+		'consoleuri@windows': 'tcp://localhost:7788',
 		'pidfile': '',
 		'log': '<logdir>',
 		'loglevel': 'INFO',
 	},
 	'ramona:console' : {
 		'serveruri': 'unix://.ramona.sock',
+		'serveruri@windows': 'tcp://localhost:7788',
 		'history': '',
 	},
 	'ramona:notify' : {
@@ -56,7 +64,7 @@ def read_config(configs=None, use_env=True):
 		# Configs from environment variables
 		config_envs = os.environ.get('RAMONA_CONFIG')
 		if config_envs is not None:
-			for config_file in config_envs.split(':'):
+			for config_file in config_envs.split(';'):
 				configs.append(config_file)
 
 	for cfile in  configs:
@@ -69,7 +77,7 @@ def read_config(configs=None, use_env=True):
 		includes = config.get('general','include')
 		if includes == '': break
 		config.set('general','include','')
-		includes = includes.split(':')
+		includes = includes.split(';')
 		for i in xrange(len(includes)-1,-1,-1):
 			include = includes[i] = includes[i].strip()
 			if include == '<siteconf>':
@@ -87,6 +95,16 @@ def read_config(configs=None, use_env=True):
 
 	else:
 		raise RuntimeError("FATAL: It looks like we have loop in configuration includes!")
+
+	# Threat platform selector alternatives
+	platform_selector = platform.system().lower()
+	if platform_selector is not None and platform_selector != '':
+		psrg = re.compile('^(.*)@{0}$'.format(platform_selector))
+		for section in config.sections():
+			for name, value in config.items(section):
+		 		r = psrg.match(name)
+		 		if not r: continue
+		 		config.set(section, r.group(1), value)
 
 	# Special treatment of some values
 	if config.get('general', 'logdir') == '<none>':

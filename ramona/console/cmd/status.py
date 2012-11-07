@@ -1,6 +1,6 @@
 import json, time, itertools, collections, logging
 from ... import cnscom
-from ._completes import complete_ident
+from ._completions import complete_ident
 
 ###
 
@@ -18,18 +18,18 @@ def init_parser(parser):
 
 ###
 
-def complete(cnsapp, text, line, begidx, endidx):
-        textst = text.strip()
-        ret = []
-        ret.extend(complete_ident(cnsapp, textst))
-        return ret
+def complete(console, text, line, begidx, endidx):
+	textst = text.strip()
+	ret = []
+	ret.extend(complete_ident(console, textst))
+	return ret
 
 ###
 
 def main(cnsapp, args):
 	params={}
 	if len(args.program) > 0: params['pfilter'] = args.program
-	ret = cnsapp.svrcall(
+	ret = cnsapp.cnssvrcall(
 		cnscom.callid_status, 
 		json.dumps(params),
 		auto_connect=True

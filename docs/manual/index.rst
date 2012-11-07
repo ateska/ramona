@@ -16,20 +16,19 @@ Target platforms are all modern UNIXes, BSD derivates and Windows.
 
 Project homepage: http://ateska.github.com/ramona
 
-Contents:
+Content
+-------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
    intro.rst
    install.rst
    features.rst
    config.rst
+   cmdline.rst
    tools.rst
-   quickref.rst
    credits.rst
-
-.. [TODO]: Example of init.d script (and modern alternatives like init) for ramona-based app
 
 
 Indices and tables

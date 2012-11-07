@@ -18,13 +18,17 @@ def init_parser(parser):
 
 ###
 
-import readline #TODO: optional
+try:
+	import readline
+except ImportError:
+	readline = None
 
-# See http://stackoverflow.com/questions/7116038/python-tab-completion-mac-osx-10-7-lion
-if 'libedit' in readline.__doc__:
-	readline.parse_and_bind("bind ^I rl_complete")
-else:
-	readline.parse_and_bind("tab: complete")
+if readline is not None:
+	# See http://stackoverflow.com/questions/7116038/python-tab-completion-mac-osx-10-7-lion
+	if 'libedit' in readline.__doc__:
+		readline.parse_and_bind("bind ^I rl_complete")
+	else:
+		readline.parse_and_bind("tab: complete")
 
 ###
 
@@ -93,7 +97,7 @@ class _console_cmd(cmd.Cmd):
 	def emptyline(self):
 		# Send 'ping' to server
 		try:
-			self.cnsapp.svrcall(cnscom.callid_ping, '', auto_connect=True)
+			self.cnsapp.cnssvrcall(cnscom.callid_ping, '', auto_connect=True)
 		except Exception, e:
 			L.error("{0}".format(e))
 	
@@ -106,7 +110,7 @@ def main(cnsapp, args):
 	if histfile != '':
 		histfile = os.path.expanduser(histfile)
 		try:
-			readline.read_history_file(histfile)
+			if readline is not None: readline.read_history_file(histfile)
 		except IOError:
 			pass
 
@@ -121,7 +125,7 @@ def main(cnsapp, args):
 		print ""
 	
 	finally:
-		if histfile != '':
+		if readline is not None and histfile != '':
 			try:
 				readline.write_history_file(histfile)
 			except Exception, e:

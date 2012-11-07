@@ -12,19 +12,21 @@ Release procedure
 	- classifiers (e.g. Development Status)
 6. Check `./ramona/__init__.py`:
 	- version info
-7. Check briefly `./README.md` and `./README`
-7.5 Check ./MANIFEST.in
-8. Run tests:
+7. Check `./docs/manual/conf.py`:
+	- version info (short and long)
+8. Check briefly `./README.md` and `./README`
+9. Check ./MANIFEST.in
+10. Run tests:
 	- `./ramona-dev.py unittests`
 	- Functional test:
 		- `./demo.py start`
 		- `./demo.py status`
 		- `./demo.py stop`
-9. Run upload to testpypi.python.org: `./ramona-dev.py upload_test`
-10. Check on http://testpypi.python.org/pypi/ramona
-11. Prepare for final release !
-12. Commit to Git
-13. Run upload to pypi.python.org: `./ramona-dev.py upload`
-14. Check on http://pypi.python.org/pypi/ramona
-15. Create tag 'release-[VERSION]' (e.g. release-0.9b3) with comment e.g. "Beta release 0.9b3"
-16. Switch back to 'master' branch and you are done
+11. Run upload to testpypi.python.org: `./ramona-dev.py upload_test`
+12. Check on http://testpypi.python.org/pypi/ramona
+13. Prepare for final release !
+14. Commit to Git
+15. Run upload to pypi.python.org: `./ramona-dev.py upload`
+16. Check on http://pypi.python.org/pypi/ramona
+17. Create tag 'release-[VERSION]' (e.g. release-0.9b3) with comment e.g. "Beta release 0.9b3"
+18. Switch back to 'master' branch and you are done

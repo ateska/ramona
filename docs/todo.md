@@ -3,6 +3,7 @@ TODO list
 
 Generic
 -------
+- split demo to demo&test (code that is more about testing and intentionally fails should not be in demo)
 - exitcodes option for autorestart (autorestart=1,2,3)
 - (low prio): SSL (optional) for protecting console-server channel
 - ulimit/resources (similar to core dump) -> minfds, minprocs
@@ -15,34 +16,26 @@ Generic
 	 - e.g. <on-platform linux:mac>
 - test Ramona how it runs in out-of-diskspace conditions
 - 'user' option - If ramona runs as root, this UNIX user account will be used as the account which runs the program. If ramona is not running as root, this option has no effect.
-- 'directory' option (change working directory prior program start)
-- 'umask' option
-
-Windows
--------
-- working on Windows (based on pyev / libev?)
-- daemonizing is not available on Windows - provide Windows Service option instead
+- configuration platform selector should support OR operator (e.g. pidfile@linux|darwin)
+- configuration platform selector should support families (e.g. pidfile@posix); posix is so far only identified family (expanded to linux|darwin|cygwin)
 
 Logging
 -------
 - Support for SIGHUP (reopen log files OR reset fully)
 - log rotate of Ramona server log (stdout/stderr redirection)
-- tail '-f' (forever) mode 
-- compress older (xxxx.log.2+) log rotated files
-- make tail buffer more line oriented
 
 Configuration
 -------------
-- optional alterative configuration for environment variables: https://github.com/ateska/ramona/issues/2
 - environment variables expansion in configuration
 
 Watchdog
 --------
 - watchdog functionality (child process is signaling that is alive periodically)
+- watchdog for non-managed programs (e.g. [watchdog:apache]) + restart commands
 
 Python specific
 ---------------
-- native python program execution (using sys.executable)
+- native python program execution (using utils.get_python_exec - substitute for STRIGAPYTHON)
 - python version (minimal) check
 
 Mailing to admin
@@ -51,15 +44,25 @@ Mailing to admin
 - On FATAL mail trigger
 - Mailing issues to admin: https://github.com/ateska/ramona/issues/1
 - Standalone log scanner (not connected to particular program) to enable supervising of e.g. CGI scripts
+- daily/weekly/monthly targets
 
 HTTP frontend
 -------------
-- Remove/optimize JQuery (following Bootstrap example)
-- Store static files in a way that setuptools and py2exe will work correctly. See: http://stackoverflow.com/questions/1395593/managing-resources-in-a-python-project
+- Store static files in a way that py2exe will work correctly.
 - RESTful API
 - (low prio): HTTPS
-- (low prio): IPv6
+
+Cron
+----
+- Ramona can be used to trigger tasks (tools) by given time - emulating functionality of cron
 
 Deployment
 ----------
 - Consider https://help.github.com/articles/splitting-a-subpath-out-into-a-new-repo for embedded deployments (for released versions)
+
+Cluster
+-------
+- Ramona can be used as cluster controller - running on every node and managing application there.
+- Ramona cluster controller needs to be built to allow single point of control
+- Fail-over scenarion support
+- Amazon ECS integration (e.g. use of Amazon variables that are passed to the box)

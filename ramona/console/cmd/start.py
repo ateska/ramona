@@ -1,7 +1,7 @@
 import json
 from ... import cnscom
 from .. import exception
-from ._completes import complete_ident
+from ._completions import complete_ident
 ###
 
 name = 'start'
@@ -18,10 +18,10 @@ def init_parser(parser):
 
 ###
 
-def complete(cnsapp, text, line, begidx, endidx):
+def complete(console, text, line, begidx, endidx):
 	textst = text.strip()
 	ret = []
-	ret.extend(complete_ident(cnsapp, textst))
+	ret.extend(complete_ident(console, textst))
 	return ret
 
 ###
@@ -39,7 +39,7 @@ def main(cnsapp, args):
 	}
 	if len(args.program) > 0: params['pfilter'] = args.program
 
-	cnsapp.svrcall(
+	cnsapp.cnssvrcall(
 		cnscom.callid_start,
 		json.dumps(params),
 		auto_connect=args.no_server_start,

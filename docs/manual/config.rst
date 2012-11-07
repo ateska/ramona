@@ -8,11 +8,40 @@ Configuration is build the way that user program(s) can share the same configura
 Application and site level configuration
 ----------------------------------------
 
-Configuration also supports split into *application level configuration* and *site level configuration*. In this concept application development team provides *application level configuration* as a part of source code and users are given an option to provide their own *site level configurations* that can override or enhance application level configurations.
+Ramona supports split of configuration options into *application* and *site* level configuration. In this concept application development team provides *application level configuration* as a part of source code and users are given an option to provide their own *site level configurations* that can override or enhance application level configurations.
 
 Practically application level configuration can specify file(s) to optionally include - these files can provide site level configuration.
 
 Application and site level configuration as syntactically equal.
+
+
+Platform selector
+-----------------
+
+TODO
+
+Syntax is ``option@selector``.
+
+Example:
+
+.. code-block:: ini
+
+  [program:foolinux]
+  disabled@windows=True
+
+
+List of selectors:
+
+   ===================== ================
+   System                Selector
+   ===================== ================
+   Linux                 ``linux``
+   Windows               ``windows``
+   Mac OS X              ``darwin``
+   ===================== ================
+
+.. note:: Platform names are based on Python ``platform.system()`` call.
+  Lowercase form is used.
 
 
 [general] section
@@ -21,10 +50,52 @@ Application and site level configuration as syntactically equal.
 TODO
 
 
+.. attribute:: appname
+
+  TODO
+
+
+.. attribute:: include
+
+  TODO
+
+Separator is ';'
+
+
+.. attribute:: logdir
+
+  TODO
+
+
+.. attribute:: logmaxsize
+
+  TODO
+
+
+.. attribute:: logbackups
+
+  TODO
+
+
+.. attribute:: logcompress
+
+  If `logcompress` configuration option is set to 1, the log files `xxx.log.2+` will be compressed
+  using gzip compression.
+
+  *Type*: boolean -- use "1", "yes", "true", and "on" for True, "0", "no", "false", and "off" for False
+  
+  *Default*: 1
+
+  *Required*: No
+
+
+
 [env] section
 -------------
 
 Environment section allows to specify `environment variables`_ that will be added to the environment variable set that applies to running Ramona server.
+
+These variables can be also used in other options via ``${VARNAME}`` placeholders.
 
 .. _`environment variables` : http://en.wikipedia.org/wiki/Environment_variable
 
@@ -44,16 +115,172 @@ Environment variable section example:
 TODO
 
 
+.. attribute:: consoleuri
+
+  One or multiple 'socket URIs' specifying where Ramona server should listen for console connections.
+  You can specify more network interfaces, protocols or ports, URIs are comma-separated. It should be synchronized with [ramona:console] option serveruri (where configuration of client side is specified), otherwise console connection fails.
+
+  Supported connection variants:
+
+  - UNIX sockets
+  
+    - optional parameter 'mode' specifies UNIX file permissions for created socket file system entry (in octal representation)
+
+  - TCP IPv4
+  - TCP IPv6
+
+  *Default*: ``unix://.ramona.sock``
+
+  *Required*: Yes (but default will work)
+
+  Example:
+
+  .. code-block:: ini
+
+    [ramona:server]
+    consoleuri=unix:///tmp/demoramona.sock;mode=0600,tcp://localhost:5566
+
+
+.. attribute:: pidfile
+
+  TODO
+  You can use environment variables in form of ${var-name}.
+  
+  Example:
+
+  .. code-block:: ini
+
+    [ramona:server]
+    pidfile=${TMP}/testramona.pid
+
+
+.. attribute:: log
+
+  TODO
+
+
+.. attribute:: loglevel
+
+  TODO
+
+
+
 [ramona:notify] section
 -----------------------
 
 TODO
 
 
+.. attribute:: delivery
+
+  TODO
+
+
+.. attribute:: sender
+
+  TODO
+
+
+.. attribute:: receiver
+
+  TODO
+
+
+
 [program:X] section
 -------------------
 
 TODO
+
+
+.. attribute:: command
+
+  expandvars
+  TODO
+
+  Example:
+
+  .. code-block:: ini
+
+    [ramona:server]
+    command=ls -l /
+    command@windows=dir c:\
+
+
+.. attribute:: directory
+
+  expandvars
+  TODO
+
+
+.. attribute:: umask
+
+  TODO
+
+
+.. attribute:: starttimeout
+
+  TODO
+
+
+.. attribute:: stoptimeout
+
+  TODO
+
+
+.. attribute:: killby
+
+  TODO
+
+
+.. attribute:: stdin
+
+  TODO
+
+
+.. attribute:: stdout
+
+  TODO
+
+
+.. attribute:: stderr
+
+  TODO
+
+
+.. attribute:: priority
+
+  TODO
+
+
+.. attribute:: disabled
+
+  TODO
+
+
+.. attribute:: coredump
+
+  TODO
+
+
+.. attribute:: autorestart
+
+  TODO
+
+
+.. attribute:: processgroup
+
+  TODO
+
+
+.. attribute:: logscan_stdout
+
+  TODO
+
+
+.. attribute:: logscan_stderr
+
+  TODO
 
 
 .. _config-ramonahttpfend:
@@ -68,11 +295,8 @@ Example:
   [program:ramonahttpfend]
   command=<httpfend>
 
-  # IP address/hostname where the HTTP frontend will listen
-  host=127.0.0.1
-  
-  # Port where the HTTP frontend will listen
-  port=5588
+  # Where the HTTP frontend will listen
+  listen=tcp://localhost:5588
   
   # Use username and password options only if you want to enable basic authentication
   username=admin
@@ -81,25 +305,27 @@ Example:
   password=pass
 
 
-
-``host``
+.. attribute:: listen
 	
-  IP address or hostname, where the Ramona HTTP frontend will listen.
-  Use ``0.0.0.0`` to make Ramona HTTP frontend listen on IP addresses of all network interfaces.
+  One or multiple 'socket URIs', where the Ramona HTTP frontend will listen. 
+  You can specify more network interfaces, protocols or ports, URIs are comma-separated.
+    
+  Supported connection variants:
 
-  *Default*:  ``localhost``
+  - UNIX sockets
+  
+    - optional parameter 'mode' specifies UNIX file permissions for created socket file system entry (in octal representation)
+
+  - TCP IPv4: For example: ``tcp://127.0.0.1:4455``
+  - TCP IPv6: For example: ``tcp://[::1]:8877``
+
+
+  *Default*:  ``tcp://localhost:5588``
 
   *Required*:  No
 
-``port``
 
-  Port on which the Ramona HTTP frontend will listen.
-  
-  *Default*:  ``5588``
-
-  *Required*:  No
-  
-``username``
+.. attribute:: username
   
   Username used for authentication to Ramona HTTP frontend. 
   The authentication will be required only if the ``username``
@@ -108,8 +334,9 @@ Example:
   *Default*:  No default
 
   *Required*:  No
-  
-``password``
+
+
+.. attribute:: password
   
   Password to be used in combination with ``username`` for authentication. 
   If ``username`` option is used, the the ``password`` has to be specified as well --
@@ -133,3 +360,4 @@ Example:
 
   *Required*:  No
   
+

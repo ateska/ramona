@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>{appname} - Ramona administation console - log</title>
+	<link rel="shortcut icon" href="/static/img/favicon.ico" />
+	<style type="text/css">
+		body {{
+			margin: 0;
+		}}
+	</style>
+	
+</head>
+<body>
+	<iframe style="border: 0; position:absolute; top:0; left:0; right:0; bottom:0; width:100%; height:100%" src="{logpath}" id="logiframe"></iframe>
+	<script type="text/javascript">
+		setInterval(function() {{
+			document.getElementById("logiframe").contentWindow.scrollTo(0,document.getElementById("logiframe").contentWindow.document.body.scrollHeight);
+			var height = document.documentElement.clientHeight;
+		    height -= 20;
+		    document.getElementById('logiframe').style.height = height + 'px';
+			
+		}},500);
+	</script>
+	
+</body>
+</html>

@@ -8,7 +8,7 @@ setup(
 	description='Enterprise-grade runtime supervisor',
 	author='Ales Teska',
 	author_email='ales.teska+ramona@gmail.com',
-	version='0.9b6', # Also in ramona.__init__.py (+ relevant version format specification)
+	version='0.9b7', # Also in ramona.__init__.py (+ relevant version format specification)
 	packages=['ramona','ramona.server','ramona.console','ramona.console.cmd','ramona.httpfend'],
 	license='BSD 2-clause "Simplified" License',
 	long_description=open('README').read(),
@@ -16,11 +16,11 @@ setup(
 	download_url='http://pypi.python.org/pypi/ramona',
 	install_requires=["pyev"],
 	requires=["pyev"],
-	zip_safe=False,
+	zip_safe=True,
 	package_data={
 		'ramona.httpfend': [
 			'*.html',
-			'static/jquery/*.js',
+			'static/miniajax/*.js',
 			'static/bootstrap/css/*.css',
 			'static/img/*.gif',
 			'static/img/*.ico',
@@ -35,7 +35,7 @@ setup(
 		'License :: OSI Approved :: BSD License',
 		'Natural Language :: English',
 		'Operating System :: MacOS :: MacOS X',
-#TODO: Not yet ... 'Operating System :: Microsoft :: Windows',
+		'Operating System :: Microsoft :: Windows',
 		'Operating System :: POSIX',
 		'Operating System :: Unix',
 		'Programming Language :: Python :: 2.7',

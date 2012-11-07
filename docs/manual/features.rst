@@ -48,11 +48,18 @@ TODO
 Ramona environment variables
 ----------------------------
 
-RAMONA_CONFIGS
-RAMONA_SECTION
-
 TODO
 
+.. attribute:: RAMONA_CONFIG
+
+  TODO
+
+  Separator is ';'
+
+
+.. attribute:: RAMONA_SECTION
+
+  TODO
 
 
 HTTP front end (Web console)
@@ -64,7 +71,7 @@ HTTP front end (Web console)
 - standalone process
 - displays states of programs 
 - allows to start/stop/restart each or all of them
-- allows displaying tail of log files 
+- allows displaying tail of log files in "follow" mode 
 - basic authentication
 
 Configuration:
@@ -78,3 +85,18 @@ Configuration:
   command=<httpfend>
 
 For all configuration options see :ref:`config-ramonahttpfend`.
+
+
+Windows service
+---------------
+
+Ramona is using `Window Services`_ for background execution on Windows platform.
+It also depends on ``pythonservice.exe`` tool from `Python for Windows extensions`_ package. Therefore it is possible to install Ramona equipped application as Windows Service via commands that are provided by Ramona system. This can be used for automatic start-up after system (re)boot or to enable smooth development on Windows machine.
+
+For more details continue to:
+
+- :ref:`cmdline-wininstall`
+- :ref:`cmdline-winuninstall`
+
+.. _`Window Services`: http://en.wikipedia.org/wiki/Windows_service
+.. _`Python for Windows extensions`: http://sourceforge.net/projects/pywin32/

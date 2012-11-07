@@ -1,9 +1,16 @@
-import socket, errno, struct, weakref, json, select, logging
+import sys, socket, errno, struct, weakref, json, select, logging
 import pyev
 from .. import cnscom
 ###
 
 L = logging.getLogger("cnscon")
+
+###
+
+if sys.platform != 'win32':
+	BUFSIZE = select.PIPE_BUF
+else:
+	BUFSIZE = 512
 
 ###
 
@@ -24,6 +31,7 @@ class console_connection(object):
 		
 		self.yield_enabled = False
 		self.return_expected = False # This is synchronization element used in asserts preventing IPC goes out of sync
+		self.tailf_enabled = False
 
 		self.watcher = pyev.Io(self.sock._sock, pyev.EV_READ, serverapp.loop, self.io_cb)
 		self.watcher.start()
@@ -37,7 +45,7 @@ class console_connection(object):
 
 	def reset(self, events):
 		self.watcher.stop()
-		self.watcher.set(self.sock, events)
+		self.watcher.set(self.sock._sock, events)
 		self.watcher.start()
 
 
@@ -95,7 +103,7 @@ class console_connection(object):
 
 	def handle_write(self):
 		try:
-			sent = self.sock.send(self.write_buf[:select.PIPE_BUF])
+			sent = self.sock.send(self.write_buf[:BUFSIZE])
 		except socket.error as err:
 			if err.args[0] not in self.NONBLOCKING:
 				#TODO: Log "error writing to {0}".format(self.sock)
@@ -112,6 +120,8 @@ class console_connection(object):
 		if self.sock is None:
 			L.warning("Socket is closed - write operation is ignored")
 			return
+
+		#TODO: Close socket if write buffer is tooo long
 
 		if self.write_buf is None:
 			self.write_buf = data
@@ -155,7 +165,7 @@ class console_connection(object):
 		'''
 		Internal function that manages communication of response (type exception) to the console (client).
 		'''
-		assert self.return_expected
+		assert self.return_expected, "Raised exception when return is not expected"
 
 		self.yield_enabled = False
 		ret = str(e)
@@ -176,6 +186,16 @@ class console_connection(object):
 			raise RuntimeError("Transmitted yield message is too long.")
 
 		self.write(struct.pack(cnscom.resp_struct_fmt, cnscom.resp_magic, cnscom.resp_yield_message, messagelen) + message)
+
+
+	def send_tailf(self, data):
+		if not self.tailf_enabled: return
+
+		datalen = len(data)
+		if datalen >= 0x7fff:
+			raise RuntimeError("Transmitted tailf data are too long.")
+
+		self.write(struct.pack(cnscom.resp_struct_fmt, cnscom.resp_magic, cnscom.resp_tailf_data, datalen) + data)
 
 ###
 

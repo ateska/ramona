@@ -1,7 +1,7 @@
 import sys, os, socket, errno, logging, time
 from ..config import config, read_config, config_files
 from ..utils import launch_server_daemonized
-from .. import cnscom
+from .. import cnscom, socketuri
 from .parser import argparser
 from . import exception
 
@@ -78,7 +78,7 @@ Console application (base for custom implementations)
 		L.debug("Configuration read from: {0}".format(', '.join(config_files)))
 
 		# Prepare server connection factory
-		self.cnsconuri = cnscom.socket_uri(config.get('ramona:console','serveruri'))
+		self.cnsconuri = socketuri.socket_uri(config.get('ramona:console','serveruri'))
 		self.ctlconsock = None
 
 
@@ -90,8 +90,13 @@ Console application (base for custom implementations)
 			ec = e.exitcode
 		except KeyboardInterrupt, e:
 			ec = 0
+		except AssertionError, e:
+			L.exception("Assertion failed:")
+			ec = 101 # Assertion failed exit code
 		except Exception, e:
-			L.error("{0}".format(e))
+			errstr = "{0}".format(e)
+			if len(errstr) == 0: errstr=e.__repr__()
+			L.error(errstr)
 			ec = 100 # Generic error exit code
 		sys.exit(ec if ec is not None else 0)
 
@@ -108,8 +113,10 @@ Console application (base for custom implementations)
 		return self.ctlconsock
 
 
-	def svrcall(self, callid, params="", auto_connect=False, auto_server_start=False):
+	def cnssvrcall(self, callid, params="", auto_connect=False, auto_server_start=False):
 		'''
+		Console-server call (wrapper to cnscom.svrcall)
+
 		@param auto_connect: Automatically establish server connection if not present
 		@param auto_server_start: Automatically start server if not running and establish connection
 		'''

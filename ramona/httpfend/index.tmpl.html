@@ -8,7 +8,7 @@
 </head>
 <body>
 	<div class="container">
-		<h1>{appname}</h1><p class="lead">Ramona web administration console</p>
+		<h1>{appname}</h1><p class="lead" title="{version}">Ramona web administration console</p>
 		{logmsg}
 		<p>
 		  <a href="/" id="refreshButton" class="btn btn-large btn-primary">Refresh</a>
@@ -26,7 +26,7 @@
 		  </form>
 	<hr>
 	<footer>
-		<p>Ramona project:
+		<p>Ramona (version {version}) project:
 		<a href="http://ateska.github.com/ramona/">Ramona project page</a> |
 		<a href="https://github.com/ateska/ramona">Ramona @ GitHub</a> |
 		<a href="http://pypi.python.org/pypi/ramona">Ramona @ PyPi</a>
@@ -34,39 +34,32 @@
 	</footer>
 	</div>
 
-	<script src="/static/jquery/jquery-1.8.1.min.js"></script>
-	<script type="text/javascript">
-	jQuery.ajaxSetup({{
-	  beforeSend: function() {{
-	     $('#loader').show();
-	  }},
-	  complete: function(){{
-	     $('#loader').hide();
-	  }},
-	  success: function() {{}}
-	}});
+	<script src="/static/miniajax/miniajax.js"></script>
 	
+	<script type="text/javascript">
 	function refreshStatuses() {{
-		$.get('/ajax/statusTable', function(data) {{
-		  $('#statusTable').html(data);
+		document.getElementById('loader').style.display = "inline";
+		ajax.get('/ajax/statusTable', function(data, response) {{
+		   if(response.status == 200) {{
+			   document.getElementById('statusTable').innerHTML = data;
+		   }} else {{
+			   document.getElementById('statusTable').innerHTML = '<div class="alert alert-error"><h4>Error loading program statuses!</h4> Please check that Ramona server is running and that the Ramona HTTP frontend is accessible.</div>';
+		   }}
+		   document.getElementById('loader').style.display = "none";
 		}});
 	}}
 	
 	setInterval(function() {{
-		if($("#refreshAutomatically").is(":checked")) {{
+		if(document.getElementById('refreshAutomatically').checked) {{
 			refreshStatuses();
 		}}
 	}}, 5000);
 	
-	
-	$(document).ready(function() {{
-	  $("#refreshButton").click(function(event) {{
+	document.getElementById('refreshButton').onclick = function(event) {{
 		event.preventDefault();
 		refreshStatuses();
-	  }});
-	  $("#raform").show();
-		
-	}});
+	}}
+	document.getElementById('raform').style.display = "inline";
 	</script>
 	
 </body>
