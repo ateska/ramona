@@ -52,7 +52,7 @@ Program roaster is object that control all configured programs, their start/stop
 			if ident in filter_set: yield p
 
 
-	def start_program(self, cnscon, pfilter=None, force=False):
+	def start_program(self, cnscon=None, pfilter=None, force=False):
 		'''Start processes that are STOPPED and (forced) FATAL'''
 		if self.start_seq is not None or self.stop_seq is not None or self.restart_seq is not None:
 			raise svrcall_error("There is already start/stop sequence running - please wait and try again later.")
@@ -75,7 +75,7 @@ Program roaster is object that control all configured programs, their start/stop
 		self.__startstop_pad_next(True)
 
 
-	def stop_program(self, cnscon, pfilter=None, force=False, coredump=False):
+	def stop_program(self, cnscon=None, pfilter=None, force=False, coredump=False):
 		'''
 		Stop processes that are RUNNING and STARTING
 		@param force: If True then it interrupts any concurrently running start/stop sequence.

@@ -3,6 +3,7 @@ TODO list
 
 Generic
 -------
+- add version check to console-server communication handshake (and print warning if not matching)
 - split demo to demo&test (code that is more about testing and intentionally fails should not be in demo)
 - exitcodes option for autorestart (autorestart=1,2,3)
 - (low prio): SSL (optional) for protecting console-server channel
@@ -16,11 +17,8 @@ Generic
 	 - e.g. <on-platform linux:mac>
 - test Ramona how it runs in out-of-diskspace conditions
 - 'user' option - If ramona runs as root, this UNIX user account will be used as the account which runs the program. If ramona is not running as root, this option has no effect.
-
-Windows
--------
-- working on Windows (based on pyev / libev?)
-- daemonizing is not available on Windows - provide Windows Service option instead
+- configuration platform selector should support OR operator (e.g. pidfile@linux|darwin)
+- configuration platform selector should support families (e.g. pidfile@posix); posix is so far only identified family (expanded to linux|darwin|cygwin)
 
 Logging
 -------
@@ -38,7 +36,7 @@ Watchdog
 
 Python specific
 ---------------
-- native python program execution (using sys.executable - substitute for STRIGAPYTHON)
+- native python program execution (using utils.get_python_exec - substitute for STRIGAPYTHON)
 - python version (minimal) check
 
 Mailing to admin
@@ -55,6 +53,17 @@ HTTP frontend
 - RESTful API
 - (low prio): HTTPS
 
+Cron
+----
+- Ramona can be used to trigger tasks (tools) by given time - emulating functionality of cron
+
 Deployment
 ----------
 - Consider https://help.github.com/articles/splitting-a-subpath-out-into-a-new-repo for embedded deployments (for released versions)
+
+Cluster
+-------
+- Ramona can be used as cluster controller - running on every node and managing application there.
+- Ramona cluster controller needs to be built to allow single point of control
+- Fail-over scenarion support
+- Amazon ECS integration (e.g. use of Amazon variables that are passed to the box)

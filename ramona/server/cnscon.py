@@ -165,7 +165,7 @@ class console_connection(object):
 		'''
 		Internal function that manages communication of response (type exception) to the console (client).
 		'''
-		assert self.return_expected
+		assert self.return_expected, "Raised exception when return is not expected"
 
 		self.yield_enabled = False
 		ret = str(e)

@@ -79,7 +79,7 @@ class httpfend_app(object):
 		
 		for sock in self.svrsockets:
 			sock.setblocking(0)
-			self.watchers.append(pyev.Io(sock._sock, pyev.EV_READ, self.loop, self.__on_accept))
+			self.watchers.append(pyev.Io(sock._sock, pyev.EV_READ, self.loop, self.__on_accept, data=sock._sock.fileno()))
 
 		
 	def run(self):
@@ -112,7 +112,7 @@ class httpfend_app(object):
 		# Fist find relevant socket
 		sock = None
 		for s in self.svrsockets:
-			if s.fileno() == watcher.fd:
+			if s.fileno() == watcher.data:
 				sock = s
 				break
 		if sock is None:

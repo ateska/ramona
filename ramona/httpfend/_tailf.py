@@ -15,8 +15,8 @@ class tail_f_handler(object):
 		self.watchers = []
 		self.req_handler = req_handler
 		self.cnsconn = cnsconn
-		self.watchers.append(self.loop.io(req_handler.rfile, pyev.EV_READ, self.__on_rfile_io))
-		self.watchers.append(self.loop.io(cnsconn, pyev.EV_READ, self.__on_cns_io))
+		self.watchers.append(self.loop.io(req_handler.rfile._sock, pyev.EV_READ, self.__on_rfile_io))
+		self.watchers.append(self.loop.io(cnsconn._sock, pyev.EV_READ, self.__on_cns_io))
 		
 	def run(self):
 		for watcher in self.watchers:

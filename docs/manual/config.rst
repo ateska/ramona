@@ -15,6 +15,35 @@ Practically application level configuration can specify file(s) to optionally in
 Application and site level configuration as syntactically equal.
 
 
+Platform selector
+-----------------
+
+TODO
+
+Syntax is ``option@selector``.
+
+Example:
+
+.. code-block:: ini
+
+  [program:foolinux]
+  disabled@windows=True
+
+
+List of selectors:
+
+   ===================== ================
+   System                Selector
+   ===================== ================
+   Linux                 ``linux``
+   Windows               ``windows``
+   Mac OS X              ``darwin``
+   ===================== ================
+
+.. note:: Platform names are based on Python ``platform.system()`` call.
+  Lowercase form is used.
+
+
 [general] section
 -----------------
 
@@ -29,6 +58,8 @@ TODO
 .. attribute:: include
 
   TODO
+
+Separator is ';'
 
 
 .. attribute:: logdir
@@ -113,6 +144,14 @@ TODO
 .. attribute:: pidfile
 
   TODO
+  You can use environment variables in form of ${var-name}.
+  
+  Example:
+
+  .. code-block:: ini
+
+    [ramona:server]
+    pidfile=${TMP}/testramona.pid
 
 
 .. attribute:: log
@@ -158,6 +197,14 @@ TODO
 
   expandvars
   TODO
+
+  Example:
+
+  .. code-block:: ini
+
+    [ramona:server]
+    command=ls -l /
+    command@windows=dir c:\
 
 
 .. attribute:: directory
@@ -313,3 +360,4 @@ Example:
 
   *Required*:  No
   
+

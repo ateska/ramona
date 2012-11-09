@@ -1,13 +1,15 @@
-import argparse
+import sys, os, argparse
 
 ###
 
 class _parser_base(argparse.ArgumentParser):
 
-	argparser_kwargs = {}
-	subparser_kwargs = {}
+	argparser_kwargs = None # To be overridden in final parser implementation class
+	subparser_kwargs = None # To be overridden in final parser implementation class
 
 	def __init__(self, cnsapp):
+
+		# Build parser
 		argparse.ArgumentParser.__init__(self, **self.argparser_kwargs)
 
 		self.subparsers = self.add_subparsers(
@@ -53,6 +55,13 @@ class _parser_base(argparse.ArgumentParser):
 		from .cmd import tail
 		yield tail
 
+		if sys.platform == 'win32':
+			from .cmd import wininstall
+			yield wininstall
+
+			from .cmd import winuninstall
+			yield winuninstall
+
 
 	def parse(self, argv):
 		self.args = None # This is to allow re-entrant parsing
@@ -76,7 +85,15 @@ class _parser_base(argparse.ArgumentParser):
 
 class argparser(_parser_base):
 
+	argparser_kwargs = {}
+	subparser_kwargs = {}
+
 	def __init__(self, cnsapp):
+
+		# Prepare description (with Ramona version)
+		from .. import version as ramona_version
+		self.argparser_kwargs['description'] = 'Powered by Ramona (version {0}).'.format(ramona_version)
+
 		_parser_base.__init__(self, cnsapp)
 
 		# Add config file option

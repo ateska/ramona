@@ -10,25 +10,35 @@ L = logging.getLogger("utils")
 
 ###
 
-def launch_server():
+def launch_server(server_only=True, programs=None):
 	'''
 This function launches Ramona server - in 'os.exec' manner which means that this function will not return
 and instead of that, current process will be replaced by launched server. 
 
 All file descriptors above 2 are closed.
 	'''
-	from .config import config_files
-	os.environ['RAMONA_CONFIG'] = ':'.join(config_files)
+	if server_only: assert (programs is None or len(programs) == 0)
 
+	# Prepare environment variable RAMONA_CONFIG
+	from .config import config_files
+	os.environ['RAMONA_CONFIG'] = ';'.join(config_files)
+
+	# Prepare command line
+	cmdline = ["-m", "ramona.server"]
+	if server_only: cmdline.append('-S')
+	elif programs is not None: cmdline.extend(programs)
+
+	# Launch
 	if sys.platform == 'win32':
 		# Windows specific code, os.exec* process replacement is not possible, so we try to mimic that
 		import subprocess
-		ret = subprocess.call("{0} -m ramona.server".format(sys.executable))
+		ret = subprocess.call(get_python_exec(cmdline))
 		sys.exit(ret)
 
 	else:
 		close_fds()
-		os.execl(sys.executable, sys.executable, "-m", "ramona.server")
+		pythonexec = get_python_exec()
+		os.execl(pythonexec, os.path.basename(pythonexec), *cmdline)
 
 #
 
@@ -114,13 +124,13 @@ if os.name == 'posix':
 		fl = fcntl.fcntl(fd, fcntl.F_GETFL)
 		fcntl.fcntl(fd, fcntl.F_SETFL, fl ^ os.O_NONBLOCK)
 
-elif os.name == 'nt':
+elif sys.platform == 'win32':
 
 	def enable_nonblocking(fd):
-		pass
+		raise NotImplementedError("utils.enable_nonblocking() not implementerd on Windows")
 
 	def disable_nonblocking(fd):
-		pass
+		raise NotImplementedError("utils.disable_nonblocking() not implementerd on Windows")
 
 ###
 
@@ -140,6 +150,7 @@ def expandvars(path, env):
         	i, j = m.span(0)
         	name = m.group(1)
 		if name.startswith('{') and name.endswith('}'): name = name[1:-1]
+		name=name.upper() # Use upper-case form for environment variables (e.g. Windows ${comspec})
 		if name in env:
 			tail = path[j:]
 			path = path[:i] + env[name]
@@ -149,3 +160,21 @@ def expandvars(path, env):
 			i = j
 
 	return path
+
+###
+
+def get_python_exec(cmdline=None):
+	"""
+	Return path for Python executable - similar to sys.executable but also handles corner cases on Win32
+
+	@param cmdline: Optional command line arguments that will be added to python executable, can be None, string or list
+	"""
+
+	if sys.executable.lower().endswith('pythonservice.exe'):
+		pythonexec = os.path.join(sys.exec_prefix, 'python.exe')
+	else:
+		pythonexec = sys.executable
+
+	if cmdline is None: return pythonexec
+	elif isinstance(cmdline, basestring): return pythonexec + ' ' + cmdline
+	else: return " ".join([pythonexec] + cmdline)

@@ -12,7 +12,7 @@ Features
 - configuration is ConfigParser compatible
 - priority (order) in which programs are started/stopped
 - Following environment variables are available:
-	- RAMONA_CONFIGS (filled by console, list of config files as given on command line or by default mechanism, delimiter is ':')
+	- RAMONA_CONFIGS (filled by console, list of config files as given on command line or by default mechanism, delimiter is ';')
 	- RAMONA_SECTION (name of [program:?] section in config that is relevant for current program)
 
 - Force start/restart of programs in 'FATAL' state (-f option)
@@ -29,6 +29,8 @@ Features
 - [program:x] command now can contain environment variable reference (e.g. ${HOME}) that will be expanded; also [env] is taken in account
 - [program:x]'directory' option (change working directory prior program start)
 - [program:x]'umask' option
+- optional alternative configuration for environment variables: https://github.com/ateska/ramona/issues/2
+
 
 Console
 -------
@@ -139,3 +141,8 @@ password=pass
 # SHA example. To generate use for example: echo -n "secret" | sha1sum
 #password={SHA}e5e9fa1ba31ecd1ae84f75caaa474f3a663f05f4
 ```
+
+Windows
+-------
+- Running as Windows Service
+- working on Windows using pyev & Python Win32

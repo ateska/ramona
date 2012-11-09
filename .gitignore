@@ -38,3 +38,4 @@ log
 .pydevproject
 .settings
 /log-test
+*.pid

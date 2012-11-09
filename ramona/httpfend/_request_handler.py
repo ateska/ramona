@@ -153,11 +153,13 @@ class ramona_http_req_handler(BaseHTTPServer.BaseHTTPRequestHandler):
 				"stream": stream,
 				"tailf": tailf 
 		}
+		headers_sent = False
 		try:
 			ret = cnscom.svrcall(cnsconn, cnscom.callid_tail, json.dumps(params))
 			self.send_response(httplib.OK)
 			self.send_header("Content-Type", "text/plain; charset=utf-8")
 			self.end_headers()
+			headers_sent = True
 			
 			self.wfile.write(ret)
 			cnsconn.setblocking(0)
@@ -165,6 +167,7 @@ class ramona_http_req_handler(BaseHTTPServer.BaseHTTPRequestHandler):
 			tailfhandler = tail_f_handler(self, cnsconn)
 			tailfhandler.run()
 			
+			# after the tailf handling exists, sent the tailf_stop command to ramona server
 			cnsconn.setblocking(1)
 			params = {
 				'program': program,
@@ -177,8 +180,10 @@ class ramona_http_req_handler(BaseHTTPServer.BaseHTTPRequestHandler):
 			)
 			
 		except Exception, e:
-			self.send_error(httplib.INTERNAL_SERVER_ERROR, str(e))
-			return
+			if not headers_sent:
+				self.send_error(httplib.INTERNAL_SERVER_ERROR, str(e))
+			else:
+				self.wfile.write("Error while getting the log contents: {0}".format(e))
 	
 	def _handler_other(self):
 		parsed = urlparse.urlparse(self.path)

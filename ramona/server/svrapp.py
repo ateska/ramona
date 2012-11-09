@@ -31,6 +31,13 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 
 		# Parse command line arguments
 		parser = argparse.ArgumentParser()
+		parser.add_argument('-S','--server-only', action='store_true', help='Start only server, programs are not launched')
+		parser.add_argument('program', nargs='*', help='Optionally specify program(s) in scope of the command (if nothing is specified, all enabled programs will be launched)')
+
+		# This is to support debuging of pythonservice.exe on Windows
+		if sys.platform == 'win32':
+			parser.add_argument('-debug', action='store', help=argparse.SUPPRESS)
+
 		self.args = parser.parse_args()
 
 		# Read configuration
@@ -76,6 +83,7 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 		else:
 			self.watchers.append(pyev.Child(0, False, self.loop, self.__child_signal_cb))
 
+
 		for sock in self.cnssockets:
 			sock.setblocking(0)
 			# Watcher data are used (instead logical watcher.fd due to Win32 mismatch)
@@ -88,6 +96,10 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 		# Enable non-terminating SIGALARM handler
 		if sys.platform != 'win32':
 			signal.signal(signal.SIGALRM, _SIGALARM_handler)
+
+		# Prepare also exit watcher - can be used to 'simulate' terminal signal (useful on Win32)
+		self.exitwatcher = pyev.Async(self.loop, self.__terminal_signal_cb)
+		self.exitwatcher.start()
 
 		program_roaster.__init__(self)
 		idlework_appmixin.__init__(self)
@@ -105,14 +117,19 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 		# Create pid file
 		pidfile = config.get('ramona:server','pidfile')
 		if pidfile !='':
+			pidfile = os.path.expandvars(pidfile)
 			try:
 				open(pidfile,'w').write("{0}\n".format(os.getpid()))
 			except Exception, e:
 				L.critical("Cannot create pidfile: {0}".format(e)) 
 				del self.cnssockets # Make sure that socket is explicitly closed (and eventual UNIX socket file deleted)
 				sys.exit(1)
-				
-		# Launch loop
+
+		# Launch start sequence
+		if not self.args.server_only:
+			self.start_program(pfilter=self.args.program if len(self.args.program) > 0 else None)
+
+		# Start heartbeat loop
 		try:
 			self.loop.start()
 		finally:
@@ -172,12 +189,16 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 
 
 	def __terminal_signal_cb(self, watcher, _revents):
-		if watcher.signum == signal.SIGINT:
-			# Print ENTER when Ctrl-C is pressed
-			print
+		if hasattr(watcher, 'signum'):
+			if watcher.signum == signal.SIGINT:
+				# Print ENTER when Ctrl-C is pressed
+				print
 
 		if self.termstatus is None:
-			L.info("Exit request received (by signal {0})".format(watcher.signum))
+			if hasattr(watcher, 'signum'):
+				L.info("Exit request received (by signal {0})".format(watcher.signum))
+			else:
+				L.info("Exit request received")
 			self.__init_soft_exit()
 			return
 
@@ -195,7 +216,11 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 			if ret != None:
 				self.on_terminate_program(p.subproc.pid, ret)
 				extra_tick = True
-		
+
+			if p.subproc is not None:
+				p.win32_read_stdfd()	
+
+
 		if extra_tick:
 			self.add_idlework(self.on_tick)
 
@@ -243,6 +268,7 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 				cnscon.yield_enabled=True
 				self.start_program(cnscon=cnscon, **kwargs)
 				return deffered_return
+
 
 		elif callid == cnscom.callid_stop:
 			kwargs = cnscom.parse_json_kwargs(params)
