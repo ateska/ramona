@@ -1,6 +1,6 @@
-import sys, os, socket, signal, errno, weakref, logging, argparse, itertools, time
+import sys, os, socket, signal, errno, weakref, logging, argparse, itertools, time, json
 import pyev
-from .. import cnscom, socketuri
+from .. import cnscom, socketuri, version as ramona_version
 from ..config import config, read_config, config_files, config_includes, get_numeric_loglevel
 from ..cnscom import program_state_enum, svrcall_error
 from .cnscon import console_connection, message_yield_loghandler, deffered_return
@@ -230,8 +230,11 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 	def dispatch_svrcall(self, cnscon, callid, params):
 		if self.termstatus is not None:
 			raise cnscom.svrcall_error('Ramona server is exiting - no further commands will be accepted')
-
-		if callid == cnscom.callid_start:
+			
+		if callid == cnscom.callid_init:
+			return json.dumps({"version": ramona_version})
+			
+		elif callid == cnscom.callid_start:
 			kwargs = cnscom.parse_json_kwargs(params)
 			immediate = kwargs.pop('immediate', False)
 			if immediate:

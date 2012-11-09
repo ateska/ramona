@@ -13,6 +13,7 @@ callid_restart = 73
 callid_status = 74
 callid_tail = 75
 callid_tailf_stop = 76 # Terminate previously initialized tailf mode
+callid_init = 77
 
 #
 
