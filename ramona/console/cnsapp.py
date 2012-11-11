@@ -1,4 +1,4 @@
-import sys, os, socket, errno, logging, time
+import sys, os, socket, errno, logging, time, json
 from ..config import config, read_config, config_files
 from ..utils import launch_server_daemonized
 from .. import cnscom, socketuri
@@ -90,8 +90,13 @@ Console application (base for custom implementations)
 			ec = e.exitcode
 		except KeyboardInterrupt, e:
 			ec = 0
+		except AssertionError, e:
+			L.exception("Assertion failed:")
+			ec = 101 # Assertion failed exit code
 		except Exception, e:
-			L.error("{0}".format(e))
+			errstr = "{0}".format(e)
+			if len(errstr) == 0: errstr=e.__repr__()
+			L.error(errstr)
 			ec = 100 # Generic error exit code
 		sys.exit(ec if ec is not None else 0)
 
@@ -104,7 +109,16 @@ Console application (base for custom implementations)
 				if e.errno == errno.ECONNREFUSED: return None
 				if e.errno == errno.ENOENT and self.cnsconuri.protocol == 'unix': return None
 				raise
-
+			
+			server_init_params_ret = cnscom.svrcall(self.ctlconsock, cnscom.callid_init, '')
+			server_init_params = json.loads(server_init_params_ret)
+			server_version = server_init_params.get("version", None)
+			if server_version is not None:
+				from .. import version as ramona_version
+				client_version = ramona_version
+				if server_version != client_version:
+					L.warn("Version mismatch. The server version '{0}' is different from the console version '{1}'. The console may malfunction.".format(server_version, client_version))
+			
 		return self.ctlconsock
 
 

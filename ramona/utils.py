@@ -10,26 +10,35 @@ L = logging.getLogger("utils")
 
 ###
 
-def launch_server():
+def launch_server(server_only=True, programs=None):
 	'''
 This function launches Ramona server - in 'os.exec' manner which means that this function will not return
 and instead of that, current process will be replaced by launched server. 
 
 All file descriptors above 2 are closed.
 	'''
+	if server_only: assert (programs is None or len(programs) == 0)
+
+	# Prepare environment variable RAMONA_CONFIG
 	from .config import config_files
 	os.environ['RAMONA_CONFIG'] = ';'.join(config_files)
 
+	# Prepare command line
+	cmdline = ["-m", "ramona.server"]
+	if server_only: cmdline.append('-S')
+	elif programs is not None: cmdline.extend(programs)
+
+	# Launch
 	if sys.platform == 'win32':
 		# Windows specific code, os.exec* process replacement is not possible, so we try to mimic that
 		import subprocess
-		ret = subprocess.call(get_python_exec("-m ramona.server"))
+		ret = subprocess.call(get_python_exec(cmdline))
 		sys.exit(ret)
 
 	else:
 		close_fds()
 		pythonexec = get_python_exec()
-		os.execl(pythonexec, os.path.basename(pythonexec), "-m", "ramona.server")
+		os.execl(pythonexec, os.path.basename(pythonexec), *cmdline)
 
 #
 
@@ -155,12 +164,17 @@ def expandvars(path, env):
 ###
 
 def get_python_exec(cmdline=None):
-	"Return path for Python executable - similar to sys.executable but also handles corner cases on Win32"
+	"""
+	Return path for Python executable - similar to sys.executable but also handles corner cases on Win32
+
+	@param cmdline: Optional command line arguments that will be added to python executable, can be None, string or list
+	"""
+
 	if sys.executable.lower().endswith('pythonservice.exe'):
 		pythonexec = os.path.join(sys.exec_prefix, 'python.exe')
 	else:
 		pythonexec = sys.executable
 
 	if cmdline is None: return pythonexec
-	else: return  pythonexec + ' ' + cmdline
-
+	elif isinstance(cmdline, basestring): return pythonexec + ' ' + cmdline
+	else: return " ".join([pythonexec] + cmdline)

@@ -1,4 +1,4 @@
-import sys, os, time, logging, shlex, signal, subprocess, re, errno, platform
+import sys, os, time, logging, shlex, signal, subprocess, errno
 import pyev
 from ..config import config, get_boolean
 from ..utils import parse_signals, close_fds, expandvars, enable_nonblocking, disable_nonblocking, get_python_exec
@@ -57,8 +57,8 @@ class program(object):
 		self.exit_status = None
 		self.coredump_enabled = None # If true, kill by SIGQUIT -> dump core
 
-		#TODO: Alternative for self.watchers on Windows ...
 		if sys.platform != 'win32':
+			# On Windows we are using periodic pipe check in win32_read_stdfd
 			self.watchers = [
 				pyev.Io(0, 0, svrapp.loop, self.__read_stdfd, 0),
 				pyev.Io(0, 0, svrapp.loop, self.__read_stdfd, 1),
@@ -66,15 +66,7 @@ class program(object):
 
 		# Build configuration
 		self.config = self.DEFAULTS.copy()
-		platform_selector = platform.system().lower()
-
 		self.config.update(config.items(config_section))
-		if platform_selector is not None and platform_selector != '':
-			psrg = re.compile('^(.*)@{0}$'.format(platform_selector))
-			for k in self.config.keys():
-				r = psrg.match(k)
-				if not r: continue
-				self.config[r.group(1)] = self.config.pop(k)
 
 		# Prepare program command line
 		cmd = self.config.get('command')
@@ -84,7 +76,7 @@ class program(object):
 			return
 
 		if cmd == '<httpfend>':
-			cmd = get_python_exec(cmdline="-u -m ramona.httpfend")
+			cmd = get_python_exec(cmdline=["-u","-m","ramona.httpfend"])
 		elif cmd[:1] == '<':
 			L.error("Unknown command option '{1}' in {0} -> CFGERROR".format(config_section, cmd))
 			self.state = program_state_enum.CFGERROR

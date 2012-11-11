@@ -3,6 +3,7 @@ TODO list
 
 Generic
 -------
+- add version check to console-server communication handshake (and print warning if not matching)
 - split demo to demo&test (code that is more about testing and intentionally fails should not be in demo)
 - exitcodes option for autorestart (autorestart=1,2,3)
 - (low prio): SSL (optional) for protecting console-server channel
@@ -16,6 +17,8 @@ Generic
 	 - e.g. <on-platform linux:mac>
 - test Ramona how it runs in out-of-diskspace conditions
 - 'user' option - If ramona runs as root, this UNIX user account will be used as the account which runs the program. If ramona is not running as root, this option has no effect.
+- configuration platform selector should support OR operator (e.g. pidfile@linux|darwin)
+- configuration platform selector should support families (e.g. pidfile@posix); posix is so far only identified family (expanded to linux|darwin|cygwin)
 
 Logging
 -------

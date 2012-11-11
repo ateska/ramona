@@ -1,6 +1,6 @@
-import sys, os, socket, signal, errno, weakref, logging, argparse, itertools, time
+import sys, os, socket, signal, errno, weakref, logging, argparse, itertools, time, json
 import pyev
-from .. import cnscom, socketuri
+from .. import cnscom, socketuri, version as ramona_version
 from ..config import config, read_config, config_files, config_includes, get_numeric_loglevel
 from ..cnscom import program_state_enum, svrcall_error
 from .cnscon import console_connection, message_yield_loghandler, deffered_return
@@ -31,6 +31,13 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 
 		# Parse command line arguments
 		parser = argparse.ArgumentParser()
+		parser.add_argument('-S','--server-only', action='store_true', help='Start only server, programs are not launched')
+		parser.add_argument('program', nargs='*', help='Optionally specify program(s) in scope of the command (if nothing is specified, all enabled programs will be launched)')
+
+		# This is to support debuging of pythonservice.exe on Windows
+		if sys.platform == 'win32':
+			parser.add_argument('-debug', action='store', help=argparse.SUPPRESS)
+
 		self.args = parser.parse_args()
 
 		# Read configuration
@@ -118,7 +125,11 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 				del self.cnssockets # Make sure that socket is explicitly closed (and eventual UNIX socket file deleted)
 				sys.exit(1)
 
-		# Launch loop
+		# Launch start sequence
+		if not self.args.server_only:
+			self.start_program(pfilter=self.args.program if len(self.args.program) > 0 else None)
+
+		# Start heartbeat loop
 		try:
 			self.loop.start()
 		finally:
@@ -244,8 +255,11 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 	def dispatch_svrcall(self, cnscon, callid, params):
 		if self.termstatus is not None:
 			raise cnscom.svrcall_error('Ramona server is exiting - no further commands will be accepted')
-
-		if callid == cnscom.callid_start:
+			
+		if callid == cnscom.callid_init:
+			return json.dumps({"version": ramona_version})
+			
+		elif callid == cnscom.callid_start:
 			kwargs = cnscom.parse_json_kwargs(params)
 			immediate = kwargs.pop('immediate', False)
 			if immediate:
@@ -254,6 +268,7 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 				cnscon.yield_enabled=True
 				self.start_program(cnscon=cnscon, **kwargs)
 				return deffered_return
+
 
 		elif callid == cnscom.callid_stop:
 			kwargs = cnscom.parse_json_kwargs(params)

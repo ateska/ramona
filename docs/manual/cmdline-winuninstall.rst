@@ -1,3 +1,5 @@
+.. _cmdline-winuninstall:
+
 winuninstall (command-line)
 ===========================
 

@@ -30,3 +30,9 @@ Release procedure
 16. Check on http://pypi.python.org/pypi/ramona
 17. Create tag 'release-[VERSION]' (e.g. release-0.9b3) with comment e.g. "Beta release 0.9b3"
 18. Switch back to 'master' branch and you are done
+
+Follow-ups
+----------
+- Update manual (documentation) and propagate that to github pages
+- Mark release in Google Analyst
+- Publish release to Freecode
