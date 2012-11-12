@@ -27,7 +27,7 @@ Console application (base for custom implementations)
 		if len(sys.argv) > 1:
 			for mn in dir(self):
 				fn = getattr(self, mn)
-				if not hasattr(fn, 'proxy_tool'): continue
+				if not hasattr(fn, '__proxy_tool'): continue
 				if mn == sys.argv[1]:
 					ret = fn(sys.argv[1:])
 					sys.exit(ret)
@@ -190,8 +190,10 @@ Console application (base for custom implementations)
 def tool(fn):
 	'''
 	Tool decorator foc console_app
+
+	Marks function object by '.__tool' attribute
 	'''
-	fn.tool = fn.func_name
+	fn.__tool = fn.func_name
 	return fn
 
 #
@@ -199,6 +201,8 @@ def tool(fn):
 def proxy_tool(fn):
 	'''
 	Proxy tool (with straight argument passing) decorator foc console_app
+
+	Marks function object by '.__proxy_tool' attribute
 	'''
-	fn.proxy_tool = fn.func_name
+	fn.__proxy_tool = fn.func_name
 	return fn

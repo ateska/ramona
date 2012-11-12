@@ -59,7 +59,7 @@ class _console_cmd(cmd.Cmd):
 		self.proxy_tool_set = set()
 		for mn in dir(cnsapp):
 			fn = getattr(cnsapp, mn)
-			if not hasattr(fn, 'proxy_tool'): continue
+			if not hasattr(fn, '__proxy_tool'): continue
 
 			self.proxy_tool_set.add(mn)
 			setattr(self.__class__, "do_{0}".format(mn), functools.partial(launch_proxy_tool, fn, mn))
