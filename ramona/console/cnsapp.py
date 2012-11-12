@@ -14,6 +14,7 @@ L = logging.getLogger("cnsapp")
 class console_app(object):
 	'''
 Console application (base for custom implementations)
+@ivar config: Configuration dictionary linked from ramona.config (shortcut for ramona tool procedures)
 	'''
 
 	def __init__(self, configuration):
@@ -62,6 +63,8 @@ Console application (base for custom implementations)
 		except Exception, e:
 			print("{0}".format(e))
 			sys.exit(exception.configuration_error.exitcode)
+
+		self.config = config
 
 		# Configure logging
 		llvl = logging.INFO

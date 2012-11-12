@@ -7,7 +7,9 @@ class MyDemoConsoleApp(ramona.console_app):
 	@ramona.tool
 	def tool_demo(self):
 		'''Printing message about demo of custom ramona.tool'''
-		print "This is implementation of custom tool (see ./demo --help)"
+		print "This is implementation of custom tool (see ./demo.sh --help)"
+		# Example how to access configuration from tool:
+		print "Value of env:RAMONADEMO = {0}".format(self.config.get("env", "RAMONADEMO"))
 
 
 	@ramona.proxy_tool

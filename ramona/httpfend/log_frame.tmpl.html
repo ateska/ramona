@@ -8,18 +8,43 @@
 		body {{
 			margin: 0;
 		}}
+		#scrollform {{
+			border: 0; 
+			position:absolute; 
+			left:10px; 
+			bottom:20px; 
+			display: none;
+		}}
+		#logiframe {{
+			border: 0; 
+			position:absolute; 
+			top:0; 
+			left:0; 
+			right:0; 
+			bottom:0; 
+			width:100%; 
+			height:100%;
+		}}
 	</style>
 	
 </head>
 <body>
-	<iframe style="border: 0; position:absolute; top:0; left:0; right:0; bottom:0; width:100%; height:100%" src="{logpath}" id="logiframe"></iframe>
+	<iframe src="{logpath}" id="logiframe"></iframe>
+	<form id="scrollform">
+		<label for="scrollcheck" title="If checked, the view automatically scrolls to the end of the log">
+		<input type="checkbox" id="scrollcheck" checked="checked"/>
+		Scroll automatically
+		</label>
+	</form>
 	<script type="text/javascript">
 		setInterval(function() {{
-			document.getElementById("logiframe").contentWindow.scrollTo(0,document.getElementById("logiframe").contentWindow.document.body.scrollHeight);
+			if(document.getElementById("scrollcheck").checked) {{
+				document.getElementById("logiframe").contentWindow.scrollTo(0,document.getElementById("logiframe").contentWindow.document.body.scrollHeight);
+			}}
+			document.getElementById("scrollform").style.display = "block";
 			var height = document.documentElement.clientHeight;
-		    height -= 20;
+		    height -= 45;
 		    document.getElementById('logiframe').style.height = height + 'px';
-			
 		}},500);
 	</script>
 	
