@@ -334,7 +334,15 @@ class ramona_http_req_handler(BaseHTTPServer.BaseHTTPRequestHandler):
 		for k,v in kwargs.iteritems():
 			queryList.append((k, v))
 		
-		return urlparse.urlunparse(("http", self.headers['Host'], "/", None, urllib.urlencode(queryList), None))
+		scheme = "http"
+		try:
+			import ssl
+			if isinstance(self.request, ssl.SSLSocket):
+				scheme = "https"
+		except:
+			pass
+		
+		return urlparse.urlunparse((scheme, self.headers['Host'], "/", None, urllib.urlencode(queryList), None))
 	
 	def getStatuses(self):
 		conn = self.socket_connect()

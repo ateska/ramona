@@ -10,10 +10,13 @@ class socket_uri(object):
 
 	# Configure urlparse
 	if 'unix' not in urlparse.uses_params: urlparse.uses_params.append('unix')
+	if 'tcp' not in urlparse.uses_query: urlparse.uses_query.append('tcp')
 
 	def __init__(self, uri):
 		self.uri = urlparse.urlparse(uri.strip())
 		self.uriparams = dict(urlparse.parse_qsl(self.uri.params))
+		# TODO: Use query or params -- not both
+		self.uriquery = dict(urlparse.parse_qsl(self.uri.query))
 
 		self.protocol = self.uri.scheme.lower()
 		if self.protocol == 'tcp':
@@ -46,7 +49,16 @@ class socket_uri(object):
 
 			for family, socktype, proto, canonname, sockaddr in socket.getaddrinfo(self.uri.hostname, self.uri.port, 0, socket.SOCK_STREAM):
 				s = socket.socket(family, socktype, proto)
-				s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+				
+				if self.uriquery.get("ssl", None) == "1":
+					import ssl
+					certfile = self.uriquery.get("certfile", None)
+					if certfile is None:
+						raise RuntimeError("certfile parametr has to be provided in URI if ssl=1")
+					keyfile = self.uriquery.get("keyfile", None)
+					s = ssl.wrap_socket(s, keyfile, certfile, True)
+					
+				s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) 
 				s.bind(sockaddr)
 				retsocks.append(s)
 
