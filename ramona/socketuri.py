@@ -33,7 +33,7 @@ class socket_uri(object):
 				self.uri = self.uri._replace(netloc='', path=self.uri.netloc + self.uri.path)
 
 		else:
-			raise RuntimeError("Unknown/unsuported protocol '{0}' in socket URI {1}".format(self.protocol, uri))
+			raise RuntimeError("Unknown/unsupported protocol '{0}' in socket URI {1}".format(self.protocol, uri))
 
 
 	def create_socket_listen(self):
@@ -62,7 +62,7 @@ class socket_uri(object):
 			retsocks.append(s)
 
 		else:
-			raise RuntimeError("Unknown/unsuported protocol '{0}'".format(self.protocol))
+			raise RuntimeError("Unknown/unsupported protocol '{0}'".format(self.protocol))
 
 		return retsocks
 
