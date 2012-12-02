@@ -6,3 +6,5 @@
 - ssl module does not contain any functionality to compare load certificate from file and use
   the loaded object for comparison with the counterpars certificate
 - ssl module does not contain any methods to create fingerprints of the certificates
+
+- http://bugs.python.org/issue8655
