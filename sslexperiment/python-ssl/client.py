@@ -2,7 +2,6 @@ import socket, ssl, pprint
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-# require a certificate from the server
 ssl_sock = ssl.wrap_socket(s,
                 keyfile="client.key",
                 certfile="client.cert"
