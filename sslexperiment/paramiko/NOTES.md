@@ -1,0 +1,2 @@
+- Demo server: https://github.com/paramiko/paramiko/blob/master/demos/demo_server.py
+- Should be enough to use the Transport class: http://www.lag.net/paramiko/docs/paramiko.Transport-class.html
