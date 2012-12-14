@@ -19,6 +19,7 @@ Generic
 - 'user' option - If ramona runs as root, this UNIX user account will be used as the account which runs the program. If ramona is not running as root, this option has no effect.
 - configuration platform selector should support OR operator (e.g. pidfile@linux|darwin)
 - configuration platform selector should support families (e.g. pidfile@posix); posix is so far only identified family (expanded to linux|darwin|cygwin)
+- `tail -f *` to show log of all running programs
 
 Logging
 -------
