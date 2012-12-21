@@ -54,6 +54,8 @@ TODO
 
   TODO
 
+  ? Can I use whitespaces in the appname? (E.g. 'Foo Bar App' or 'foobarapp')
+
 
 .. attribute:: include
 
@@ -157,6 +159,40 @@ TODO
 .. attribute:: log
 
   TODO
+
+  Example:
+
+  .. code-block:: ini
+
+    [ramona:server]
+    log=/var/log/foo.log
+
+
+  Magic variable '<logdir>'
+
+  .. code-block:: ini
+
+    [general]
+    logdir=./log
+
+    [ramona:server]
+    log=<logdir>
+
+
+  Will result in ./log/ramona.log
+
+
+
+  .. code-block:: ini
+
+    [general]
+    logdir=./log
+
+    [ramona:server]
+    log=<logdir>/foo.log
+
+
+  Will result in ./log/foo.log
 
 
 .. attribute:: loglevel

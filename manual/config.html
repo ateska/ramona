@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Configuration &mdash; Ramona 0.9 beta 7 documentation</title>
+    <title>Configuration &mdash; Ramona 0.9 beta 8 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.9 beta 7',
+        VERSION:     '0.9 beta 8',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Ramona 0.9 beta 7 documentation" href="index.html" />
+    <link rel="top" title="Ramona 0.9 beta 8 documentation" href="index.html" />
     <link rel="next" title="Command line" href="cmdline.html" />
     <link rel="prev" title="Features" href="features.html" /> 
   </head>
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="features.html" title="Features"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Ramona 0.9 beta 7 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Ramona 0.9 beta 8 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -107,6 +107,7 @@ Lowercase form is used.</p>
 <dt id="appname">
 <tt class="descname">appname</tt><a class="headerlink" href="#appname" title="Permalink to this definition">¶</a></dt>
 <dd><p>TODO</p>
+<p>? Can I use whitespaces in the appname? (E.g. &#8216;Foo Bar App&#8217; or &#8216;foobarapp&#8217;)</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -199,6 +200,28 @@ You can use environment variables in form of ${var-name}.</p>
 <dt id="log">
 <tt class="descname">log</tt><a class="headerlink" href="#log" title="Permalink to this definition">¶</a></dt>
 <dd><p>TODO</p>
+<p>Example:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[ramona:server]</span>
+<span class="na">log</span><span class="o">=</span><span class="s">/var/log/foo.log</span>
+</pre></div>
+</div>
+<p>Magic variable &#8216;&lt;logdir&gt;&#8217;</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[general]</span>
+<span class="na">logdir</span><span class="o">=</span><span class="s">./log</span>
+
+<span class="k">[ramona:server]</span>
+<span class="na">log</span><span class="o">=</span><span class="s">&lt;logdir&gt;</span>
+</pre></div>
+</div>
+<p>Will result in ./log/ramona.log</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[general]</span>
+<span class="na">logdir</span><span class="o">=</span><span class="s">./log</span>
+
+<span class="k">[ramona:server]</span>
+<span class="na">log</span><span class="o">=</span><span class="s">&lt;logdir&gt;/foo.log</span>
+</pre></div>
+</div>
+<p>Will result in ./log/foo.log</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -466,7 +489,7 @@ you can use the following command (works on Linux):</p>
         <li class="right" >
           <a href="features.html" title="Features"
              >previous</a> |</li>
-        <li><a href="index.html">Ramona 0.9 beta 7 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Ramona 0.9 beta 8 documentation</a> &raquo;</li> 
       </ul>
     </div>
 

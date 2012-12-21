@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Features &mdash; Ramona 0.9 beta 7 documentation</title>
+    <title>Features &mdash; Ramona 0.9 beta 8 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.9 beta 7',
+        VERSION:     '0.9 beta 8',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Ramona 0.9 beta 7 documentation" href="index.html" />
+    <link rel="top" title="Ramona 0.9 beta 8 documentation" href="index.html" />
     <link rel="next" title="Configuration" href="config.html" />
     <link rel="prev" title="Installation" href="install.html" /> 
   </head>
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="install.html" title="Installation"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Ramona 0.9 beta 7 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Ramona 0.9 beta 8 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -77,6 +77,30 @@ Program life cycle (statuses)</p>
 <div class="section" id="custom-tools">
 <h2>Custom tools<a class="headerlink" href="#custom-tools" title="Permalink to this headline">¶</a></h2>
 <p>TODO</p>
+<p>Example of tool function:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">FooConsoleApp</span><span class="p">(</span><span class="n">ramona</span><span class="o">.</span><span class="n">console_app</span><span class="p">):</span>
+
+      <span class="nd">@ramona.tool</span>
+      <span class="k">def</span> <span class="nf">mytool</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+              <span class="sd">&#39;&#39;&#39;This is help text of my tool&#39;&#39;&#39;</span>
+              <span class="o">...</span>
+</pre></div>
+</div>
+<p>Example of tool class:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">FooConsoleApp</span><span class="p">(</span><span class="n">ramona</span><span class="o">.</span><span class="n">console_app</span><span class="p">):</span>
+
+      <span class="nd">@ramona.tool</span>
+      <span class="k">class</span> <span class="nc">mytool</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+              <span class="sd">&#39;&#39;&#39;This is help text of my tool&#39;&#39;&#39;</span>
+
+              <span class="k">def</span> <span class="nf">init_parser</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cnsapp</span><span class="p">,</span> <span class="n">parser</span><span class="p">):</span>
+                      <span class="n">parser</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="s">&#39;...&#39;</span>
+                      <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+
+              <span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cnsapp</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+                      <span class="o">...</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="log-scanning">
 <h2>Log scanning<a class="headerlink" href="#log-scanning" title="Permalink to this headline">¶</a></h2>
@@ -195,7 +219,7 @@ It also depends on <tt class="docutils literal"><span class="pre">pythonservice.
         <li class="right" >
           <a href="install.html" title="Installation"
              >previous</a> |</li>
-        <li><a href="index.html">Ramona 0.9 beta 7 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Ramona 0.9 beta 8 documentation</a> &raquo;</li> 
       </ul>
     </div>
 
