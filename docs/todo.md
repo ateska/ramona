@@ -4,7 +4,6 @@ TODO list
 Generic
 -------
 - add version check to console-server communication handshake (and print warning if not matching)
-- split demo to demo&test (code that is more about testing and intentionally fails should not be in demo)
 - exitcodes option for autorestart (autorestart=1,2,3)
 - (low prio): SSL (optional) for protecting console-server channel
 - ulimit/resources (similar to core dump) -> minfds, minprocs
@@ -31,7 +30,7 @@ Logging
 
 Configuration
 -------------
-- environment variables expansion in configuration
+- (environment) variables expansion in configuration
 
 Watchdog
 --------
@@ -60,10 +59,6 @@ HTTP frontend
 Cron
 ----
 - Ramona can be used to trigger tasks (tools) by given time - emulating functionality of cron
-
-Deployment
-----------
-- Consider https://help.github.com/articles/splitting-a-subpath-out-into-a-new-repo for embedded deployments (for released versions)
 
 Cluster
 -------
