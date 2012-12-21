@@ -1,4 +1,4 @@
-import sys, os, argparse
+import sys, os, argparse, inspect
 
 ###
 
@@ -29,8 +29,19 @@ class _parser_base(argparse.ArgumentParser):
 		for mn in dir(cnsapp):
 			fn = getattr(cnsapp, mn)
 			if hasattr(fn, '__tool'):
-				self.subparsers.add_parser(mn, help=fn.__doc__)
-				self.subcommands[mn] = fn.im_func # Unbound method
+				subparser = self.subparsers.add_parser(mn, help=fn.__doc__)
+				if inspect.ismethod(fn):
+					self.subcommands[mn] = fn.im_func # Unbound method
+				elif inspect.isclass(fn):
+					# Initialize tool given by a class
+					toolobj = fn()
+					if hasattr(toolobj,'init_parser'):
+						toolobj.init_parser(cnsapp, subparser)
+					self.subcommands[mn] = toolobj
+
+				else:
+					raise RuntimeError("Unknown type of Ramona tool object: {0}".format(fn))
+
 			elif hasattr(fn, '__proxy_tool'):
 				self.subparsers.add_parser(mn, help=fn.__doc__)
 				# Not subcommand as proxy tools are handled prior argument parsing

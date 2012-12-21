@@ -1,4 +1,4 @@
-import sys, os, socket, errno, logging, time, json
+import sys, os, socket, errno, logging, time, json, inspect
 from ..config import config, read_config, config_files
 from ..utils import launch_server_daemonized
 from .. import cnscom, socketuri
@@ -196,7 +196,16 @@ def tool(fn):
 
 	Marks function object by '.__tool' attribute
 	'''
-	fn.__tool = fn.func_name
+
+	if inspect.isfunction(fn):
+		fn.__tool = fn.func_name
+
+	elif inspect.isclass(fn):
+		fn.__tool = fn.__name__
+
+	else:
+		raise RuntimeError("Unknown type decorated as Ramona tool: {0}".format(fn))
+
 	return fn
 
 #

@@ -39,6 +39,36 @@ Custom tools
 TODO
 
 
+Example of tool function:
+
+.. code-block:: python
+
+  class FooConsoleApp(ramona.console_app):
+
+  	@ramona.tool
+  	def mytool(self):
+  		'''This is help text of my tool'''
+  		...
+
+
+Example of tool class:
+
+.. code-block:: python
+
+  class FooConsoleApp(ramona.console_app):
+
+  	@ramona.tool
+  	class mytool(object):
+  		'''This is help text of my tool'''
+  	
+  		def init_parser(self, cnsapp, parser):
+			parser.description = '...'
+			parser.add_argument(...)
+  
+		def main(self, cnsapp, args):
+  			...
+
+
 Log scanning
 ------------
 

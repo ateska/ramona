@@ -4,12 +4,32 @@ import ramona
 
 class MyDemoConsoleApp(ramona.console_app):
 
+
 	@ramona.tool
 	def tool_demo(self):
 		'''Printing message about demo of custom ramona.tool'''
 		print "This is implementation of custom tool (see ./demo.sh --help)"
 		# Example how to access configuration from tool:
 		print "Value of env:RAMONADEMO = {0}".format(self.config.get("env", "RAMONADEMO"))
+
+
+	@ramona.tool
+	class tool_class_demo(object):
+		'''Demo of custom ramona.tool (class)'''
+
+		def init_parser(self, cnsapp, parser):
+			parser.description = 'You can use methods from argparse module of Python to customize tool (sub)parser.'
+			parser.add_argument('integers', metavar='N', type=int, nargs='+', 
+				help='an integer for the accumulator'
+			)
+			parser.add_argument('--sum', dest='accumulate', action='store_const',
+				const=sum, default=max,
+				help='sum the integers (default: find the max)'
+			)
+
+		def main(self, cnsapp, args):
+			print args.accumulate(args.integers)
+
 
 
 	@ramona.proxy_tool
