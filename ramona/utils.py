@@ -51,8 +51,10 @@ In comparison to launch_server() it returns.
 	from .config import config
 
 	logfname = config.get('ramona:server','log')
-	if logfname == '<logdir>':
-		logfname = os.path.join(config.get('general','logdir'), 'ramona.log')
+	if logfname.find('<logdir>') == 0:
+		lastfname = logfname[8:].strip().lstrip('/')
+		if len(lastfname) == 0: lastfname = 'ramona.log'
+		logfname = os.path.join(config.get('general','logdir'), lastfname)
 	elif logfname[:1] == '<':
 		L.error("Unknown log option in [server] section - server not started")
 		return

@@ -59,7 +59,7 @@ class _console_cmd(cmd.Cmd):
 		self.proxy_tool_set = set()
 		for mn in dir(cnsapp):
 			fn = getattr(cnsapp, mn)
-			if not hasattr(fn, 'proxy_tool'): continue
+			if not hasattr(fn, '__proxy_tool'): continue
 
 			self.proxy_tool_set.add(mn)
 			setattr(self.__class__, "do_{0}".format(mn), functools.partial(launch_proxy_tool, fn, mn))
@@ -104,7 +104,8 @@ class _console_cmd(cmd.Cmd):
 #
 
 def main(cnsapp, args):
-	L.info("Ramona console for {0}".format(config.get('general','appname'))) #TODO: Add version info
+	from ... import version as ramona_version
+	L.info("Ramona (version {0}) console for {1}".format(ramona_version, config.get('general','appname')))
 
 	histfile = config.get('ramona:console', 'history')
 	if histfile != '':

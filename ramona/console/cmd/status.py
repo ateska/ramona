@@ -55,6 +55,12 @@ def main(cnsapp, args):
 		t = sp.pop('exit_time', None)
 		if t is not None: details["exit_time"] = time.strftime("%d-%m-%Y %H:%M:%S",time.localtime(t))
 
+		# Format uptime
+		t = sp.pop('uptime', None)
+		if t is not None:
+			# TODO: Print pretty (e.g. uptime:2d 2h)
+			details['uptime'] = "{0:.2f}s".format(t)
+
 		state = sp.pop('state')
 		stlbl = cnscom.program_state_enum.labels.get(state, "({0})".format(state))
 

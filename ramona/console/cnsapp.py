@@ -1,4 +1,4 @@
-import sys, os, socket, errno, logging, time
+import sys, os, socket, errno, logging, time, json, inspect
 from ..config import config, read_config, config_files
 from ..utils import launch_server_daemonized
 from .. import cnscom, socketuri
@@ -14,6 +14,7 @@ L = logging.getLogger("cnsapp")
 class console_app(object):
 	'''
 Console application (base for custom implementations)
+@ivar config: Configuration dictionary linked from ramona.config (shortcut for ramona tool procedures)
 	'''
 
 	def __init__(self, configuration):
@@ -27,7 +28,7 @@ Console application (base for custom implementations)
 		if len(sys.argv) > 1:
 			for mn in dir(self):
 				fn = getattr(self, mn)
-				if not hasattr(fn, 'proxy_tool'): continue
+				if not hasattr(fn, '__proxy_tool'): continue
 				if mn == sys.argv[1]:
 					ret = fn(sys.argv[1:])
 					sys.exit(ret)
@@ -62,6 +63,8 @@ Console application (base for custom implementations)
 		except Exception, e:
 			print("{0}".format(e))
 			sys.exit(exception.configuration_error.exitcode)
+
+		self.config = config
 
 		# Configure logging
 		llvl = logging.INFO
@@ -109,7 +112,16 @@ Console application (base for custom implementations)
 				if e.errno == errno.ECONNREFUSED: return None
 				if e.errno == errno.ENOENT and self.cnsconuri.protocol == 'unix': return None
 				raise
-
+			
+			server_init_params_ret = cnscom.svrcall(self.ctlconsock, cnscom.callid_init, '')
+			server_init_params = json.loads(server_init_params_ret)
+			server_version = server_init_params.get("version", None)
+			if server_version is not None:
+				from .. import version as ramona_version
+				client_version = ramona_version
+				if server_version != client_version:
+					L.warn("Version mismatch. The server version '{0}' is different from the console version '{1}'. The console may malfunction.".format(server_version, client_version))
+			
 		return self.ctlconsock
 
 
@@ -181,8 +193,19 @@ Console application (base for custom implementations)
 def tool(fn):
 	'''
 	Tool decorator foc console_app
+
+	Marks function object by '.__tool' attribute
 	'''
-	fn.tool = fn.func_name
+
+	if inspect.isfunction(fn):
+		fn.__tool = fn.func_name
+
+	elif inspect.isclass(fn):
+		fn.__tool = fn.__name__
+
+	else:
+		raise RuntimeError("Unknown type decorated as Ramona tool: {0}".format(fn))
+
 	return fn
 
 #
@@ -190,6 +213,8 @@ def tool(fn):
 def proxy_tool(fn):
 	'''
 	Proxy tool (with straight argument passing) decorator foc console_app
+
+	Marks function object by '.__proxy_tool' attribute
 	'''
-	fn.proxy_tool = fn.func_name
+	fn.__proxy_tool = fn.func_name
 	return fn
