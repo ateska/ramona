@@ -22,6 +22,9 @@ Generic
 - Add support for [var] section - similar to [env] but in this case, values are not propagated into environment variables
 	Otherwise it remains complementary (useful for ${VAR} expressions on command-line).
 	Maybe this can be archived in a different (more elegant) way (e.g. not introduce [var]/[env] duality).
+- Better error message when directory of socket file does not exist: 
+    Current message when server starts: 2013-01-04 01:09:17,846 CRITICAL: It looks like that server is already running: [Errno 2] No such file or directory
+
 
 Logging
 -------
