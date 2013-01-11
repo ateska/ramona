@@ -24,7 +24,7 @@ Generic
 	Maybe this can be archived in a different (more elegant) way (e.g. not introduce [var]/[env] duality).
 - Better error message when directory of socket file does not exist: 
     Current message when server starts: 2013-01-04 01:09:17,846 CRITICAL: It looks like that server is already running: [Errno 2] No such file or directory
-
+- Explore eventuality of forking TTY when launching program: http://stackoverflow.com/questions/1922254/python-when-to-use-pty-fork-versus-os-fork
 
 Logging
 -------
