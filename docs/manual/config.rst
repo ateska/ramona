@@ -219,7 +219,7 @@ TODO
 
 .. attribute:: receiver
 
-  TODO
+  Default recipient of all notifications
 
 
 
@@ -311,12 +311,22 @@ TODO
 
 .. attribute:: logscan_stdout
 
-  TODO
+  Example:
+  
+  .. code-block:: ini
+  
+    logscan_stdout=error>now:foo2@bar.com,fatal>now,exception>now,warn>daily:foo3@bar.com
+   
+  The meaning is following:
+     - ``error>now:foo2@bar.com`` -- Whenever keyword *error* is found in the stdout, send an email immediatelly (now) to email address *foo2@bar.com*
+     - ``fatal>now`` -- Whenever keyword *fatal* is found in the stdout, send an email immediatelly (now) to the default nofitication recipient configured in ``[ramona:notify]`` > receiver_ configuration option
+     - ``exception>now`` -- same as fatal (above) just detecting different keyword (*exception*)
+     - ``warn>daily:foo3@bar.com`` -- Cummulate all the log messages containing the keyword *warn* and send them to address *foo3@bar.com* once a day.
 
 
 .. attribute:: logscan_stderr
 
-  TODO
+  Same as logscan_stdout_, just scanning stderr stream.
 
 
 .. _config-ramonahttpfend:
