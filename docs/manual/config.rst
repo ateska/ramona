@@ -221,6 +221,14 @@ TODO
 
   Default recipient of all notifications
 
+.. attribute:: dailyat
+
+  At what time the notifications should be used when ``daily`` period is used. The value is in the local timezone of your computer. Use the format ``HH:MM``
+
+  *Default*:  ``09:00``
+
+  *Required*:  No
+
 
 
 [program:X] section

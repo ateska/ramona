@@ -30,6 +30,7 @@ config_defaults = {
 	'ramona:notify' : {
 		'delivery': '',
 		'sender': '<user>',
+		'dailyat': '09:00'
 	},
 	'ramona:httpfend': {
 		'listenaddr': "tcp://localhost:5588",
