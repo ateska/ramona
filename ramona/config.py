@@ -86,7 +86,7 @@ def read_config(configs=None, use_env=True):
 			include = includes[i] = includes[i].strip()
 			if include == '<siteconf>':
 				# These are platform specific
-				siteconfs = ['./site.conf', '/etc/{0}.conf'.format(config.get('general','appname'))]
+				siteconfs = ['./site.conf','./{}-site.conf'.format(config.get('general','appname')), '/etc/{0}.conf'.format(config.get('general','appname'))]
 				includes[i:i+1] = siteconfs
 			elif include[:1] == '<':
 				L.warning('Unknown include fragment: {0}'.format(include))
