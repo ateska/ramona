@@ -1,7 +1,6 @@
 import re, collections, os, glob, weakref, logging, gzip
 from ..config import config
 from ..kmpsearch import kmp_search
-from ..cnscom import svrcall_error
 from .svrappsingl import get_svrapp
 
 ###
@@ -105,11 +104,11 @@ class log_mediator(object):
 				tail = ""
 				for i in range(-3,0):
 					try:
-						tail += self.tailbuf[i][0]
+						tail += self.tailbuf[i]
 					except IndexError:
 						pass
 				tail = tail[-2048:] # Limit result to 2kb of text
-
+				
 				svrapp = get_svrapp()
 				if svrapp is not None:
 					svrapp.notificator.publish(
@@ -249,7 +248,7 @@ class _log_scanner(kmp_search):
 
 	def __init__(self, prog_ident, stream_name, pattern, target):
 		kmp_search.__init__(self, pattern)
-		assert target in ('now','daily') or target.startswith('mailto:')
+		assert target.startswith(('now','daily'))
 		self.target = target
 		self.prog_ident = prog_ident
 		self.stream_name = stream_name

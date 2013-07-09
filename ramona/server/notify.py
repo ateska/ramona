@@ -21,7 +21,7 @@ class notificator(object):
 				L.error("{0}".format(e))
 				self.delivery = None
 
-			if delivery is not None:
+			if self.delivery is not None:
 				self.delivery.connection_test()
 
 
@@ -46,22 +46,27 @@ class notificator(object):
 		nfttext += tail	
 		nfttext += '\n'+'-'*50+'\n'
 
-		if target.startswith('mailto'):
-			recipient = urlparse.urlparse(target).path
-		else: 
-			recipient = None
-
+		targettime, _, recipient = target.partition(":")
+		if recipient == "":
+			# Take recipient from config
+			recipient = config.get("ramona:notify", "receiver")
+		
 		#TODO: Decide what to do based on 'target' value
 
-		self._send_mail('{0} / {1} / {2} / {3}'.format(
-				appname,
-				prog_ident,
-				pattern,
-				hostname,
-				), 
-			nfttext,
-			recipient
-		)
+		if targettime == "now":
+			self._send_mail('{0} / {1} / {2} / {3}'.format(
+					appname,
+					prog_ident,
+					pattern,
+					hostname,
+					), 
+				nfttext,
+				recipient
+			)
+		else:
+			L.warn("Target {} not implemented!".format(targettime))
+			# TODO: Put on stash and send at given time period
+			
 
 
 	def _send_mail(self, subject, text, recipient=None):
