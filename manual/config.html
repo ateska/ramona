@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -15,7 +13,7 @@
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
+        URL_ROOT:    './',
         VERSION:     '0.9 beta 8',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -56,9 +54,19 @@
 <p>Configuration is build the way that user program(s) can share the same configuration file(s) with Ramona system. Configuration is compatible with Python <a class="reference external" href="http://docs.python.org/library/configparser.html">ConfigParser</a>. These are basic configuration files that use structure similar to what you would find on Microsoft Windows INI files.</p>
 <div class="section" id="application-and-site-level-configuration">
 <h2>Application and site level configuration<a class="headerlink" href="#application-and-site-level-configuration" title="Permalink to this headline">¶</a></h2>
-<p>Ramona supports split of configuration options into <em>application</em> and <em>site</em> level configuration. In this concept application development team provides <em>application level configuration</em> as a part of source code and users are given an option to provide their own <em>site level configurations</em> that can override or enhance application level configurations.</p>
-<p>Practically application level configuration can specify file(s) to optionally include - these files can provide site level configuration.</p>
+<p>Ramona supports split of configuration options into <em>application</em> and <em>site</em> level configuration. In this concept, application development team provides <em>application level configuration</em> as a part of source code and users are given by an option to provide their own <em>site level configurations</em> that can override or enhance application level configurations.</p>
+<p>Both  <em>application</em> and <em>site</em> level configuration are supplied in form of files. Name (including full file path) of application level configuration file is provided by user application. Site configuration file name is derived based on table bellow.</p>
 <p>Application and site level configuration as syntactically equal.</p>
+<div class="section" id="site-config-file-names">
+<h3>Site config file names<a class="headerlink" href="#site-config-file-names" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>./site.conf</li>
+<li>./<em>[appname]</em>-site.conf</li>
+<li>/etc/<em>[appname]</em>.conf</li>
+</ul>
+<p>Placeholder <em>[appname]</em> is replaced by value given by <tt class="docutils literal"><span class="pre">[general]</span> <span class="pre">appname</span></tt> value (see <a class="reference internal" href="#appname" title="appname"><tt class="xref py py-attr docutils literal"><span class="pre">appname</span></tt></a> bellow).</p>
+<p>Relative path is evaluated from location of application main executable (e.g. containing <tt class="docutils literal"><span class="pre">ramona.console_app</span></tt>).</p>
+</div>
 </div>
 <div class="section" id="platform-selector">
 <h2>Platform selector<a class="headerlink" href="#platform-selector" title="Permalink to this headline">¶</a></h2>
@@ -106,8 +114,15 @@ Lowercase form is used.</p>
 <dl class="attribute">
 <dt id="appname">
 <tt class="descname">appname</tt><a class="headerlink" href="#appname" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
-<p>? Can I use whitespaces in the appname? (E.g. &#8216;Foo Bar App&#8217; or &#8216;foobarapp&#8217;)</p>
+<dd><p>Specifies name of application.</p>
+<p>Use of whitespaces is discourages (although possible). This value can become part of various file names, therefore it needs to respect syntax of file path and name.</p>
+<p><em>Type</em>: string</p>
+<p><em>Required</em>: Yes</p>
+<p>Example:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[general]</span>
+<span class="na">appname</span><span class="o">=</span><span class="s">foobarapp</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="attribute">
@@ -249,7 +264,15 @@ You can use environment variables in form of ${var-name}.</p>
 <dl class="attribute">
 <dt id="receiver">
 <tt class="descname">receiver</tt><a class="headerlink" href="#receiver" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dd><p>Default recipient of all notifications</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dailyat">
+<tt class="descname">dailyat</tt><a class="headerlink" href="#dailyat" title="Permalink to this definition">¶</a></dt>
+<dd><p>At what time the notifications should be used when <tt class="docutils literal"><span class="pre">daily</span></tt> period is used. The value is in the local timezone of your computer. Use the format <tt class="docutils literal"><span class="pre">HH:MM</span></tt></p>
+<p><em>Default</em>:  <tt class="docutils literal"><span class="pre">09:00</span></tt></p>
+<p><em>Required</em>:  No</p>
 </dd></dl>
 
 </div>
@@ -351,13 +374,26 @@ TODO</p>
 <dl class="attribute">
 <dt id="logscan_stdout">
 <tt class="descname">logscan_stdout</tt><a class="headerlink" href="#logscan_stdout" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dd><p>Example:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="na">logscan_stdout</span><span class="o">=</span><span class="s">error&gt;now:foo2@bar.com,fatal&gt;now,exception&gt;now,warn&gt;daily:foo3@bar.com</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>The meaning is following:</dt>
+<dd><ul class="first last simple">
+<li><tt class="docutils literal"><span class="pre">error&gt;now:foo2&#64;bar.com</span></tt> &#8211; Whenever keyword <em>error</em> is found in the stdout, send an email immediatelly (now) to email address <em>foo2&#64;bar.com</em></li>
+<li><tt class="docutils literal"><span class="pre">fatal&gt;now</span></tt> &#8211; Whenever keyword <em>fatal</em> is found in the stdout, send an email immediatelly (now) to the default nofitication recipient configured in <tt class="docutils literal"><span class="pre">[ramona:notify]</span></tt> &gt; <a class="reference internal" href="#receiver">receiver</a> configuration option</li>
+<li><tt class="docutils literal"><span class="pre">exception&gt;now</span></tt> &#8211; same as fatal (above) just detecting different keyword (<em>exception</em>)</li>
+<li><tt class="docutils literal"><span class="pre">warn&gt;daily:foo3&#64;bar.com</span></tt> &#8211; Cummulate all the log messages containing the keyword <em>warn</em> and send them to address <em>foo3&#64;bar.com</em> once a day.</li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="logscan_stderr">
 <tt class="descname">logscan_stderr</tt><a class="headerlink" href="#logscan_stderr" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dd><p>Same as <a class="reference internal" href="#logscan_stdout">logscan_stdout</a>, just scanning stderr stream.</p>
 </dd></dl>
 
 </div>
@@ -437,7 +473,10 @@ you can use the following command (works on Linux):</p>
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Configuration</a><ul>
-<li><a class="reference internal" href="#application-and-site-level-configuration">Application and site level configuration</a></li>
+<li><a class="reference internal" href="#application-and-site-level-configuration">Application and site level configuration</a><ul>
+<li><a class="reference internal" href="#site-config-file-names">Site config file names</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#platform-selector">Platform selector</a></li>
 <li><a class="reference internal" href="#general-section">[general] section</a></li>
 <li><a class="reference internal" href="#env-section">[env] section</a></li>
@@ -495,7 +534,7 @@ you can use the following command (works on Linux):</p>
 
     <div class="footer">
         &copy; Copyright 2012, Ales Teska.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
 <script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
