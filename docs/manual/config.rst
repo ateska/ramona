@@ -8,11 +8,22 @@ Configuration is build the way that user program(s) can share the same configura
 Application and site level configuration
 ----------------------------------------
 
-Ramona supports split of configuration options into *application* and *site* level configuration. In this concept application development team provides *application level configuration* as a part of source code and users are given an option to provide their own *site level configurations* that can override or enhance application level configurations.
+Ramona supports split of configuration options into *application* and *site* level configuration. In this concept, application development team provides *application level configuration* as a part of source code and users are given by an option to provide their own *site level configurations* that can override or enhance application level configurations.
 
-Practically application level configuration can specify file(s) to optionally include - these files can provide site level configuration.
+Both  *application* and *site* level configuration are supplied in form of files. Name (including full file path) of application level configuration file is provided by user application. Site configuration file name is derived based on table bellow.
 
 Application and site level configuration as syntactically equal.
+
+
+Site config file names
+^^^^^^^^^^^^^^^^^^^^^^
+* ./site.conf
+* ./*[appname]*-site.conf
+* /etc/*[appname]*.conf
+
+Placeholder *[appname]* is replaced by value given by ``[general] appname`` value (see :attr:`appname` bellow).
+
+Relative path is evaluated from location of application main executable (e.g. containing ``ramona.console_app``).
 
 
 Platform selector
@@ -52,9 +63,21 @@ TODO
 
 .. attribute:: appname
 
-  TODO
+  Specifies name of application.
 
-  ? Can I use whitespaces in the appname? (E.g. 'Foo Bar App' or 'foobarapp')
+  Use of whitespaces is discourages (although possible). This value can become part of various file names, therefore it needs to respect syntax of file path and name.
+
+
+  *Type*: string
+
+  *Required*: Yes
+
+  Example:
+
+  .. code-block:: ini
+
+    [general]
+    appname=foobarapp
 
 
 .. attribute:: include
