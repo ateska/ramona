@@ -96,6 +96,13 @@ def parse_signals(signals):
 		ret.append(signum)
 	return ret
 
+
+def get_signal_name(signum):
+	sigdict = dict((num, name) for name, num in signal.__dict__.iteritems() if name.startswith('SIG') and not name.startswith('SIG_'))
+	ret = sigdict.get(signum)
+	if ret is None: ret = "SIG({})".format(str(signum))
+	return ret
+
 ###
 
 def close_fds():
