@@ -1,7 +1,7 @@
 import sys, os, time, logging, shlex, signal, subprocess, errno
 import pyev
 from ..config import config, get_boolean
-from ..utils import parse_signals, close_fds, expandvars, enable_nonblocking, disable_nonblocking, get_python_exec
+from ..utils import parse_signals, close_fds, expandvars, enable_nonblocking, disable_nonblocking, get_python_exec, get_signal_name
 from ..cnscom import program_state_enum, svrcall_error
 from .logmed import log_mediator
 
@@ -241,7 +241,12 @@ class program(object):
 
 
 	def __repr__(self):
-		return "<{0} {1} state={2} pid={3}>".format(self.__class__.__name__, self.ident, program_state_enum.labels[self.state],self.subproc.pid if self.subproc is not None else '?')
+		ret = "<{0} {1} state={2}".format(self.__class__.__name__, self.ident, program_state_enum.labels[self.state])
+		if self.subproc is not None:
+			ret +=  ' pid={}'.format(self.subproc.pid)
+		if self.exit_status is not None:
+			ret +=  ' exit_status={}'.format(self.exit_status)
+		return ret+'>'
 
 
 	def start(self, reset_autorestart_cnt=True):
@@ -353,7 +358,17 @@ class program(object):
 
 	def on_terminate(self, status):
 		self.exit_time = time.time()
-		self.exit_status = status
+
+		# Evaluate exit status
+		if sys.platform == 'win32':
+			self.exit_status = status
+		elif os.WIFSIGNALED(status):
+			self.exit_status = get_signal_name(os.WTERMSIG(status))
+		elif os.WIFEXITED(status):
+			self.exit_status = os.WEXITSTATUS(status)
+		else:
+			self.exit_status = "?"
+
 
 		# Close process stdout and stderr pipes (including vacuum of actual content)
 		if sys.platform != 'win32':
@@ -397,30 +412,31 @@ class program(object):
 		self.subproc = None
 
 		# Close log files
-		self.log_err.write("\n-=[ EXITED on {0} with status {1} ]=-\n".format(time.strftime("%Y-%m-%d %H:%M:%S"), status))
+
+		self.log_err.write("\n-=[ EXITED on {0} {1} ]=-\n".format(time.strftime("%Y-%m-%d %H:%M:%S"), self.exit_status))
 		self.log_out.close()
 		self.log_err.close()
 
 		# Handle state change properly
 		if self.state == program_state_enum.STARTING:
-			Lmy.error("{0} exited too quickly (now in FATAL state)".format(self.ident))
+			Lmy.error("{0} exited too quickly (exit_status:{1}, now in FATAL state)".format(self.ident, self.exit_status))
 			L.error("{0} exited too quickly -> FATAL".format(self))
 			self.state = program_state_enum.FATAL
 
 		elif self.state == program_state_enum.STOPPING:
-			Lmy.info("{0} is now STOPPED".format(self.ident))
+			Lmy.info("{0} is now STOPPED (exit_status:{1})".format(self.ident, self.exit_status))
 			L.debug("{0} -> STOPPED".format(self))
 			self.state = program_state_enum.STOPPED
 
 		else:
 			if self.autorestart:
-				Lmy.error("{0} exited unexpectedly and going to be restarted".format(self.ident))
+				Lmy.error("{0} exited unexpectedly and going to be restarted (exit_status:{1})".format(self.ident, self.exit_status))
 				L.error("{0} exited unexpectedly -> FATAL -> autorestart".format(self))
 				self.state = program_state_enum.FATAL
 				self.autorestart_cnt += 1
 				self.start(reset_autorestart_cnt=False)
 			else:
-				Lmy.error("{0} exited unexpectedly (now in FATAL state)".format(self.ident))
+				Lmy.error("{0} exited unexpectedly (exit_status:{1}, now in FATAL state)".format(self.ident, self.exit_status))
 				L.error("{0} exited unexpectedly -> FATAL".format(self))
 				self.state = program_state_enum.FATAL
 
