@@ -32,7 +32,7 @@ Ramona provides command-line console, a tool that allows interaction with Ramona
 
 This approach simplifies maintenance of the application and allow easy operating of even complex applications consisting of many different programs.
 
-User can also add their custom commands (see *custom tools* bellow) to cover all needs of its application.
+User can also add their custom commands (see `custom tools`_) to cover all needs of its application.
 
 
 Logging and log scanning
