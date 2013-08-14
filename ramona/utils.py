@@ -20,8 +20,8 @@ All file descriptors above 2 are closed.
 	if server_only: assert (programs is None or len(programs) == 0)
 
 	# Prepare environment variable RAMONA_CONFIG
-	from .config import config_files, config_includes
-	os.environ['RAMONA_CONFIG'] = ';'.join(config_files + config_includes)
+	from .config import config_files
+	os.environ['RAMONA_CONFIG'] = ';'.join(config_files)
 
 	# Prepare command line
 	cmdline = ["-m", "ramona.server"]
