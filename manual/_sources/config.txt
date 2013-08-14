@@ -143,11 +143,11 @@ TODO
 .. attribute:: consoleuri
 
   One or multiple 'socket URIs' specifying where Ramona server should listen for console connections.
-  You can specify more network interfaces, protocols or ports, URIs are comma-separated. It should be synchronized with [ramona:console] option serveruri (where configuration of client side is specified), otherwise console connection fails.
+  You can specify more network interfaces, protocols or ports, URIs are comma-separated. It should be synchronized with ``[ramona:console]`` :attr:`serveruri` option where configuration of Ramona client is specified, otherwise console connection fails.
 
   Supported connection variants:
 
-  - UNIX sockets
+  - UNIX sockets (where available)
   
     - optional parameter 'mode' specifies UNIX file permissions for created socket file system entry (in octal representation)
 
@@ -155,6 +155,8 @@ TODO
   - TCP IPv6
 
   *Default*: ``unix://.ramona.sock``
+
+  *Default on Windows*: ``tcp://localhost:7788``
 
   *Required*: Yes (but default will work)
 
@@ -222,6 +224,59 @@ TODO
 
   TODO
 
+
+[ramona:console] section
+------------------------
+
+This section contains configuration used by Ramona console.
+
+
+.. attribute:: serveruri
+
+  One 'socket URIs' specifying Ramona server connection where Ramona console should connect to.
+  It should be synchronized with ``[ramona:server]`` :attr:`consoleuri` option where relevant configuration of Ramona server is specified, otherwise console connection fails.
+
+  Supported connection variants:
+
+  - TCP IPv4
+  - TCP IPv6
+  - UNIX sockets (where available)
+
+  *Default*: ``unix://.ramona.sock``
+
+  *Default on Windows*: ``tcp://localhost:7788``
+
+  *Required*: Yes (but default will work)
+
+  Example:
+
+  .. code-block:: ini
+
+    [ramona:console]
+    serveruri=unix:///tmp/demoramona.sock
+
+
+
+.. attribute:: history
+
+  Specifies the location of a command history file that will be used by Ramona console to store commands issued by its user.
+  It allows users to use cursor keys to navigate up and down through the history list and re-use commands found there.
+  History list is persistent and is available across program restarts.
+
+  Generic description of command history feature can be found here: http://en.wikipedia.org/wiki/Command_history
+
+  Empty configuration value disables history function completely.
+
+  *Default*: (command history disabled)
+
+  *Required*: No
+
+  Example:
+
+  .. code-block:: ini
+
+    [ramona:console]
+    history=./.appcmdhistory
 
 
 [ramona:notify] section

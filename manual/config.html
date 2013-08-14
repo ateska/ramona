@@ -180,10 +180,10 @@ using gzip compression.</p>
 <dt id="consoleuri">
 <tt class="descname">consoleuri</tt><a class="headerlink" href="#consoleuri" title="Permalink to this definition">¶</a></dt>
 <dd><p>One or multiple &#8216;socket URIs&#8217; specifying where Ramona server should listen for console connections.
-You can specify more network interfaces, protocols or ports, URIs are comma-separated. It should be synchronized with [ramona:console] option serveruri (where configuration of client side is specified), otherwise console connection fails.</p>
+You can specify more network interfaces, protocols or ports, URIs are comma-separated. It should be synchronized with <tt class="docutils literal"><span class="pre">[ramona:console]</span></tt> <a class="reference internal" href="#serveruri" title="serveruri"><tt class="xref py py-attr docutils literal"><span class="pre">serveruri</span></tt></a> option where configuration of Ramona client is specified, otherwise console connection fails.</p>
 <p>Supported connection variants:</p>
 <ul class="simple">
-<li>UNIX sockets<ul>
+<li>UNIX sockets (where available)<ul>
 <li>optional parameter &#8216;mode&#8217; specifies UNIX file permissions for created socket file system entry (in octal representation)</li>
 </ul>
 </li>
@@ -191,6 +191,7 @@ You can specify more network interfaces, protocols or ports, URIs are comma-sepa
 <li>TCP IPv6</li>
 </ul>
 <p><em>Default</em>: <tt class="docutils literal"><span class="pre">unix://.ramona.sock</span></tt></p>
+<p><em>Default on Windows</em>: <tt class="docutils literal"><span class="pre">tcp://localhost:7788</span></tt></p>
 <p><em>Required</em>: Yes (but default will work)</p>
 <p>Example:</p>
 <div class="highlight-ini"><div class="highlight"><pre><span class="k">[ramona:server]</span>
@@ -243,6 +244,48 @@ You can use environment variables in form of ${var-name}.</p>
 <dt id="loglevel">
 <tt class="descname">loglevel</tt><a class="headerlink" href="#loglevel" title="Permalink to this definition">¶</a></dt>
 <dd><p>TODO</p>
+</dd></dl>
+
+</div>
+<div class="section" id="ramona-console-section">
+<h2>[ramona:console] section<a class="headerlink" href="#ramona-console-section" title="Permalink to this headline">¶</a></h2>
+<p>This section contains configuration used by Ramona console.</p>
+<dl class="attribute">
+<dt id="serveruri">
+<tt class="descname">serveruri</tt><a class="headerlink" href="#serveruri" title="Permalink to this definition">¶</a></dt>
+<dd><p>One &#8216;socket URIs&#8217; specifying Ramona server connection where Ramona console should connect to.
+It should be synchronized with <tt class="docutils literal"><span class="pre">[ramona:server]</span></tt> <a class="reference internal" href="#consoleuri" title="consoleuri"><tt class="xref py py-attr docutils literal"><span class="pre">consoleuri</span></tt></a> option where relevant configuration of Ramona server is specified, otherwise console connection fails.</p>
+<p>Supported connection variants:</p>
+<ul class="simple">
+<li>TCP IPv4</li>
+<li>TCP IPv6</li>
+<li>UNIX sockets (where available)</li>
+</ul>
+<p><em>Default</em>: <tt class="docutils literal"><span class="pre">unix://.ramona.sock</span></tt></p>
+<p><em>Default on Windows</em>: <tt class="docutils literal"><span class="pre">tcp://localhost:7788</span></tt></p>
+<p><em>Required</em>: Yes (but default will work)</p>
+<p>Example:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[ramona:console]</span>
+<span class="na">serveruri</span><span class="o">=</span><span class="s">unix:///tmp/demoramona.sock</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="history">
+<tt class="descname">history</tt><a class="headerlink" href="#history" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specifies the location of a command history file that will be used by Ramona console to store commands issued by its user.
+It allows users to use cursor keys to navigate up and down through the history list and re-use commands found there.
+History list is persistent and is available across program restarts.</p>
+<p>Generic description of command history feature can be found here: <a class="reference external" href="http://en.wikipedia.org/wiki/Command_history">http://en.wikipedia.org/wiki/Command_history</a></p>
+<p>Empty configuration value disables history function completely.</p>
+<p><em>Default</em>: (command history disabled)</p>
+<p><em>Required</em>: No</p>
+<p>Example:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[ramona:console]</span>
+<span class="na">history</span><span class="o">=</span><span class="s">./.appcmdhistory</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </div>
@@ -481,6 +524,7 @@ you can use the following command (works on Linux):</p>
 <li><a class="reference internal" href="#general-section">[general] section</a></li>
 <li><a class="reference internal" href="#env-section">[env] section</a></li>
 <li><a class="reference internal" href="#ramona-server-section">[ramona:server] section</a></li>
+<li><a class="reference internal" href="#ramona-console-section">[ramona:console] section</a></li>
 <li><a class="reference internal" href="#ramona-notify-section">[ramona:notify] section</a></li>
 <li><a class="reference internal" href="#program-x-section">[program:X] section</a></li>
 <li><a class="reference internal" href="#program-ramonahttpfend">[program:ramonahttpfend]</a></li>
