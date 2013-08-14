@@ -84,7 +84,7 @@ def read_config(configs=None, use_env=True):
 		# Configs from environment variables
 		config_envs = os.environ.get('RAMONA_CONFIG')
 		if config_envs is not None:
-			for config_file in config_envs.split(';'):
+			for config_file in config_envs.split(os.pathsep):
 				configs.append(config_file)
 
 	for cfile in configs:
