@@ -12,7 +12,10 @@ Ramona supports split of configuration options into *application* and *site* lev
 
 Both  *application* and *site* level configuration are supplied in form of files. Name (including full file path) of application level configuration file is provided by user application. Site configuration file name is derived based on table bellow.
 
-Application and site level configuration as syntactically equal.
+Application and site level configuration as syntactically equal. Its structure is similar to what you would find on Microsoft Windows INI files (however they are not the same).
+
+.. note::
+  Configuration files are are compatible with Python Standart Library ``ConfigParser`` module.
 
 
 Site config file names
@@ -29,17 +32,11 @@ Relative path is evaluated from location of application main executable (e.g. co
 Platform selector
 -----------------
 
-TODO
+Sometimes you wish to have different configurations for different platforms (basically OSes).
+This is possible thru *platform selector* postfix mechanism that is provided by Ramona.
+You can define platform-specific values optinally together with generic ones. In such a case, matching platform value is used instead of generic option.
 
-Syntax is ``option@selector``.
-
-Example:
-
-.. code-block:: ini
-
-  [program:foolinux]
-  disabled@windows=True
-
+Syntax is ``option@selector=value``.
 
 List of selectors:
 
@@ -53,6 +50,20 @@ List of selectors:
 
 .. note:: Platform names are based on Python ``platform.system()`` call.
   Lowercase form is used.
+
+Examples:
+
+.. code-block:: ini
+
+  [program:ping]
+  cmd=/sbin/ping
+  cmd@windows=C:\Windows\System32\ping.exe
+
+
+.. code-block:: ini
+
+  [program:foolinux]
+  disabled@windows=True
 
 
 [general] section
