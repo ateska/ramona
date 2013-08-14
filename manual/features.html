@@ -106,20 +106,41 @@ Program life cycle (statuses)</p>
 </div>
 <div class="section" id="ramona-environment-variables">
 <h2>Ramona environment variables<a class="headerlink" href="#ramona-environment-variables" title="Permalink to this headline">¶</a></h2>
-<p>TODO</p>
+<p>Ramona sets following environment variables to propagate certain information to programs, that are launched as Ramona subprocesses.
+This allows exchange of configuration information in a control way, helping to keep overall configuration nice and tidy.</p>
 <dl class="attribute">
 <dt id="RAMONA_CONFIG">
 <tt class="descname">RAMONA_CONFIG</tt><a class="headerlink" href="#RAMONA_CONFIG" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
-<p>Separator is &#8216;;&#8217;</p>
+<dd><p>This environment variable specifies list of configuration files that has been used to configure Ramona server.
+List is ordered (configuration values can overlap so correct override behaviour needs to be maintained) and its separator is &#8216;:&#8217; for POSIX or &#8216;;&#8217; for Windows. See <tt class="docutils literal"><span class="pre">os.pathsep</span></tt> in Python.</p>
+<p>Client application can use this variable to read configuration from same place(s) as Ramona did.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="RAMONA_SECTION">
 <tt class="descname">RAMONA_SECTION</tt><a class="headerlink" href="#RAMONA_SECTION" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dd><p>This environment variable reflect name of section in Ramona configuration files that in relevant for actual program (subprocess of Ramona). Uses can use this value to reach program specific configuration options.</p>
 </dd></dl>
 
+<p>Example:</p>
+<blockquote>
+<div><div class="highlight-ini"><div class="highlight"><pre><span class="k">[program:envdump]</span>
+<span class="na">command</span><span class="o">=</span><span class="s">bash -c &quot;echo RAMONA_CONFIG: ${RAMONA_CONFIG}; echo RAMONA_SECTION: ${RAMONA_SECTION}&quot;</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>This produces following output:</p>
+<blockquote>
+<div><div class="highlight-console"><div class="highlight"><pre><span class="go">RAMONA_CONFIG: ./test.conf</span>
+<span class="go">RAMONA_SECTION: program:envdump</span>
+</pre></div>
+</div>
+</div></blockquote>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Configuration files are compatible with Python Standart Library <tt class="docutils literal"><span class="pre">ConfigParser</span></tt> module.
+You can read configuration files using this module in order given by <tt class="docutils literal"><span class="pre">RAMONA_CONFIG</span></tt> environment variable and access configuration values. You can use <tt class="docutils literal"><span class="pre">RAMONA_SECTION</span></tt> environment variable to identify section in configuration files that is relevant to your actual program.</p>
+</div>
 </div>
 <div class="section" id="http-front-end-web-console">
 <h2>HTTP front end (Web console)<a class="headerlink" href="#http-front-end-web-console" title="Permalink to this headline">¶</a></h2>

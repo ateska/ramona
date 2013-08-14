@@ -5,6 +5,7 @@ Configuration is build the way that user program(s) can share the same configura
 
 .. _ConfigParser : http://docs.python.org/library/configparser.html
 
+
 Application and site level configuration
 ----------------------------------------
 
@@ -12,34 +13,19 @@ Ramona supports split of configuration options into *application* and *site* lev
 
 Both  *application* and *site* level configuration are supplied in form of files. Name (including full file path) of application level configuration file is provided by user application. Site configuration file name is derived based on table bellow.
 
-Application and site level configuration as syntactically equal.
+*Application* and *site* level configuration as syntactically equal. 
 
-
-Site config file names
-^^^^^^^^^^^^^^^^^^^^^^
-* ./site.conf
-* ./*[appname]*-site.conf
-* /etc/*[appname]*.conf
-
-Placeholder *[appname]* is replaced by value given by ``[general] appname`` value (see :attr:`appname` bellow).
-
-Relative path is evaluated from location of application main executable (e.g. containing ``ramona.console_app``).
+See ``[general]`` :attr:`include` *<siteconf>* option for implementation details.
 
 
 Platform selector
 -----------------
 
-TODO
+Sometimes you wish to have different configurations for different platforms (basically OSes).
+This is possible thru *platform selector* postfix mechanism that is provided by Ramona.
+You can define platform-specific values optinally together with generic ones. In such a case, matching platform value is used instead of generic option.
 
-Syntax is ``option@selector``.
-
-Example:
-
-.. code-block:: ini
-
-  [program:foolinux]
-  disabled@windows=True
-
+Syntax is ``option@selector=value``.
 
 List of selectors:
 
@@ -54,11 +40,25 @@ List of selectors:
 .. note:: Platform names are based on Python ``platform.system()`` call.
   Lowercase form is used.
 
+Examples:
+
+.. code-block:: ini
+
+  [program:ping]
+  cmd=/sbin/ping
+  cmd@windows=C:\Windows\System32\ping.exe
+
+
+.. code-block:: ini
+
+  [program:foolinux]
+  disabled@windows=True
+
 
 [general] section
 -----------------
 
-TODO
+This section provides general configuration of Ramona-equiped application.
 
 
 .. attribute:: appname
@@ -82,9 +82,35 @@ TODO
 
 .. attribute:: include
 
-  TODO
+  Ordered list of configuration files that should be loaded by Ramona. Separator of individual list items in this list is ';'.
 
-Separator is ';'
+  Magic value ``<siteconf>`` is expanded to following site level configuration file names:
+
+    * ./site.conf
+    * ./[appname]-site.conf
+    * /etc/[appname].conf
+    * ~/.[appname].conf
+
+    Placeholder *[appname]* is expanded to value of ``[general]`` :attr:`appname` option.
+    Relative path is evaluated from location of application main executable (e.g. containing ``ramona.console_app``).
+
+
+  *Default*: ``<siteconf>``
+
+  *Required*: No
+
+  Example:
+
+  .. code-block:: ini
+
+    [general]
+    include=<siteconf>
+
+
+  .. code-block:: ini
+
+    [general]
+    include=/etc/foo.conf;/etc/bar.conf
 
 
 .. attribute:: logdir

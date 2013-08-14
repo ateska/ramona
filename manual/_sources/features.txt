@@ -78,18 +78,41 @@ TODO
 Ramona environment variables
 ----------------------------
 
-TODO
+Ramona sets following environment variables to propagate certain information to programs, that are launched as Ramona subprocesses.
+This allows exchange of configuration information in a control way, helping to keep overall configuration nice and tidy.
 
 .. attribute:: RAMONA_CONFIG
 
-  TODO
+  This environment variable specifies list of configuration files that has been used to configure Ramona server.
+  List is ordered (configuration values can overlap so correct override behaviour needs to be maintained) and its separator is ':' for POSIX or ';' for Windows. See ``os.pathsep`` in Python.
 
-  Separator is ';'
+  Client application can use this variable to read configuration from same place(s) as Ramona did.
 
 
 .. attribute:: RAMONA_SECTION
 
-  TODO
+  This environment variable reflect name of section in Ramona configuration files that in relevant for actual program (subprocess of Ramona). Uses can use this value to reach program specific configuration options.
+
+
+Example:
+
+  .. code-block:: ini
+
+    [program:envdump]
+    command=bash -c "echo RAMONA_CONFIG: ${RAMONA_CONFIG}; echo RAMONA_SECTION: ${RAMONA_SECTION}"
+
+
+This produces following output:
+
+  .. code-block:: console
+
+    RAMONA_CONFIG: ./test.conf
+    RAMONA_SECTION: program:envdump
+
+.. note::
+
+  Configuration files are compatible with Python Standart Library ``ConfigParser`` module.
+  You can read configuration files using this module in order given by ``RAMONA_CONFIG`` environment variable and access configuration values. You can use ``RAMONA_SECTION`` environment variable to identify section in configuration files that is relevant to your actual program.
 
 
 HTTP front end (Web console)

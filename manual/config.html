@@ -56,27 +56,15 @@
 <h2>Application and site level configuration<a class="headerlink" href="#application-and-site-level-configuration" title="Permalink to this headline">¶</a></h2>
 <p>Ramona supports split of configuration options into <em>application</em> and <em>site</em> level configuration. In this concept, application development team provides <em>application level configuration</em> as a part of source code and users are given by an option to provide their own <em>site level configurations</em> that can override or enhance application level configurations.</p>
 <p>Both  <em>application</em> and <em>site</em> level configuration are supplied in form of files. Name (including full file path) of application level configuration file is provided by user application. Site configuration file name is derived based on table bellow.</p>
-<p>Application and site level configuration as syntactically equal.</p>
-<div class="section" id="site-config-file-names">
-<h3>Site config file names<a class="headerlink" href="#site-config-file-names" title="Permalink to this headline">¶</a></h3>
-<ul class="simple">
-<li>./site.conf</li>
-<li>./<em>[appname]</em>-site.conf</li>
-<li>/etc/<em>[appname]</em>.conf</li>
-</ul>
-<p>Placeholder <em>[appname]</em> is replaced by value given by <tt class="docutils literal"><span class="pre">[general]</span> <span class="pre">appname</span></tt> value (see <a class="reference internal" href="#appname" title="appname"><tt class="xref py py-attr docutils literal"><span class="pre">appname</span></tt></a> bellow).</p>
-<p>Relative path is evaluated from location of application main executable (e.g. containing <tt class="docutils literal"><span class="pre">ramona.console_app</span></tt>).</p>
-</div>
+<p><em>Application</em> and <em>site</em> level configuration as syntactically equal.</p>
+<p>See <tt class="docutils literal"><span class="pre">[general]</span></tt> <a class="reference internal" href="#include" title="include"><tt class="xref py py-attr docutils literal"><span class="pre">include</span></tt></a> <em>&lt;siteconf&gt;</em> option for implementation details.</p>
 </div>
 <div class="section" id="platform-selector">
 <h2>Platform selector<a class="headerlink" href="#platform-selector" title="Permalink to this headline">¶</a></h2>
-<p>TODO</p>
-<p>Syntax is <tt class="docutils literal"><span class="pre">option&#64;selector</span></tt>.</p>
-<p>Example:</p>
-<div class="highlight-ini"><div class="highlight"><pre><span class="k">[program:foolinux]</span>
-<span class="na">disabled@windows</span><span class="o">=</span><span class="s">True</span>
-</pre></div>
-</div>
+<p>Sometimes you wish to have different configurations for different platforms (basically OSes).
+This is possible thru <em>platform selector</em> postfix mechanism that is provided by Ramona.
+You can define platform-specific values optinally together with generic ones. In such a case, matching platform value is used instead of generic option.</p>
+<p>Syntax is <tt class="docutils literal"><span class="pre">option&#64;selector=value</span></tt>.</p>
 <p>List of selectors:</p>
 <blockquote>
 <div><table border="1" class="docutils">
@@ -107,10 +95,20 @@
 <p class="last">Platform names are based on Python <tt class="docutils literal"><span class="pre">platform.system()</span></tt> call.
 Lowercase form is used.</p>
 </div>
+<p>Examples:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[program:ping]</span>
+<span class="na">cmd</span><span class="o">=</span><span class="s">/sbin/ping</span>
+<span class="na">cmd@windows</span><span class="o">=</span><span class="s">C:\Windows\System32\ping.exe</span>
+</pre></div>
+</div>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[program:foolinux]</span>
+<span class="na">disabled@windows</span><span class="o">=</span><span class="s">True</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="general-section">
 <h2>[general] section<a class="headerlink" href="#general-section" title="Permalink to this headline">¶</a></h2>
-<p>TODO</p>
+<p>This section provides general configuration of Ramona-equiped application.</p>
 <dl class="attribute">
 <dt id="appname">
 <tt class="descname">appname</tt><a class="headerlink" href="#appname" title="Permalink to this definition">¶</a></dt>
@@ -128,10 +126,31 @@ Lowercase form is used.</p>
 <dl class="attribute">
 <dt id="include">
 <tt class="descname">include</tt><a class="headerlink" href="#include" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dd><p>Ordered list of configuration files that should be loaded by Ramona. Separator of individual list items in this list is &#8216;;&#8217;.</p>
+<p>Magic value <tt class="docutils literal"><span class="pre">&lt;siteconf&gt;</span></tt> is expanded to following site level configuration file names:</p>
+<blockquote>
+<div><ul class="simple">
+<li>./site.conf</li>
+<li>./[appname]-site.conf</li>
+<li>/etc/[appname].conf</li>
+<li>~/.[appname].conf</li>
+</ul>
+<p>Placeholder <em>[appname]</em> is expanded to value of <tt class="docutils literal"><span class="pre">[general]</span></tt> <a class="reference internal" href="#appname" title="appname"><tt class="xref py py-attr docutils literal"><span class="pre">appname</span></tt></a> option.
+Relative path is evaluated from location of application main executable (e.g. containing <tt class="docutils literal"><span class="pre">ramona.console_app</span></tt>).</p>
+</div></blockquote>
+<p><em>Default</em>: <tt class="docutils literal"><span class="pre">&lt;siteconf&gt;</span></tt></p>
+<p><em>Required</em>: No</p>
+<p>Example:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[general]</span>
+<span class="na">include</span><span class="o">=</span><span class="s">&lt;siteconf&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[general]</span>
+<span class="na">include</span><span class="o">=</span><span class="s">/etc/foo.conf;/etc/bar.conf</span>
+</pre></div>
+</div>
 </dd></dl>
 
-<p>Separator is &#8216;;&#8217;</p>
 <dl class="attribute">
 <dt id="logdir">
 <tt class="descname">logdir</tt><a class="headerlink" href="#logdir" title="Permalink to this definition">¶</a></dt>
@@ -516,10 +535,7 @@ you can use the following command (works on Linux):</p>
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Configuration</a><ul>
-<li><a class="reference internal" href="#application-and-site-level-configuration">Application and site level configuration</a><ul>
-<li><a class="reference internal" href="#site-config-file-names">Site config file names</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#application-and-site-level-configuration">Application and site level configuration</a></li>
 <li><a class="reference internal" href="#platform-selector">Platform selector</a></li>
 <li><a class="reference internal" href="#general-section">[general] section</a></li>
 <li><a class="reference internal" href="#env-section">[env] section</a></li>
