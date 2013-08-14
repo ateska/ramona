@@ -88,11 +88,14 @@ def read_config(configs=None, use_env=True):
 				configs.append(config_file)
 
 	for cfile in configs:
-		if os.path.isfile(cfile):
+		rfile = os.path.expanduser(cfile)
+		if os.path.isfile(rfile):
 			config_files.append(cfile)
-		config.read([cfile])
+		config.read([rfile])
+
 
 	# Handle includes ...
+	appname = config.get('general','appname')
 	for _ in range(100):
 		includes = config.get('general','include')
 		if includes == '': break
@@ -102,16 +105,22 @@ def read_config(configs=None, use_env=True):
 			include = includes[i] = includes[i].strip()
 			if include == '<siteconf>':
 				# These are platform specific
-				siteconfs = ['./site.conf','./{}-site.conf'.format(config.get('general','appname')), '/etc/{0}.conf'.format(config.get('general','appname'))]
+				siteconfs = [
+					'./site.conf',
+					'./{}-site.conf'.format(appname),
+					'/etc/{0}.conf'.format(appname),
+					'~/.{0}.conf'.format(appname),
+				]
 				includes[i:i+1] = siteconfs
 			elif include[:1] == '<':
 				L.warning('Unknown include fragment: {0}'.format(include))
 				continue
 
 		for include in includes:
-			if os.path.isfile(include):
+			rinclude = os.path.expanduser(include)
+			if os.path.isfile(rinclude):
 				config_includes.append(include)
-				config.read([include])
+				config.read([rinclude])
 
 	else:
 		raise RuntimeError("FATAL: It looks like we have loop in configuration includes!")
