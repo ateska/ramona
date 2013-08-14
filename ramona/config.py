@@ -87,7 +87,7 @@ def read_config(configs=None, use_env=True):
 			for config_file in config_envs.split(';'):
 				configs.append(config_file)
 
-	for cfile in  configs:
+	for cfile in configs:
 		if os.path.isfile(cfile):
 			config_files.append(cfile)
 		config.read([cfile])
