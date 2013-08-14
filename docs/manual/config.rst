@@ -5,6 +5,7 @@ Configuration is build the way that user program(s) can share the same configura
 
 .. _ConfigParser : http://docs.python.org/library/configparser.html
 
+
 Application and site level configuration
 ----------------------------------------
 
@@ -12,21 +13,9 @@ Ramona supports split of configuration options into *application* and *site* lev
 
 Both  *application* and *site* level configuration are supplied in form of files. Name (including full file path) of application level configuration file is provided by user application. Site configuration file name is derived based on table bellow.
 
-Application and site level configuration as syntactically equal. Its structure is similar to what you would find on Microsoft Windows INI files (however they are not the same).
+*Application* and *site* level configuration as syntactically equal. 
 
-.. note::
-  Configuration files are are compatible with Python Standart Library ``ConfigParser`` module.
-
-
-Site config file names
-^^^^^^^^^^^^^^^^^^^^^^
-* ./site.conf
-* ./*[appname]*-site.conf
-* /etc/*[appname]*.conf
-
-Placeholder *[appname]* is replaced by value given by ``[general] appname`` value (see :attr:`appname` bellow).
-
-Relative path is evaluated from location of application main executable (e.g. containing ``ramona.console_app``).
+See ``[general]`` :attr:`include` *<siteconf>* option for implementation details.
 
 
 Platform selector
@@ -69,7 +58,7 @@ Examples:
 [general] section
 -----------------
 
-TODO
+This section provides general configuration of Ramona-equiped application.
 
 
 .. attribute:: appname
@@ -93,9 +82,35 @@ TODO
 
 .. attribute:: include
 
-  TODO
+  Ordered list of configuration files that should be loaded by Ramona. Separator of individual list items in this list is ';'.
 
-Separator is ';'
+  Magic value ``<siteconf>`` is expanded to following site level configuration file names:
+
+    * ./site.conf
+    * ./[appname]-site.conf
+    * /etc/[appname].conf
+    * ~/.[appname].conf
+
+    Placeholder *[appname]* is expanded to value of ``[general]`` :attr:`appname` option.
+    Relative path is evaluated from location of application main executable (e.g. containing ``ramona.console_app``).
+
+
+  *Default*: ``<siteconf>``
+
+  *Required*: No
+
+  Example:
+
+  .. code-block:: ini
+
+    [general]
+    include=<siteconf>
+
+
+  .. code-block:: ini
+
+    [general]
+    include=/etc/foo.conf;/etc/bar.conf
 
 
 .. attribute:: logdir
