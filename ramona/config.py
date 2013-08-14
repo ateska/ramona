@@ -45,19 +45,34 @@ config.optionxform = str # Disable default 'lowecasing' behavior of ConfigParser
 config_files = []
 config_includes = []
 
+config_platform_selector = platform.system().lower()
+
 ###
 
 def read_config(configs=None, use_env=True):
 	global config
 	assert len(config.sections()) == 0
 
-	# Load defaults
+	# Prepare platform selector regex
+	psrg = re.compile('^(.*)@(.*)$')
+
+	# Load config_defaults
+	psdefaults = []
 	for section, items in config_defaults.iteritems():
 		if not config.has_section(section):
 			config.add_section(section)
 
 		for key, val in items.iteritems():
-			config.set(section, key, val)
+		 	r = psrg.match(key)
+		 	if r is None:
+				config.set(section, key, val)
+			else:
+				if r.group(2) != config_platform_selector: continue
+				psdefaults.append((section, r.group(1), val))
+
+	# Handle platform selectors in config_defaults
+	for section, key, val in psdefaults:
+		config.set(section, key, val)
 
 
 	# Load configuration files
@@ -102,13 +117,12 @@ def read_config(configs=None, use_env=True):
 		raise RuntimeError("FATAL: It looks like we have loop in configuration includes!")
 
 	# Threat platform selector alternatives
-	platform_selector = platform.system().lower()
-	if platform_selector is not None and platform_selector != '':
-		psrg = re.compile('^(.*)@{0}$'.format(platform_selector))
+	if config_platform_selector is not None and config_platform_selector != '':
 		for section in config.sections():
 			for name, value in config.items(section):
 		 		r = psrg.match(name)
-		 		if not r: continue
+		 		if r is None: continue
+		 		if (r.group(2) != config_platform_selector): continue
 		 		config.set(section, r.group(1), value)
 
 	# Special treatment of some values
