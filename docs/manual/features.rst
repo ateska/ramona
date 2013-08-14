@@ -2,27 +2,41 @@
 Features
 ========
 
-Program
--------
-
-TODO
-Program life cycle (statuses)
-
-
-Program roaster
+Execution model
 ---------------
 
-TODO
+TODO: Diagram of how Ramona operated (console, server, programs)
+
+
+Program and program roaster
+---------------------------
+
+Ramona maintains pre-configured set of programs; these programs are placed in a 'roaster', list that is managed by Ramona server.
+Each program in this roaster has a status that reflects its current phase of life cycle.
+
+List of program statuses
+^^^^^^^^^^^^^^^^^^^^^^^^
+  * DISABLED - program is disabled by configuration; Ramona will not launch this program at any condition.
+  * STOPPED - program is stopped (not running); you can launch it by 'start' command.
+  * STARTING - program has been just launched.
+  * RUNNING - program is running for some time already.
+  * STOPPING - program has been asked to terminate but it has not exited yet.
+  * FATAL - program exited in a errorneous way (maybe several times in row) and Ramona evaluated this as non-recoverable error.
+  * CFGERROR - program is incorrectly configured and cannot be launched.
 
 
 Command-line console
 --------------------
 
-TODO
+Ramona provides command-line console, a tool that allows interaction with Ramona server and thru this controlling of all application programs. This tool can be tighly integrated with application that uses Ramona and it is designed to represent 'single point of execution' of given application.
+
+This approach simplifies maintenance of the application and allow easy operating of even complex applications consisting of many different programs.
+
+User can also add their custom commands (see *custom tools* bellow) to cover all needs of its application.
 
 
-Logging
--------
+Logging and log scanning
+------------------------
 
 TODO
 
@@ -67,12 +81,6 @@ Example of tool class:
   
 		def main(self, cnsapp, args):
   			...
-
-
-Log scanning
-------------
-
-TODO
 
 
 Ramona environment variables
