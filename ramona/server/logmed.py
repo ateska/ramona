@@ -47,7 +47,7 @@ class log_mediator(object):
 			with open(self.fname, "r") as logf:
 				logf.seek(0, os.SEEK_END)
 				fsize = logf.tell()
-				fsize -= self.linehistory * 512;
+				fsize -= self.linehistory * 512
 				if fsize <0: fsize = 0
 				logf.seek(fsize, os.SEEK_SET)
 				
