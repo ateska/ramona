@@ -2,17 +2,15 @@
 Features
 ========
 
-Execution model
----------------
 
-TODO: Diagram of how Ramona operated (console, server, programs)
+.. image:: img/execmodel.png
 
 
 Program and program roaster
 ---------------------------
 
 Ramona maintains pre-configured set of programs; these programs are placed in a 'roaster', list that is managed by Ramona server.
-Each program in this roaster has a status that reflects its current phase of life cycle.
+Each program in this roaster has a status that reflects its current phase of life cycle. Ramona is responsible for supervising of these programs in terms of their uptime, eventual restarts, logging etc.
 
 List of program statuses
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -23,6 +21,8 @@ List of program statuses
   * STOPPING - program has been asked to terminate but it has not exited yet.
   * FATAL - program exited in a errorneous way (maybe several times in row) and Ramona evaluated this as non-recoverable error.
   * CFGERROR - program is incorrectly configured and cannot be launched.
+
+.. image:: img/progstates.png
 
 
 Command-line console
@@ -38,11 +38,16 @@ User can also add their custom commands (see `custom tools`_) to cover all needs
 Logging and log scanning
 ------------------------
 
-TODO
+Ramona monitors `standard output`_ and `standard error`_ streams of all its supervisored programs. These streams are persisted to files on a filesystem in a highly configurable way. It is a primary way of how Ramona approaches logging so programs are advised to log using standard streams instead on logging into log files. It also enables Ramona to capture any other textual output of the program that may not be captured by typical logging mechanism like unexpected kills or top-level exceptions.
+
+.. _`standard output`: http://en.wikipedia.org/wiki/Standard_streams
+.. _`standard error`: http://en.wikipedia.org/wiki/Standard_streams
+
+Ramona also allows to configure scanner that seeks thru log streams for given patterns and if such a pattern is found, then Ramona notifies about such an event via email.
 
 
-Mailing to admin
-----------------
+Email notifications
+-------------------
 
 TODO
 
@@ -81,6 +86,9 @@ Example of tool class:
   
 		def main(self, cnsapp, args):
   			...
+
+.. note::
+  This manual is actually build using this feature, by executing ``./ramona.py manual``.
 
 
 Ramona environment variables
@@ -123,29 +131,14 @@ This produces following output:
   You can read configuration files using this module in order given by ``RAMONA_CONFIG`` environment variable and access configuration values. You can use ``RAMONA_SECTION`` environment variable to identify section in configuration files that is relevant to your actual program.
 
 
-HTTP front end (Web console)
-----------------------------
+Web console
+-----------
 
 .. image:: img/httpfend.png
    :width: 600px
 
-- standalone process
-- displays states of programs 
-- allows to start/stop/restart each or all of them
-- allows displaying tail of log files in "follow" mode 
-- basic authentication
+Displays states of supervised programs using web browser. It also allows user to start/stop/restart each or all of them or retrieve recent standart output and/or standard error of each program.
 
-Configuration:
-
-- The HTTP frontend is added to configuration file as any other program, only with the special option `command=<httpfend>`.
-- To enable HTTP frontend, just add the below sample configuration and then open http://localhost:5588
-
-.. code-block:: ini
-  
-  [program:ramonahttpfend]
-  command=<httpfend>
-
-For all configuration options see :ref:`config-ramonahttpfend`.
 
 
 Windows service
