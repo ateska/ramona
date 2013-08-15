@@ -26,7 +26,7 @@
 	<key>MasterSheets</key>
 	<array/>
 	<key>ModificationDate</key>
-	<string>2013-08-15 21:10:29 +0000</string>
+	<string>2013-08-15 21:15:35 +0000</string>
 	<key>Modifier</key>
 	<string>Ales Teska</string>
 	<key>NotesVisible</key>
@@ -869,9 +869,9 @@ Server}</string>
 					<key>FontInfo</key>
 					<dict>
 						<key>Font</key>
-						<string>Helvetica-Bold</string>
+						<string>HelveticaNeue-Medium</string>
 						<key>Size</key>
-						<real>7</real>
+						<real>6</real>
 					</dict>
 					<key>ID</key>
 					<integer>19</integer>
@@ -908,11 +908,11 @@ Server}</string>
 					<dict>
 						<key>Text</key>
 						<string>{\rtf1\ansi\ansicpg1252\cocoartf1187\cocoasubrtf390
-\cocoascreenfonts1{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+\cocoascreenfonts1{\fonttbl\f0\fnil\fcharset0 HelveticaNeue-Medium;}
 {\colortbl;\red255\green255\blue255;}
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc
 
-\f0\b\fs12 \cf0 STOPPING}</string>
+\f0\fs12 \cf0 STOPPING}</string>
 						<key>VerticalPad</key>
 						<integer>0</integer>
 					</dict>
@@ -967,9 +967,9 @@ Server}</string>
 					<key>FontInfo</key>
 					<dict>
 						<key>Font</key>
-						<string>Helvetica-Bold</string>
+						<string>HelveticaNeue-Medium</string>
 						<key>Size</key>
-						<real>7</real>
+						<real>6</real>
 					</dict>
 					<key>ID</key>
 					<integer>17</integer>
@@ -1006,11 +1006,11 @@ Server}</string>
 					<dict>
 						<key>Text</key>
 						<string>{\rtf1\ansi\ansicpg1252\cocoartf1187\cocoasubrtf390
-\cocoascreenfonts1{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+\cocoascreenfonts1{\fonttbl\f0\fnil\fcharset0 HelveticaNeue-Medium;}
 {\colortbl;\red255\green255\blue255;}
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc
 
-\f0\b\fs12 \cf0 FATAL}</string>
+\f0\fs12 \cf0 FATAL}</string>
 						<key>VerticalPad</key>
 						<integer>0</integer>
 					</dict>
@@ -1067,9 +1067,9 @@ Server}</string>
 					<key>FontInfo</key>
 					<dict>
 						<key>Font</key>
-						<string>Helvetica-Bold</string>
+						<string>HelveticaNeue-Medium</string>
 						<key>Size</key>
-						<real>7</real>
+						<real>6</real>
 					</dict>
 					<key>ID</key>
 					<integer>15</integer>
@@ -1106,11 +1106,11 @@ Server}</string>
 					<dict>
 						<key>Text</key>
 						<string>{\rtf1\ansi\ansicpg1252\cocoartf1187\cocoasubrtf390
-\cocoascreenfonts1{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+\cocoascreenfonts1{\fonttbl\f0\fnil\fcharset0 HelveticaNeue-Medium;}
 {\colortbl;\red255\green255\blue255;}
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc
 
-\f0\b\fs12 \cf0 RUNNING}</string>
+\f0\fs12 \cf0 RUNNING}</string>
 						<key>VerticalPad</key>
 						<integer>0</integer>
 					</dict>
@@ -1165,9 +1165,9 @@ Server}</string>
 					<key>FontInfo</key>
 					<dict>
 						<key>Font</key>
-						<string>Helvetica-Bold</string>
+						<string>HelveticaNeue-Medium</string>
 						<key>Size</key>
-						<real>7</real>
+						<real>6</real>
 					</dict>
 					<key>ID</key>
 					<integer>13</integer>
@@ -1204,11 +1204,11 @@ Server}</string>
 					<dict>
 						<key>Text</key>
 						<string>{\rtf1\ansi\ansicpg1252\cocoartf1187\cocoasubrtf390
-\cocoascreenfonts1{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+\cocoascreenfonts1{\fonttbl\f0\fnil\fcharset0 HelveticaNeue-Medium;}
 {\colortbl;\red255\green255\blue255;}
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc
 
-\f0\b\fs12 \cf0 STARTING}</string>
+\f0\fs12 \cf0 STARTING}</string>
 						<key>VerticalPad</key>
 						<integer>0</integer>
 					</dict>
@@ -1263,9 +1263,9 @@ Server}</string>
 					<key>FontInfo</key>
 					<dict>
 						<key>Font</key>
-						<string>Helvetica-Bold</string>
+						<string>HelveticaNeue-Medium</string>
 						<key>Size</key>
-						<real>7</real>
+						<real>6</real>
 					</dict>
 					<key>ID</key>
 					<integer>11</integer>
@@ -1302,11 +1302,11 @@ Server}</string>
 					<dict>
 						<key>Text</key>
 						<string>{\rtf1\ansi\ansicpg1252\cocoartf1187\cocoasubrtf390
-\cocoascreenfonts1{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+\cocoascreenfonts1{\fonttbl\f0\fnil\fcharset0 HelveticaNeue-Medium;}
 {\colortbl;\red255\green255\blue255;}
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc
 
-\f0\b\fs12 \cf0 CFGERROR}</string>
+\f0\fs12 \cf0 CFGERROR}</string>
 						<key>VerticalPad</key>
 						<integer>0</integer>
 					</dict>
@@ -1398,9 +1398,9 @@ Server}</string>
 					<key>FontInfo</key>
 					<dict>
 						<key>Font</key>
-						<string>Helvetica-Bold</string>
+						<string>HelveticaNeue-Medium</string>
 						<key>Size</key>
-						<real>7</real>
+						<real>6</real>
 					</dict>
 					<key>ID</key>
 					<integer>9</integer>
@@ -1437,11 +1437,11 @@ Server}</string>
 					<dict>
 						<key>Text</key>
 						<string>{\rtf1\ansi\ansicpg1252\cocoartf1187\cocoasubrtf390
-\cocoascreenfonts1{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+\cocoascreenfonts1{\fonttbl\f0\fnil\fcharset0 HelveticaNeue-Medium;}
 {\colortbl;\red255\green255\blue255;}
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc
 
-\f0\b\fs12 \cf0 STOPPED}</string>
+\f0\fs12 \cf0 STOPPED}</string>
 						<key>VerticalPad</key>
 						<integer>0</integer>
 					</dict>
@@ -1454,9 +1454,9 @@ Server}</string>
 					<key>FontInfo</key>
 					<dict>
 						<key>Font</key>
-						<string>Helvetica-Bold</string>
+						<string>HelveticaNeue-Medium</string>
 						<key>Size</key>
-						<real>7</real>
+						<real>6</real>
 					</dict>
 					<key>ID</key>
 					<integer>8</integer>
@@ -1493,11 +1493,11 @@ Server}</string>
 					<dict>
 						<key>Text</key>
 						<string>{\rtf1\ansi\ansicpg1252\cocoartf1187\cocoasubrtf390
-\cocoascreenfonts1{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+\cocoascreenfonts1{\fonttbl\f0\fnil\fcharset0 HelveticaNeue-Medium;}
 {\colortbl;\red255\green255\blue255;}
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc
 
-\f0\b\fs12 \cf0 DISABLED}</string>
+\f0\fs12 \cf0 DISABLED}</string>
 						<key>VerticalPad</key>
 						<integer>0</integer>
 					</dict>
