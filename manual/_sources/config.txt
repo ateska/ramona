@@ -446,6 +446,10 @@ TODO
 [program:ramonahttpfend]
 ------------------------
 
+The HTTP frontend is added to configuration file as any other program, only with the special option `command=<httpfend>`.
+
+By default configuration, it is available at http://localhost:5588
+
 Example:
 
 .. code-block:: ini
@@ -470,12 +474,11 @@ Example:
     
   Supported connection variants:
 
-  - UNIX sockets
-  
-    - optional parameter 'mode' specifies UNIX file permissions for created socket file system entry (in octal representation)
-
   - TCP IPv4: For example: ``tcp://127.0.0.1:4455``
   - TCP IPv6: For example: ``tcp://[::1]:8877``
+  - UNIX sockets  
+    
+    - optional parameter 'mode' specifies UNIX file permissions for created socket file system entry (in octal representation)
 
 
   *Default*:  ``tcp://localhost:5588``

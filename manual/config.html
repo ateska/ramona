@@ -461,6 +461,8 @@ TODO</p>
 </div>
 <div class="section" id="program-ramonahttpfend">
 <span id="config-ramonahttpfend"></span><h2>[program:ramonahttpfend]<a class="headerlink" href="#program-ramonahttpfend" title="Permalink to this headline">¶</a></h2>
+<p>The HTTP frontend is added to configuration file as any other program, only with the special option <cite>command=&lt;httpfend&gt;</cite>.</p>
+<p>By default configuration, it is available at <a class="reference external" href="http://localhost:5588">http://localhost:5588</a></p>
 <p>Example:</p>
 <div class="highlight-ini"><div class="highlight"><pre><span class="k">[program:ramonahttpfend]</span>
 <span class="na">command</span><span class="o">=</span><span class="s">&lt;httpfend&gt;</span>
@@ -482,12 +484,12 @@ TODO</p>
 You can specify more network interfaces, protocols or ports, URIs are comma-separated.</p>
 <p>Supported connection variants:</p>
 <ul class="simple">
+<li>TCP IPv4: For example: <tt class="docutils literal"><span class="pre">tcp://127.0.0.1:4455</span></tt></li>
+<li>TCP IPv6: For example: <tt class="docutils literal"><span class="pre">tcp://[::1]:8877</span></tt></li>
 <li>UNIX sockets<ul>
 <li>optional parameter &#8216;mode&#8217; specifies UNIX file permissions for created socket file system entry (in octal representation)</li>
 </ul>
 </li>
-<li>TCP IPv4: For example: <tt class="docutils literal"><span class="pre">tcp://127.0.0.1:4455</span></tt></li>
-<li>TCP IPv6: For example: <tt class="docutils literal"><span class="pre">tcp://[::1]:8877</span></tt></li>
 </ul>
 <p><em>Default</em>:  <tt class="docutils literal"><span class="pre">tcp://localhost:5588</span></tt></p>
 <p><em>Required</em>:  No</p>

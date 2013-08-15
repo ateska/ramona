@@ -51,25 +51,40 @@
             
   <div class="section" id="features">
 <h1>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="program">
-<h2>Program<a class="headerlink" href="#program" title="Permalink to this headline">¶</a></h2>
-<p>TODO
-Program life cycle (statuses)</p>
+<img alt="_images/execmodel.png" src="_images/execmodel.png" />
+<div class="section" id="program-and-program-roaster">
+<h2>Program and program roaster<a class="headerlink" href="#program-and-program-roaster" title="Permalink to this headline">¶</a></h2>
+<p>Ramona maintains pre-configured set of programs; these programs are placed in a &#8216;roaster&#8217;, list that is managed by Ramona server.
+Each program in this roaster has a status that reflects its current phase of life cycle. Ramona is responsible for supervising of these programs in terms of their uptime, eventual restarts, logging etc.</p>
+<div class="section" id="list-of-program-statuses">
+<h3>List of program statuses<a class="headerlink" href="#list-of-program-statuses" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ul class="simple">
+<li>DISABLED - program is disabled by configuration; Ramona will not launch this program at any condition.</li>
+<li>STOPPED - program is stopped (not running); you can launch it by &#8216;start&#8217; command.</li>
+<li>STARTING - program has been just launched.</li>
+<li>RUNNING - program is running for some time already.</li>
+<li>STOPPING - program has been asked to terminate but it has not exited yet.</li>
+<li>FATAL - program exited in a errorneous way (maybe several times in row) and Ramona evaluated this as non-recoverable error.</li>
+<li>CFGERROR - program is incorrectly configured and cannot be launched.</li>
+</ul>
+</div></blockquote>
+<img alt="_images/progstates.png" src="_images/progstates.png" />
 </div>
-<div class="section" id="program-roaster">
-<h2>Program roaster<a class="headerlink" href="#program-roaster" title="Permalink to this headline">¶</a></h2>
-<p>TODO</p>
 </div>
 <div class="section" id="command-line-console">
 <h2>Command-line console<a class="headerlink" href="#command-line-console" title="Permalink to this headline">¶</a></h2>
-<p>TODO</p>
+<p>Ramona provides command-line console, a tool that allows interaction with Ramona server and thru this controlling of all application programs. This tool can be tighly integrated with application that uses Ramona and it is designed to represent &#8216;single point of execution&#8217; of given application.</p>
+<p>This approach simplifies maintenance of the application and allow easy operating of even complex applications consisting of many different programs.</p>
+<p>User can also add their custom commands (see <a class="reference internal" href="#custom-tools">custom tools</a>) to cover all needs of its application.</p>
 </div>
-<div class="section" id="logging">
-<h2>Logging<a class="headerlink" href="#logging" title="Permalink to this headline">¶</a></h2>
-<p>TODO</p>
+<div class="section" id="logging-and-log-scanning">
+<h2>Logging and log scanning<a class="headerlink" href="#logging-and-log-scanning" title="Permalink to this headline">¶</a></h2>
+<p>Ramona monitors <a class="reference external" href="http://en.wikipedia.org/wiki/Standard_streams">standard output</a> and <a class="reference external" href="http://en.wikipedia.org/wiki/Standard_streams">standard error</a> streams of all its supervisored programs. These streams are persisted to files on a filesystem in a highly configurable way. It is a primary way of how Ramona approaches logging so programs are advised to log using standard streams instead on logging into log files. It also enables Ramona to capture any other textual output of the program that may not be captured by typical logging mechanism like unexpected kills or top-level exceptions.</p>
+<p>Ramona also allows to configure scanner that seeks thru log streams for given patterns and if such a pattern is found, then Ramona notifies about such an event via email.</p>
 </div>
-<div class="section" id="mailing-to-admin">
-<h2>Mailing to admin<a class="headerlink" href="#mailing-to-admin" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="email-notifications">
+<h2>Email notifications<a class="headerlink" href="#email-notifications" title="Permalink to this headline">¶</a></h2>
 <p>TODO</p>
 </div>
 <div class="section" id="custom-tools">
@@ -99,10 +114,10 @@ Program life cycle (statuses)</p>
                       <span class="o">...</span>
 </pre></div>
 </div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This manual is actually build using this feature, by executing <tt class="docutils literal"><span class="pre">./ramona.py</span> <span class="pre">manual</span></tt>.</p>
 </div>
-<div class="section" id="log-scanning">
-<h2>Log scanning<a class="headerlink" href="#log-scanning" title="Permalink to this headline">¶</a></h2>
-<p>TODO</p>
 </div>
 <div class="section" id="ramona-environment-variables">
 <h2>Ramona environment variables<a class="headerlink" href="#ramona-environment-variables" title="Permalink to this headline">¶</a></h2>
@@ -142,26 +157,10 @@ List is ordered (configuration values can overlap so correct override behaviour 
 You can read configuration files using this module in order given by <tt class="docutils literal"><span class="pre">RAMONA_CONFIG</span></tt> environment variable and access configuration values. You can use <tt class="docutils literal"><span class="pre">RAMONA_SECTION</span></tt> environment variable to identify section in configuration files that is relevant to your actual program.</p>
 </div>
 </div>
-<div class="section" id="http-front-end-web-console">
-<h2>HTTP front end (Web console)<a class="headerlink" href="#http-front-end-web-console" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="web-console">
+<h2>Web console<a class="headerlink" href="#web-console" title="Permalink to this headline">¶</a></h2>
 <a class="reference internal image-reference" href="_images/httpfend.png"><img alt="_images/httpfend.png" src="_images/httpfend.png" style="width: 600px;" /></a>
-<ul class="simple">
-<li>standalone process</li>
-<li>displays states of programs</li>
-<li>allows to start/stop/restart each or all of them</li>
-<li>allows displaying tail of log files in &#8220;follow&#8221; mode</li>
-<li>basic authentication</li>
-</ul>
-<p>Configuration:</p>
-<ul class="simple">
-<li>The HTTP frontend is added to configuration file as any other program, only with the special option <cite>command=&lt;httpfend&gt;</cite>.</li>
-<li>To enable HTTP frontend, just add the below sample configuration and then open <a class="reference external" href="http://localhost:5588">http://localhost:5588</a></li>
-</ul>
-<div class="highlight-ini"><div class="highlight"><pre><span class="k">[program:ramonahttpfend]</span>
-<span class="na">command</span><span class="o">=</span><span class="s">&lt;httpfend&gt;</span>
-</pre></div>
-</div>
-<p>For all configuration options see <a class="reference internal" href="config.html#config-ramonahttpfend"><em>[program:ramonahttpfend]</em></a>.</p>
+<p>Displays states of supervised programs using web browser. It also allows user to start/stop/restart each or all of them or retrieve recent standart output and/or standard error of each program.</p>
 </div>
 <div class="section" id="windows-service">
 <h2>Windows service<a class="headerlink" href="#windows-service" title="Permalink to this headline">¶</a></h2>
@@ -184,15 +183,16 @@ It also depends on <tt class="docutils literal"><span class="pre">pythonservice.
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Features</a><ul>
-<li><a class="reference internal" href="#program">Program</a></li>
-<li><a class="reference internal" href="#program-roaster">Program roaster</a></li>
+<li><a class="reference internal" href="#program-and-program-roaster">Program and program roaster</a><ul>
+<li><a class="reference internal" href="#list-of-program-statuses">List of program statuses</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#command-line-console">Command-line console</a></li>
-<li><a class="reference internal" href="#logging">Logging</a></li>
-<li><a class="reference internal" href="#mailing-to-admin">Mailing to admin</a></li>
+<li><a class="reference internal" href="#logging-and-log-scanning">Logging and log scanning</a></li>
+<li><a class="reference internal" href="#email-notifications">Email notifications</a></li>
 <li><a class="reference internal" href="#custom-tools">Custom tools</a></li>
-<li><a class="reference internal" href="#log-scanning">Log scanning</a></li>
 <li><a class="reference internal" href="#ramona-environment-variables">Ramona environment variables</a></li>
-<li><a class="reference internal" href="#http-front-end-web-console">HTTP front end (Web console)</a></li>
+<li><a class="reference internal" href="#web-console">Web console</a></li>
 <li><a class="reference internal" href="#windows-service">Windows service</a></li>
 </ul>
 </li>
