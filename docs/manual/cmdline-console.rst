@@ -1,7 +1,7 @@
 console (command-line)
 ======================
 
-TODO
+Enter interactive console mode.
 
 .. code-block:: bash
 

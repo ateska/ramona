@@ -1,7 +1,7 @@
 restart (command-line)
 ======================
 
-TODO
+Restart supervised program(s)
 
 .. code-block:: bash
 
@@ -10,23 +10,23 @@ TODO
 
 .. describe:: program
 
-  TODO
+  Optionally specify program(s) in scope of the command. If none is given, all programs are considered in scope.
 
 
 .. cmdoption:: restart -n
                restart --no-server-start
 
-  TODO
+  Avoid eventual automatic Ramona server start.
+  This is relevant in case command ``restart`` is issued when Ramona server is not running.
 
 
 .. cmdoption:: restart -i
                restart --immediate-return
 
-  TODO
+  Don't wait for restart of programs and return ASAP.
 
 
 .. cmdoption:: restart -f
                restart --force-start
 
-  TODO
-
+  Force restart of programs even if they are in FATAL state.

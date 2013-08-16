@@ -46,16 +46,10 @@ Ramona monitors `standard output`_ and `standard error`_ streams of all its supe
 Ramona also allows to configure scanner that seeks thru log streams for given patterns and if such a pattern is found, then Ramona notifies about such an event via email.
 
 
-Email notifications
--------------------
-
-TODO
-
-
 Custom tools
 ------------
 
-TODO
+Ramona can be easily extended by custom commands; these are implemented in Python and enables cross-platform automation of common tasks connected with the application.
 
 
 Example of tool function:
@@ -140,17 +134,20 @@ Web console
 Displays states of supervised programs using web browser. It also allows user to start/stop/restart each or all of them or retrieve recent standart output and/or standard error of each program.
 
 
+.. _`features-windowsservice`:
 
 Windows service
 ---------------
 
-Ramona is using `Window Services`_ for background execution on Windows platform.
+Ramona is using `Windows Services`_ for background execution on Windows platform.
 It also depends on ``pythonservice.exe`` tool from `Python for Windows extensions`_ package. Therefore it is possible to install Ramona equipped application as Windows Service via commands that are provided by Ramona system. This can be used for automatic start-up after system (re)boot or to enable smooth development on Windows machine.
+
+You can have multiple Ramona Windows Services installed on a one box; for example for different Ramona-equipped applications or versions.
 
 For more details continue to:
 
 - :ref:`cmdline-wininstall`
 - :ref:`cmdline-winuninstall`
 
-.. _`Window Services`: http://en.wikipedia.org/wiki/Windows_service
+.. _`Windows Services`: http://en.wikipedia.org/wiki/Windows_service
 .. _`Python for Windows extensions`: http://sourceforge.net/projects/pywin32/
