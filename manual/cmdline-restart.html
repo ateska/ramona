@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Ramona 0.9 beta 8 documentation" href="index.html" />
-    <link rel="up" title="Command line" href="cmdline.html" />
+    <link rel="up" title="Command line console" href="cmdline.html" />
     <link rel="next" title="status (command-line)" href="cmdline-status.html" />
     <link rel="prev" title="stop (command-line)" href="cmdline-stop.html" /> 
   </head>
@@ -42,7 +42,7 @@
           <a href="cmdline-stop.html" title="stop (command-line)"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Ramona 0.9 beta 8 documentation</a> &raquo;</li>
-          <li><a href="cmdline.html" accesskey="U">Command line</a> &raquo;</li> 
+          <li><a href="cmdline.html" accesskey="U">Command line console</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -53,14 +53,14 @@
             
   <div class="section" id="restart-command-line">
 <h1>restart (command-line)<a class="headerlink" href="#restart-command-line" title="Permalink to this headline">¶</a></h1>
-<p>TODO</p>
+<p>Restart supervised program(s)</p>
 <div class="highlight-bash"><div class="highlight"><pre>&lt;console.py&gt; restart <span class="o">[</span>-h<span class="o">]</span> <span class="o">[</span>-n<span class="o">]</span> <span class="o">[</span>-i<span class="o">]</span> <span class="o">[</span>-f<span class="o">]</span> <span class="o">[</span>program <span class="o">[</span>program ...<span class="o">]]</span>
 </pre></div>
 </div>
 <dl class="describe">
 <dt>
 <tt class="descname">program</tt></dt>
-<dd><p>TODO</p>
+<dd><p>Optionally specify program(s) in scope of the command. If none is given, all programs are considered in scope.</p>
 </dd></dl>
 
 <dl class="cmdoption">
@@ -68,7 +68,8 @@
 <tt class="descname">-n</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-n" title="Permalink to this definition">¶</a></dt>
 <dt id="cmdoption--no-server-start">
 <tt class="descname">--no-server-start</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption--no-server-start" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dd><p>Avoid eventual automatic Ramona server start.
+This is relevant in case command <tt class="docutils literal"><span class="pre">restart</span></tt> is issued when Ramona server is not running.</p>
 </dd></dl>
 
 <dl class="cmdoption">
@@ -76,7 +77,7 @@
 <tt class="descname">-i</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-i" title="Permalink to this definition">¶</a></dt>
 <dt id="cmdoption--immediate-return">
 <tt class="descname">--immediate-return</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption--immediate-return" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dd><p>Don&#8217;t wait for restart of programs and return ASAP.</p>
 </dd></dl>
 
 <dl class="cmdoption">
@@ -84,7 +85,7 @@
 <tt class="descname">-f</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-f" title="Permalink to this definition">¶</a></dt>
 <dt id="cmdoption--force-start">
 <tt class="descname">--force-start</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption--force-start" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dd><p>Force restart of programs even if they are in FATAL state.</p>
 </dd></dl>
 
 </div>
@@ -136,7 +137,7 @@
           <a href="cmdline-stop.html" title="stop (command-line)"
              >previous</a> |</li>
         <li><a href="index.html">Ramona 0.9 beta 8 documentation</a> &raquo;</li>
-          <li><a href="cmdline.html" >Command line</a> &raquo;</li> 
+          <li><a href="cmdline.html" >Command line console</a> &raquo;</li> 
       </ul>
     </div>
 

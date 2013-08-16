@@ -83,13 +83,9 @@ Each program in this roaster has a status that reflects its current phase of lif
 <p>Ramona monitors <a class="reference external" href="http://en.wikipedia.org/wiki/Standard_streams">standard output</a> and <a class="reference external" href="http://en.wikipedia.org/wiki/Standard_streams">standard error</a> streams of all its supervisored programs. These streams are persisted to files on a filesystem in a highly configurable way. It is a primary way of how Ramona approaches logging so programs are advised to log using standard streams instead on logging into log files. It also enables Ramona to capture any other textual output of the program that may not be captured by typical logging mechanism like unexpected kills or top-level exceptions.</p>
 <p>Ramona also allows to configure scanner that seeks thru log streams for given patterns and if such a pattern is found, then Ramona notifies about such an event via email.</p>
 </div>
-<div class="section" id="email-notifications">
-<h2>Email notifications<a class="headerlink" href="#email-notifications" title="Permalink to this headline">¶</a></h2>
-<p>TODO</p>
-</div>
 <div class="section" id="custom-tools">
 <h2>Custom tools<a class="headerlink" href="#custom-tools" title="Permalink to this headline">¶</a></h2>
-<p>TODO</p>
+<p>Ramona can be easily extended by custom commands; these are implemented in Python and enables cross-platform automation of common tasks connected with the application.</p>
 <p>Example of tool function:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">FooConsoleApp</span><span class="p">(</span><span class="n">ramona</span><span class="o">.</span><span class="n">console_app</span><span class="p">):</span>
 
@@ -163,9 +159,10 @@ You can read configuration files using this module in order given by <tt class="
 <p>Displays states of supervised programs using web browser. It also allows user to start/stop/restart each or all of them or retrieve recent standart output and/or standard error of each program.</p>
 </div>
 <div class="section" id="windows-service">
-<h2>Windows service<a class="headerlink" href="#windows-service" title="Permalink to this headline">¶</a></h2>
-<p>Ramona is using <a class="reference external" href="http://en.wikipedia.org/wiki/Windows_service">Window Services</a> for background execution on Windows platform.
+<span id="features-windowsservice"></span><h2>Windows service<a class="headerlink" href="#windows-service" title="Permalink to this headline">¶</a></h2>
+<p>Ramona is using <a class="reference external" href="http://en.wikipedia.org/wiki/Windows_service">Windows Services</a> for background execution on Windows platform.
 It also depends on <tt class="docutils literal"><span class="pre">pythonservice.exe</span></tt> tool from <a class="reference external" href="http://sourceforge.net/projects/pywin32/">Python for Windows extensions</a> package. Therefore it is possible to install Ramona equipped application as Windows Service via commands that are provided by Ramona system. This can be used for automatic start-up after system (re)boot or to enable smooth development on Windows machine.</p>
+<p>You can have multiple Ramona Windows Services installed on a one box; for example for different Ramona-equipped applications or versions.</p>
 <p>For more details continue to:</p>
 <ul class="simple">
 <li><a class="reference internal" href="cmdline-wininstall.html#cmdline-wininstall"><em>wininstall (command-line)</em></a></li>
@@ -189,7 +186,6 @@ It also depends on <tt class="docutils literal"><span class="pre">pythonservice.
 </li>
 <li><a class="reference internal" href="#command-line-console">Command-line console</a></li>
 <li><a class="reference internal" href="#logging-and-log-scanning">Logging and log scanning</a></li>
-<li><a class="reference internal" href="#email-notifications">Email notifications</a></li>
 <li><a class="reference internal" href="#custom-tools">Custom tools</a></li>
 <li><a class="reference internal" href="#ramona-environment-variables">Ramona environment variables</a></li>
 <li><a class="reference internal" href="#web-console">Web console</a></li>

@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Ramona 0.9 beta 8 documentation" href="index.html" />
-    <link rel="up" title="Command line" href="cmdline.html" />
+    <link rel="up" title="Command line console" href="cmdline.html" />
     <link rel="next" title="restart (command-line)" href="cmdline-restart.html" />
     <link rel="prev" title="start (command-line)" href="cmdline-start.html" /> 
   </head>
@@ -42,7 +42,7 @@
           <a href="cmdline-start.html" title="start (command-line)"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Ramona 0.9 beta 8 documentation</a> &raquo;</li>
-          <li><a href="cmdline.html" accesskey="U">Command line</a> &raquo;</li> 
+          <li><a href="cmdline.html" accesskey="U">Command line console</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -53,14 +53,15 @@
             
   <div class="section" id="stop-command-line">
 <h1>stop (command-line)<a class="headerlink" href="#stop-command-line" title="Permalink to this headline">¶</a></h1>
-<p>TODO</p>
+<p>Stop supervised program(s).</p>
+<p>Optionally also terminate Ramona server.</p>
 <div class="highlight-bash"><div class="highlight"><pre>&lt;console.py&gt; stop <span class="o">[</span>-h<span class="o">]</span> <span class="o">[</span>-i<span class="o">]</span> <span class="o">[</span>-c<span class="o">]</span> <span class="o">[</span>-E<span class="o">]</span> <span class="o">[</span>-T<span class="o">]</span> <span class="o">[</span>program <span class="o">[</span>program ...<span class="o">]]</span>
 </pre></div>
 </div>
 <dl class="describe">
 <dt>
 <tt class="descname">program</tt></dt>
-<dd><p>TODO</p>
+<dd><p>Optionally specify program(s) in scope of the command. If none is given, all programs are considered in scope.</p>
 </dd></dl>
 
 <dl class="cmdoption">
@@ -68,7 +69,7 @@
 <tt class="descname">-i</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-i" title="Permalink to this definition">¶</a></dt>
 <dt id="cmdoption--immediate-return">
 <tt class="descname">--immediate-return</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption--immediate-return" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dd><p>Dont wait for termination of programs and exit ASAP.</p>
 </dd></dl>
 
 <dl class="cmdoption">
@@ -76,23 +77,25 @@
 <tt class="descname">-c</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-c" title="Permalink to this definition">¶</a></dt>
 <dt id="cmdoption--core-dump">
 <tt class="descname">--core-dump</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption--core-dump" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dd><p>Stop program(s) to produce core dump (core dump must be enabled in program configuration).
+It is archived by sending signal that lead to dumping of a core file.</p>
 </dd></dl>
 
 <dl class="cmdoption">
 <dt id="cmdoption-E">
 <tt class="descname">-E</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-E" title="Permalink to this definition">¶</a></dt>
-<dt id="cmdoption--stop-and-exi">
-<tt class="descname">--stop-and-exi</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption--stop-and-exi" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dt id="cmdoption--stop-and-exit">
+<tt class="descname">--stop-and-exit</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption--stop-and-exit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stop all programs and exit Ramona server.
+This is a default behaviour of the <tt class="docutils literal"><span class="pre">stop</span></tt> command.</p>
 </dd></dl>
 
 <dl class="cmdoption">
-<dt id="cmdoption-T">
-<tt class="descname">-T</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-T" title="Permalink to this definition">¶</a></dt>
+<dt id="cmdoption-S">
+<tt class="descname">-S</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-S" title="Permalink to this definition">¶</a></dt>
 <dt id="cmdoption--stop-and-stay">
 <tt class="descname">--stop-and-stay</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption--stop-and-stay" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dd><p>Stop all programs but keep Ramona server running.</p>
 </dd></dl>
 
 </div>
@@ -144,7 +147,7 @@
           <a href="cmdline-start.html" title="start (command-line)"
              >previous</a> |</li>
         <li><a href="index.html">Ramona 0.9 beta 8 documentation</a> &raquo;</li>
-          <li><a href="cmdline.html" >Command line</a> &raquo;</li> 
+          <li><a href="cmdline.html" >Command line console</a> &raquo;</li> 
       </ul>
     </div>
 

@@ -1,7 +1,7 @@
 tail (command-line)
 ===================
 
-TODO
+Display the last part of a log (standard output and/or standard error) of specified program.
 
 .. code-block:: bash
 
@@ -10,23 +10,24 @@ TODO
 
 .. describe:: program
 
-  TODO
+  Specify the program in scope of the command.
 
 
 .. cmdoption:: tail -l {stdout,stderr}
                tail --log-stream {stdout,stderr}
 
-  TODO
+  Specify which standard stream to use.
+  Default is ``stderr``.
 
 
 .. cmdoption:: tail -f
                tail --follow
 
-  TODO
+  Causes tail command to not stop when end of stream is reached, but rather to wait for additional data to be appended to the input.
 
 
 .. cmdoption:: tail -n N
                tail --lines N
 
-  TODO
+  Output the last N lines, instead of the last 40.
 

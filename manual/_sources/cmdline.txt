@@ -1,38 +1,38 @@
-Command line
-============
+Command line console
+====================
 
-TODO
+Command-line console is a basic tool for interaction with Ramona-equipped application.
 
-.. describe:: <console.py>
-
-  TODO
+User can issue commands to Ramona server thru this tool or execute any of custom tools.
 
 
 Generic options
 ---------------
 
+Generic options should be given prior actual command on the command line.
+
 .. cmdoption:: -c CONFIGFILE
                --config CONFIGFILE
 
-  TODO
+  Specify configuration file(s) to read (this option can be given more times). This will override build-in application-level configuration.
 
 
 .. cmdoption:: -h
                --help
 
-  TODO
+  Displays build-in help.
 
 
 .. cmdoption:: -d
                --debug
 
-  TODO
+  Enable debug (verbose) output.
 
 
 .. cmdoption:: -s
                --silent
 
-  TODO
+  Enable silent mode of operation (only errors are printed).
 
 
 Common commands

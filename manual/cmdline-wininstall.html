@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Ramona 0.9 beta 8 documentation" href="index.html" />
-    <link rel="up" title="Command line" href="cmdline.html" />
+    <link rel="up" title="Command line console" href="cmdline.html" />
     <link rel="next" title="winuninstall (command-line)" href="cmdline-winuninstall.html" />
     <link rel="prev" title="server (command-line)" href="cmdline-server.html" /> 
   </head>
@@ -42,7 +42,7 @@
           <a href="cmdline-server.html" title="server (command-line)"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Ramona 0.9 beta 8 documentation</a> &raquo;</li>
-          <li><a href="cmdline.html" accesskey="U">Command line</a> &raquo;</li> 
+          <li><a href="cmdline.html" accesskey="U">Command line console</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -53,15 +53,18 @@
             
   <div class="section" id="wininstall-command-line">
 <span id="cmdline-wininstall"></span><h1>wininstall (command-line)<a class="headerlink" href="#wininstall-command-line" title="Permalink to this headline">¶</a></h1>
-<p>TODO</p>
+<p><strong>Windows only !</strong></p>
+<p>Install the Ramona server as a Windows Service.</p>
+<p>An user application will be able to run as Windows Service using this Ramona feature.
+For more details, see <a class="reference internal" href="features.html#features-windowsservice"><em>Windows service</em></a>.</p>
 <div class="highlight-bash"><div class="highlight"><pre>&lt;console.py&gt; wininstall <span class="o">[</span>-h<span class="o">]</span> <span class="o">[</span>-d<span class="o">]</span> <span class="o">[</span>-S<span class="o">]</span> <span class="o">[</span>program <span class="o">[</span>program ...<span class="o">]]</span>
 </pre></div>
 </div>
-<p>Windows only !</p>
 <dl class="describe">
 <dt>
 <tt class="descname">program</tt></dt>
-<dd><p>TODO</p>
+<dd><p>Optionally specify program(s) in scope of the command. If none is given, all programs are considered in scope.
+Programs in scope will be started when this Ramona Windows Service is started by OS.</p>
 </dd></dl>
 
 <dl class="cmdoption">
@@ -69,7 +72,7 @@
 <tt class="descname">-S</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-S" title="Permalink to this definition">¶</a></dt>
 <dt id="cmdoption--server-only">
 <tt class="descname">--server-only</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption--server-only" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dd><p>When service is acticated start only the Ramona server, not supervised programs.</p>
 </dd></dl>
 
 <dl class="cmdoption">
@@ -77,7 +80,7 @@
 <tt class="descname">-d</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-d" title="Permalink to this definition">¶</a></dt>
 <dt id="cmdoption--dont-start">
 <tt class="descname">--dont-start</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption--dont-start" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dd><p>Don&#8217;t start Windows service (Ramona server) after an installation.</p>
 </dd></dl>
 
 </div>
@@ -129,7 +132,7 @@
           <a href="cmdline-server.html" title="server (command-line)"
              >previous</a> |</li>
         <li><a href="index.html">Ramona 0.9 beta 8 documentation</a> &raquo;</li>
-          <li><a href="cmdline.html" >Command line</a> &raquo;</li> 
+          <li><a href="cmdline.html" >Command line console</a> &raquo;</li> 
       </ul>
     </div>
 

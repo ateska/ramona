@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Ramona 0.9 beta 8 documentation" href="index.html" />
-    <link rel="up" title="Command line" href="cmdline.html" />
+    <link rel="up" title="Command line console" href="cmdline.html" />
     <link rel="next" title="console (command-line)" href="cmdline-console.html" />
     <link rel="prev" title="status (command-line)" href="cmdline-status.html" /> 
   </head>
@@ -42,7 +42,7 @@
           <a href="cmdline-status.html" title="status (command-line)"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Ramona 0.9 beta 8 documentation</a> &raquo;</li>
-          <li><a href="cmdline.html" accesskey="U">Command line</a> &raquo;</li> 
+          <li><a href="cmdline.html" accesskey="U">Command line console</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -53,14 +53,14 @@
             
   <div class="section" id="tail-command-line">
 <h1>tail (command-line)<a class="headerlink" href="#tail-command-line" title="Permalink to this headline">¶</a></h1>
-<p>TODO</p>
+<p>Display the last part of a log (standard output and/or standard error) of specified program.</p>
 <div class="highlight-bash"><div class="highlight"><pre>&lt;console.py&gt; tail <span class="o">[</span>-h<span class="o">]</span> <span class="o">[</span>-l <span class="o">{</span>stdout,stderr<span class="o">}]</span> <span class="o">[</span>-f<span class="o">]</span> <span class="o">[</span>-n N<span class="o">]</span> program
 </pre></div>
 </div>
 <dl class="describe">
 <dt>
 <tt class="descname">program</tt></dt>
-<dd><p>TODO</p>
+<dd><p>Specify the program in scope of the command.</p>
 </dd></dl>
 
 <dl class="cmdoption">
@@ -68,7 +68,8 @@
 <tt class="descname">-l</tt><tt class="descclassname"> {stdout,stderr}</tt><a class="headerlink" href="#cmdoption-l" title="Permalink to this definition">¶</a></dt>
 <dt id="cmdoption--log-stream">
 <tt class="descname">--log-stream</tt><tt class="descclassname"> {stdout,stderr}</tt><a class="headerlink" href="#cmdoption--log-stream" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dd><p>Specify which standard stream to use.
+Default is <tt class="docutils literal"><span class="pre">stderr</span></tt>.</p>
 </dd></dl>
 
 <dl class="cmdoption">
@@ -76,7 +77,7 @@
 <tt class="descname">-f</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-f" title="Permalink to this definition">¶</a></dt>
 <dt id="cmdoption--follow">
 <tt class="descname">--follow</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption--follow" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dd><p>Causes tail command to not stop when end of stream is reached, but rather to wait for additional data to be appended to the input.</p>
 </dd></dl>
 
 <dl class="cmdoption">
@@ -84,7 +85,7 @@
 <tt class="descname">-n</tt><tt class="descclassname"> N</tt><a class="headerlink" href="#cmdoption-n" title="Permalink to this definition">¶</a></dt>
 <dt id="cmdoption--lines">
 <tt class="descname">--lines</tt><tt class="descclassname"> N</tt><a class="headerlink" href="#cmdoption--lines" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dd><p>Output the last N lines, instead of the last 40.</p>
 </dd></dl>
 
 </div>
@@ -136,7 +137,7 @@
           <a href="cmdline-status.html" title="status (command-line)"
              >previous</a> |</li>
         <li><a href="index.html">Ramona 0.9 beta 8 documentation</a> &raquo;</li>
-          <li><a href="cmdline.html" >Command line</a> &raquo;</li> 
+          <li><a href="cmdline.html" >Command line console</a> &raquo;</li> 
       </ul>
     </div>
 
