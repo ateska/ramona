@@ -3,13 +3,13 @@ from .. import exception
 ###
 
 name = 'server'
-cmdhelp = 'Launch server in the foreground'
+cmdhelp = 'Start the Ramona server in the foreground'
 
 ###
 
 def init_parser(parser):
 	parser.add_argument('-S','--server-only', action='store_true', help='Start only server, programs are not launched')
-	parser.add_argument('program', nargs='*', help='Optionally specify program(s) in scope of the command (if nothing is specified, all enabled programs will be launched)')
+	parser.add_argument('program', nargs='*', help='Optionally specify program(s) in scope of the command. If none is given, all programs are considered in scope.')
 
 ###
 

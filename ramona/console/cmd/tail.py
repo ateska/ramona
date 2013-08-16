@@ -5,7 +5,7 @@ from ._completions import complete_ident
 ###
 
 name = 'tail'
-cmdhelp = 'Tail log of specified program'
+cmdhelp = 'Display the last part of a log'
 
 ###
 
@@ -14,10 +14,10 @@ L = logging.getLogger('tail')
 ###
 
 def init_parser(parser):
-	parser.add_argument('-l','--log-stream', choices=['stdout','stderr'], default='stderr', help='Specify which log stream to use in tail (default is stderr)')
+	parser.add_argument('-l','--log-stream', choices=['stdout','stderr'], default='stderr', help='Specify which standard stream to use (default is stderr)')
 	parser.add_argument('-f', '--follow', action='store_true', help='Causes tail command to not stop when end of stream is reached, but rather to wait for additional data to be appended to the input')
 	parser.add_argument('-n', '--lines', metavar='N', type=int, default=40, help='Output the last N lines, instead of the last 40')
-	parser.add_argument('program', help='Specify program in scope of the command')
+	parser.add_argument('program', help='Specify the program in scope of the command')
 
 ###
 

@@ -5,7 +5,7 @@ from ._completions import complete_ident
 ###
 
 name = 'status'
-cmdhelp = 'Show status of subprocess(es)'
+cmdhelp = 'Show status of program(s)'
 
 ###
 
@@ -14,7 +14,7 @@ L = logging.getLogger('status')
 ###
 
 def init_parser(parser):
-	parser.add_argument('program', nargs='*', help='Optionally specify program(s) in scope of the command')
+	parser.add_argument('program', nargs='*', help='Optionally specify program(s) in scope of the command. If none is given, all programs are considered in scope')
 
 ###
 
