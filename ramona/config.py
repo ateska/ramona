@@ -137,7 +137,7 @@ def read_config(configs=None, use_env=True):
 	# Special treatment of some values
 	if config.get('general', 'logdir') == '<env>':
 		logdir = os.environ.get('LOGDIR')
-		if logdir is None: logdir = '.'
+		if logdir is None: logdir = os.curdir
 		logdir = os.path.expanduser(logdir)
 		config.set('general','logdir',logdir)
 	elif config.get('general', 'logdir').strip()[:1] == '<':
