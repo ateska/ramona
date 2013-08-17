@@ -5,6 +5,11 @@ Configuration is build the way that user program(s) can share the same configura
 
 .. _ConfigParser : http://docs.python.org/library/configparser.html
 
+.. note:: 
+  You are free to blend configuration options of your application with Ramona ones. This is the design intention and it simplifies the structure of a configuration and therefore it makes maintenance significantly easier.
+
+  Ideally there should be only one application level configuration file and maybe another one for site level in a whole application.
+
 
 Application and site level configuration
 ----------------------------------------
@@ -59,6 +64,10 @@ Examples:
 -----------------
 
 This section provides general configuration of Ramona-equiped application.
+
+.. note::
+
+  Feel free to add any other configuration values that are usefull for your application. Ramona will silently ignore them. Also your application can of course use configuration values required by Ramona.
 
 
 .. attribute:: appname
