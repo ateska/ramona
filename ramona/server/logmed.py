@@ -56,14 +56,18 @@ class log_mediator(object):
 
 
 		# Configure log rotation
-		if config.get('general','logmaxsize') == 'indefinite':
+		if config.get('general','logmaxsize') == '<inf>':
 			self.logbackups = self.logmaxsize = 0
 			self.logcompress = False
 		else:			
 			try:
 				# TODO: Parse human-friendly logmaxsize ... e.g. 10Mb
 				self.logmaxsize = config.getint('general','logmaxsize')
-				self.logbackups = config.getint('general','logbackups')
+				x = config.getint('general','logbackups')
+				if x == '<inf>':
+					self.logbackups = 0
+				else:
+					self.logbackups = int(x)
 				self.logcompress = config.getboolean('general', 'logcompress')
 			except Exception, e:
 				self.logbackups = self.logmaxsize = 0
