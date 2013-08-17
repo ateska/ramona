@@ -135,20 +135,58 @@ This section provides general configuration of Ramona-equiped application.
     logdir=/var/log/foo
 
 
+
 .. attribute:: logmaxsize
 
-  TODO
+  Maximum log file size prior being rotated.
+
+  Basically a log file grows without bound unless action is taken and this can cause problems. A solution to this generic problem of log file growth is log rotation. This involves t moving of an existing log file that reach certain size to some other file name and starting fresh with an empty log file. After a period the old log files get thrown away.
+
+  The pattern is that if a log file name is ``foobar.log`` then the first (the freshest) rotated log file name is ``foobar.log.1``, the second freshest is ``foobar.log.2`` and so on. Rotated log files are renamed in a process of a log rotation increasing a tail number by one to make a space for a newly rotated file.
+
+  Value 'indefinite' disables log rotation function.
+
+  *Default*: 536870912 (512Mb)
+
+  *Required*: Yes *(but default works fine)*
+
+  Example:
+
+  .. code-block:: ini
+
+    [general]
+    logmaxsize=1000000000
 
 
 .. attribute:: logbackups
 
-  TODO
+  Number of archived rotated log files, rotated log files with a higher tail number that this config value will be removed.
+
+  *Default*: 3
+
+  *Required*: Yes *(but default works fine)*
+
+  Example:
+
+  .. code-block:: ini
+
+    [general]
+    logmaxsize=1000000
+    logbackups=2
+
+  Then
+
+  ::
+
+    foobar.log
+    foobar.log.1
+    foobar.log.2
+    foobar.log.3 <-- this one will be removed
 
 
 .. attribute:: logcompress
 
-  If `logcompress` configuration option is set to 1, the log files `xxx.log.2+` will be compressed
-  using gzip compression.
+  If this configuration option is enabled, rotated log files ``foobar.log.2+`` will be compressed using gzip compression.
 
   *Type*: boolean
     - "1", "yes", "true", or "on" for enabling this feature
@@ -158,6 +196,14 @@ This section provides general configuration of Ramona-equiped application.
 
   *Required*: No
 
+  Example:
+
+  .. code-block:: ini
+
+    [general]
+    logmaxsize=1000000
+    logbackups=5
+    logcompress=off
 
 
 [env] section
