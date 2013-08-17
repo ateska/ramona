@@ -52,6 +52,11 @@
   <div class="section" id="configuration">
 <h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
 <p>Configuration is build the way that user program(s) can share the same configuration file(s) with Ramona system. Configuration is compatible with Python <a class="reference external" href="http://docs.python.org/library/configparser.html">ConfigParser</a>. These are basic configuration files that use structure similar to what you would find on Microsoft Windows INI files.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>You are free to blend configuration options of your application with Ramona ones. This is the design intention and it simplifies the structure of a configuration and therefore it makes maintenance significantly easier.</p>
+<p class="last">Ideally there should be only one application level configuration file and maybe another one for site level in a whole application.</p>
+</div>
 <div class="section" id="application-and-site-level-configuration">
 <h2>Application and site level configuration<a class="headerlink" href="#application-and-site-level-configuration" title="Permalink to this headline">¶</a></h2>
 <p>Ramona supports split of configuration options into <em>application</em> and <em>site</em> level configuration. In this concept, application development team provides <em>application level configuration</em> as a part of source code and users are given by an option to provide their own <em>site level configurations</em> that can override or enhance application level configurations.</p>
@@ -109,11 +114,18 @@ Lowercase form is used.</p>
 <div class="section" id="general-section">
 <h2>[general] section<a class="headerlink" href="#general-section" title="Permalink to this headline">¶</a></h2>
 <p>This section provides general configuration of Ramona-equiped application.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Feel free to add any other configuration values that are usefull for your application. Ramona will silently ignore them. Also your application can of course use configuration values required by Ramona.</p>
+</div>
 <dl class="attribute">
 <dt id="appname">
 <tt class="descname">appname</tt><a class="headerlink" href="#appname" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specifies name of application.</p>
-<p>Use of whitespaces is discourages (although possible). This value can become part of various file names, therefore it needs to respect syntax of file path and name.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Use of whitespaces is discourages (although possible). This value can become part of various file names, therefore it needs to respect syntax of file path and name.</p>
+</div>
 <p><em>Type</em>: string</p>
 <p><em>Required</em>: Yes</p>
 <p>Example:</p>
@@ -154,29 +166,81 @@ Relative path is evaluated from location of application main executable (e.g. co
 <dl class="attribute">
 <dt id="logdir">
 <tt class="descname">logdir</tt><a class="headerlink" href="#logdir" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dd><p>Specifies path of a log directory on a filesystem. This value is then stored as a <tt class="docutils literal"><span class="pre">&lt;logdir&gt;</span></tt> magic value and can be used in other log configuration options.</p>
+<p>It allows you to ensure that all logs that are produced by Ramona (including logs from program standard streams) will be stored in single directory.</p>
+<dl class="docutils">
+<dt><em>Magic values</em>:</dt>
+<dd><ul class="first last simple">
+<li><tt class="docutils literal"><span class="pre">&lt;env&gt;</span></tt>: Use the <tt class="docutils literal"><span class="pre">LOGDIR</span></tt> environment variable to specify a location of a logging directory. If not present, use a current directory (e.g. <tt class="docutils literal"><span class="pre">.</span></tt> on POSIX) relatively to Ramona application.</li>
+</ul>
+</dd>
+</dl>
+<p><em>Default</em>: <tt class="docutils literal"><span class="pre">&lt;env&gt;</span></tt></p>
+<p><em>Required</em>: Yes <em>(but default works fine)</em></p>
+<p>Example:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[general]</span>
+<span class="na">logdir</span><span class="o">=</span><span class="s">/var/log/foo</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="logmaxsize">
 <tt class="descname">logmaxsize</tt><a class="headerlink" href="#logmaxsize" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dd><p>Maximum log file size prior being rotated.</p>
+<p>Basically a log file grows without bound unless action is taken and this can cause problems. A solution to this generic problem of log file growth is log rotation. This involves t moving of an existing log file that reach certain size to some other file name and starting fresh with an empty log file. After a period the old log files get thrown away.</p>
+<p>The pattern is that if a log file name is <tt class="docutils literal"><span class="pre">foobar.log</span></tt> then the first (the freshest) rotated log file name is <tt class="docutils literal"><span class="pre">foobar.log.1</span></tt>, the second freshest is <tt class="docutils literal"><span class="pre">foobar.log.2</span></tt> and so on. Rotated log files are renamed in a process of a log rotation increasing a tail number by one to make a space for a newly rotated file.</p>
+<p>Value &#8216;indefinite&#8217; disables log rotation function.</p>
+<p><em>Default</em>: 536870912 (512Mb)</p>
+<p><em>Required</em>: Yes <em>(but default works fine)</em></p>
+<p>Example:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[general]</span>
+<span class="na">logmaxsize</span><span class="o">=</span><span class="s">1000000000</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="logbackups">
 <tt class="descname">logbackups</tt><a class="headerlink" href="#logbackups" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dd><p>Number of archived rotated log files, rotated log files with a higher tail number that this config value will be removed.</p>
+<p><em>Default</em>: 3</p>
+<p><em>Required</em>: Yes <em>(but default works fine)</em></p>
+<p>Example:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[general]</span>
+<span class="na">logmaxsize</span><span class="o">=</span><span class="s">1000000</span>
+<span class="na">logbackups</span><span class="o">=</span><span class="s">2</span>
+</pre></div>
+</div>
+<p>Then</p>
+<div class="highlight-python"><pre>foobar.log
+foobar.log.1
+foobar.log.2
+foobar.log.3 &lt;-- this one will be removed</pre>
+</div>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="logcompress">
 <tt class="descname">logcompress</tt><a class="headerlink" href="#logcompress" title="Permalink to this definition">¶</a></dt>
-<dd><p>If <cite>logcompress</cite> configuration option is set to 1, the log files <cite>xxx.log.2+</cite> will be compressed
-using gzip compression.</p>
-<p><em>Type</em>: boolean &#8211; use &#8220;1&#8221;, &#8220;yes&#8221;, &#8220;true&#8221;, and &#8220;on&#8221; for True, &#8220;0&#8221;, &#8220;no&#8221;, &#8220;false&#8221;, and &#8220;off&#8221; for False</p>
-<p><em>Default</em>: 1</p>
+<dd><p>If this configuration option is enabled, rotated log files <tt class="docutils literal"><span class="pre">foobar.log.2+</span></tt> will be compressed using gzip compression.</p>
+<dl class="docutils">
+<dt><em>Type</em>: boolean</dt>
+<dd><ul class="first last simple">
+<li>&#8220;1&#8221;, &#8220;yes&#8221;, &#8220;true&#8221;, or &#8220;on&#8221; for enabling this feature</li>
+<li>&#8220;0&#8221;, no&#8221;, &#8220;false&#8221;, and &#8220;off&#8221; for disaling</li>
+</ul>
+</dd>
+</dl>
+<p><em>Default</em>: &#8220;on&#8221;</p>
 <p><em>Required</em>: No</p>
+<p>Example:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[general]</span>
+<span class="na">logmaxsize</span><span class="o">=</span><span class="s">1000000</span>
+<span class="na">logbackups</span><span class="o">=</span><span class="s">5</span>
+<span class="na">logcompress</span><span class="o">=</span><span class="s">off</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </div>
