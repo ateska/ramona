@@ -65,7 +65,8 @@ This section provides general configuration of Ramona-equiped application.
 
   Specifies name of application.
 
-  Use of whitespaces is discourages (although possible). This value can become part of various file names, therefore it needs to respect syntax of file path and name.
+  .. note::
+    Use of whitespaces is discourages (although possible). This value can become part of various file names, therefore it needs to respect syntax of file path and name.
 
 
   *Type*: string
@@ -115,7 +116,23 @@ This section provides general configuration of Ramona-equiped application.
 
 .. attribute:: logdir
 
-  TODO
+  Specifies path of a log directory on a filesystem. This value is then stored as a ``<logdir>`` magic value and can be used in other log configuration options.
+
+  It allows you to ensure that all logs that are produced by Ramona (including logs from program standard streams) will be stored in single directory.
+
+  *Magic values*:
+    - ``<env>``: Use the ``LOGDIR`` environment variable to specify a location of a logging directory. If not present, use a current directory (e.g. ``.`` on POSIX) relatively to Ramona application.
+
+  *Default*: ``<env>``
+
+  *Required*: Yes *(but default works fine)*
+
+  Example:
+
+  .. code-block:: ini
+
+    [general]
+    logdir=/var/log/foo
 
 
 .. attribute:: logmaxsize
@@ -133,9 +150,11 @@ This section provides general configuration of Ramona-equiped application.
   If `logcompress` configuration option is set to 1, the log files `xxx.log.2+` will be compressed
   using gzip compression.
 
-  *Type*: boolean -- use "1", "yes", "true", and "on" for True, "0", "no", "false", and "off" for False
+  *Type*: boolean
+    - "1", "yes", "true", or "on" for enabling this feature
+    - "0", no", "false", and "off" for disaling
   
-  *Default*: 1
+  *Default*: "on"
 
   *Required*: No
 
