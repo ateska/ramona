@@ -54,15 +54,21 @@ class log_mediator(object):
 				for line in logf:
 					self.__add_to_tailbuf(line)
 
+
 		# Configure log rotation
-		try:
-			self.logmaxsize = config.getint('general','logmaxsize')
-			self.logbackups = config.getint('general','logbackups')
-			self.logcompress = config.getboolean('general', 'logcompress')
-		except Exception, e:
+		if config.get('general','logmaxsize') == 'indefinite':
 			self.logbackups = self.logmaxsize = 0
 			self.logcompress = False
-			L.warning("Invalid configuration of log rotation: {0} - log rotation disabled".format(e))
+		else:			
+			try:
+				# TODO: Parse human-friendly logmaxsize ... e.g. 10Mb
+				self.logmaxsize = config.getint('general','logmaxsize')
+				self.logbackups = config.getint('general','logbackups')
+				self.logcompress = config.getboolean('general', 'logcompress')
+			except Exception, e:
+				self.logbackups = self.logmaxsize = 0
+				self.logcompress = False
+				L.warning("Invalid configuration of log rotation: {0} - log rotation disabled".format(e))
 
 
 	def open(self):
