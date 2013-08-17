@@ -153,7 +153,8 @@ This section provides general configuration of Ramona-equiped application.
 
   The pattern is that if a log file name is ``foobar.log`` then the first (the freshest) rotated log file name is ``foobar.log.1``, the second freshest is ``foobar.log.2`` and so on. Rotated log files are renamed in a process of a log rotation increasing a tail number by one to make a space for a newly rotated file.
 
-  Value 'indefinite' disables log rotation function.
+  Magic values:
+    - ``<inf>``: disables log rotation function.
 
   *Default*: 536870912 (512Mb)
 
@@ -170,6 +171,9 @@ This section provides general configuration of Ramona-equiped application.
 .. attribute:: logbackups
 
   Number of archived rotated log files, rotated log files with a higher tail number that this config value will be removed.
+
+  Magic values:
+    - ``<inf>``: infinite number of rotated log files (disabling removal of old rotated log files)
 
   *Default*: 3
 
@@ -218,7 +222,7 @@ This section provides general configuration of Ramona-equiped application.
 [env] section
 -------------
 
-Environment section allows to specify `environment variables`_ that will be added to the environment variable set that applies to running Ramona server.
+Environment variables section allows to specify `environment variables`_ that will be added to the environment of Ramona server. These will be also propagated to supervised programs during their start.
 
 These variables can be also used in other options via ``${VARNAME}`` placeholders.
 
@@ -237,7 +241,7 @@ Environment variable section example:
 [ramona:server] section
 -----------------------
 
-TODO
+This section configures Ramona server.
 
 
 .. attribute:: consoleuri
@@ -270,9 +274,21 @@ TODO
 
 .. attribute:: pidfile
 
-  TODO
-  You can use environment variables in form of ${var-name}.
+  Specifies location of file with `process identified`_ of Ramona server. This file can be eventually used by other processes or users to look it up.
+
+  If no or empty value is provided, no pid file is created.
+
+  .. _`process identified`: http://en.wikipedia.org/wiki/Process_identifier
   
+  .. note ::
+    
+    You can use environment variables in form of ``${VARNAME}``.
+
+  *Default*: (empty)
+
+  *Required*: No
+
+
   Example:
 
   .. code-block:: ini
@@ -281,9 +297,14 @@ TODO
     pidfile=${TMP}/testramona.pid
 
 
+
 .. attribute:: log
 
-  TODO
+  Specifies where to store a log file of Ramona server.
+
+  *Default*: ``<logdir>``
+
+  *Required*: Yes
 
   Example:
 
@@ -293,7 +314,8 @@ TODO
     log=/var/log/foo.log
 
 
-  Magic variable '<logdir>'
+  Magic variables:
+    - ``<logdir>``: can be used anywhere in a path to refer to a value of ``[general]`` :attr:`logdir` .
 
   .. code-block:: ini
 
@@ -322,7 +344,29 @@ TODO
 
 .. attribute:: loglevel
 
-  TODO
+  Defines a log level respectively a verbosity of Ramona server.
+
+  Following log levels can be used:
+    ============= =============================================================================
+     Level         Meaning
+    ============= =============================================================================
+     ``DEBUG``     Detailed information, typically of interest only when diagnosing problems. 
+     ``INFO``      Confirmation that things are working as expected.
+     ``WARNING``   An indication that something unexpected happened, or indicative of some problem in the near future. The software is still working as expected.
+     ``ERROR``     Due to a more serious problem, the software has not been able to perform some function.
+     ``CRITICAL``  A serious error, indicating that the program itself may be unable to continue running.
+    ============= =============================================================================
+
+  *Default*: ``INFO``
+
+  *Required*: No
+
+  Example:
+
+  .. code-block:: ini
+
+    [ramona:server]
+    loglevel=DEBUG
 
 
 [ramona:console] section
