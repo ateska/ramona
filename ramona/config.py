@@ -9,7 +9,7 @@ L = logging.getLogger("config")
 config_defaults = {
 	'general' : {
 		'appname' : 'ramona-driven-app',
-		'logdir' : '<none>',
+		'logdir' : '<env>',
 		'include' : '<siteconf>',
 		'logmaxsize': '{0}'.format(512*1024*1024), # 512Mb
 		'logbackups': '3',
@@ -135,11 +135,13 @@ def read_config(configs=None, use_env=True):
 		 		config.set(section, r.group(1), value)
 
 	# Special treatment of some values
-	if config.get('general', 'logdir') == '<none>':
+	if config.get('general', 'logdir') == '<env>':
 		logdir = os.environ.get('LOGDIR')
 		if logdir is None: logdir = '.'
 		logdir = os.path.expanduser(logdir)
 		config.set('general','logdir',logdir)
+	elif config.get('general', 'logdir').strip()[:1] == '<':
+		raise RuntimeError("FATAL: Unknown magic value in [general] logdir: '{}'".format(config.get('general', 'logdir')))
 
 ###
 

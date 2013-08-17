@@ -80,6 +80,11 @@ Console application (base for custom implementations)
 
 		L.debug("Configuration read from: {0}".format(', '.join(config_files)))
 
+		logdir = self.config.get('general', 'logdir')
+		if not os.path.isdir(logdir):
+			L.warning("Log directory '{}' not found.".format(logdir))
+
+
 		# Prepare server connection factory
 		self.cnsconuri = socketuri.socket_uri(config.get('ramona:console','serveruri'))
 		self.ctlconsock = None
