@@ -426,30 +426,100 @@ This section contains configuration used by Ramona console.
 [ramona:notify] section
 -----------------------
 
-TODO
+This is configuration of Ramona notification sub-system. This component (part of Ramona server) is reponsible for sending out email notifications about pre-configured events.
+
+.. note::
+
+  Python ``smtplib`` module is used to handle SMTP connectivity.
 
 
 .. attribute:: delivery
 
-  TODO
+  URL specifies a default delivery method for notifications.
+
+  Supported scheme is currently only 'smtp'. Format of URL is ``smtp://[username][:password]@host[:port]/[;parameters]``.
+    - ``username``: the name of a user that will be used during a SMTP authorization (optional)
+    - ``password``: the password of a user that will be used during a SMTP authorization (optional)
+    - ``host``: the server name or IP address of SMTP MTA_ (**mandatory**)
+    - ``port``: the port number to be used (optional, port 25 is default)
+    - ``parameters``: set of parameters that will be used to configure STMP communication
+
+      * ``tls``: if this paramater is set to `1` then TLS (Transport Layer Security) mode of the STMP connection will be enabled
+
+  .. _MTA: http://en.wikipedia.org/wiki/Message_transfer_agent
+
+
+  A missing or empty value efectively disables default delivery option.
+
+  *Default*: (empty)
+
+  *Required*: No
+
+  Examples:
+
+  .. code-block:: ini
+
+    [ramona:notify]
+    delivery=smtp://user:password@smtp.gmail.com:587/;tls=1
+
+
+  .. code-block:: ini
+
+    [ramona:notify]
+    delivery=smtp://mail.example.com/
+
 
 
 .. attribute:: sender
 
-  TODO
+  The email address of a sender which will be used in ``From:`` field of the notification email.
+
+  Magic value ``<user>`` will result in email address constructed from a name of an OS user used to launch Ramona server.
+
+  *Default*: ``<user>``
+
+  *Required*: No
+
+  Examples:
+
+  .. code-block:: ini
+
+    [ramona:notify]
+    sender=ramona@app.foobar.com
 
 
 .. attribute:: receiver
 
-  Default recipient of all notifications
+  The default email address of an recipient of notifications.
+
+  You can provide multiple email addresses separated by comma (``,``).
+
+  *Default*: (empty)
+
+  *Required*: No
+
+  Examples:
+
+  .. code-block:: ini
+
+    [ramona:notify]
+    receiver=admin@foobar.com,moniting@foobar.com
+
 
 .. attribute:: dailyat
 
-  At what time the notifications should be used when ``daily`` period is used. The value is in the local timezone of your computer. Use the format ``HH:MM``
+  At what time the notifications should be used when ``daily`` period is used. The value is in the local timezone of your computer. Use the format ``HH:MM`` (24-hours).
 
   *Default*:  ``09:00``
 
   *Required*:  No
+
+  Examples:
+
+  .. code-block:: ini
+
+    [ramona:notify]
+    dailyat=23:00
 
 
 
