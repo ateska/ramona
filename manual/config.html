@@ -190,7 +190,13 @@ Relative path is evaluated from location of application main executable (e.g. co
 <dd><p>Maximum log file size prior being rotated.</p>
 <p>Basically a log file grows without bound unless action is taken and this can cause problems. A solution to this generic problem of log file growth is log rotation. This involves t moving of an existing log file that reach certain size to some other file name and starting fresh with an empty log file. After a period the old log files get thrown away.</p>
 <p>The pattern is that if a log file name is <tt class="docutils literal"><span class="pre">foobar.log</span></tt> then the first (the freshest) rotated log file name is <tt class="docutils literal"><span class="pre">foobar.log.1</span></tt>, the second freshest is <tt class="docutils literal"><span class="pre">foobar.log.2</span></tt> and so on. Rotated log files are renamed in a process of a log rotation increasing a tail number by one to make a space for a newly rotated file.</p>
-<p>Value &#8216;indefinite&#8217; disables log rotation function.</p>
+<dl class="docutils">
+<dt>Magic values:</dt>
+<dd><ul class="first last simple">
+<li><tt class="docutils literal"><span class="pre">&lt;inf&gt;</span></tt>: disables log rotation function.</li>
+</ul>
+</dd>
+</dl>
 <p><em>Default</em>: 536870912 (512Mb)</p>
 <p><em>Required</em>: Yes <em>(but default works fine)</em></p>
 <p>Example:</p>
@@ -204,6 +210,13 @@ Relative path is evaluated from location of application main executable (e.g. co
 <dt id="logbackups">
 <tt class="descname">logbackups</tt><a class="headerlink" href="#logbackups" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of archived rotated log files, rotated log files with a higher tail number that this config value will be removed.</p>
+<dl class="docutils">
+<dt>Magic values:</dt>
+<dd><ul class="first last simple">
+<li><tt class="docutils literal"><span class="pre">&lt;inf&gt;</span></tt>: infinite number of rotated log files (disabling removal of old rotated log files)</li>
+</ul>
+</dd>
+</dl>
 <p><em>Default</em>: 3</p>
 <p><em>Required</em>: Yes <em>(but default works fine)</em></p>
 <p>Example:</p>
@@ -246,7 +259,7 @@ foobar.log.3 &lt;-- this one will be removed</pre>
 </div>
 <div class="section" id="env-section">
 <h2>[env] section<a class="headerlink" href="#env-section" title="Permalink to this headline">¶</a></h2>
-<p>Environment section allows to specify <a class="reference external" href="http://en.wikipedia.org/wiki/Environment_variable">environment variables</a> that will be added to the environment variable set that applies to running Ramona server.</p>
+<p>Environment variables section allows to specify <a class="reference external" href="http://en.wikipedia.org/wiki/Environment_variable">environment variables</a> that will be added to the environment of Ramona server. These will be also propagated to supervised programs during their start.</p>
 <p>These variables can be also used in other options via <tt class="docutils literal"><span class="pre">${VARNAME}</span></tt> placeholders.</p>
 <p>Environment variable section example:</p>
 <div class="highlight-ini"><div class="highlight"><pre><span class="k">[env]</span>
@@ -258,7 +271,7 @@ foobar.log.3 &lt;-- this one will be removed</pre>
 </div>
 <div class="section" id="ramona-server-section">
 <h2>[ramona:server] section<a class="headerlink" href="#ramona-server-section" title="Permalink to this headline">¶</a></h2>
-<p>TODO</p>
+<p>This section configures Ramona server.</p>
 <dl class="attribute">
 <dt id="consoleuri">
 <tt class="descname">consoleuri</tt><a class="headerlink" href="#consoleuri" title="Permalink to this definition">¶</a></dt>
@@ -286,8 +299,14 @@ You can specify more network interfaces, protocols or ports, URIs are comma-sepa
 <dl class="attribute">
 <dt id="pidfile">
 <tt class="descname">pidfile</tt><a class="headerlink" href="#pidfile" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO
-You can use environment variables in form of ${var-name}.</p>
+<dd><p>Specifies location of file with <a class="reference external" href="http://en.wikipedia.org/wiki/Process_identifier">process identified</a> of Ramona server. This file can be eventually used by other processes or users to look it up.</p>
+<p>If no or empty value is provided, no pid file is created.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You can use environment variables in form of <tt class="docutils literal"><span class="pre">${VARNAME}</span></tt>.</p>
+</div>
+<p><em>Default</em>: (empty)</p>
+<p><em>Required</em>: No</p>
 <p>Example:</p>
 <div class="highlight-ini"><div class="highlight"><pre><span class="k">[ramona:server]</span>
 <span class="na">pidfile</span><span class="o">=</span><span class="s">${TMP}/testramona.pid</span>
@@ -298,13 +317,21 @@ You can use environment variables in form of ${var-name}.</p>
 <dl class="attribute">
 <dt id="log">
 <tt class="descname">log</tt><a class="headerlink" href="#log" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dd><p>Specifies where to store a log file of Ramona server.</p>
+<p><em>Default</em>: <tt class="docutils literal"><span class="pre">&lt;logdir&gt;</span></tt></p>
+<p><em>Required</em>: Yes</p>
 <p>Example:</p>
 <div class="highlight-ini"><div class="highlight"><pre><span class="k">[ramona:server]</span>
 <span class="na">log</span><span class="o">=</span><span class="s">/var/log/foo.log</span>
 </pre></div>
 </div>
-<p>Magic variable &#8216;&lt;logdir&gt;&#8217;</p>
+<dl class="docutils">
+<dt>Magic variables:</dt>
+<dd><ul class="first last simple">
+<li><tt class="docutils literal"><span class="pre">&lt;logdir&gt;</span></tt>: can be used anywhere in a path to refer to a value of <tt class="docutils literal"><span class="pre">[general]</span></tt> <a class="reference internal" href="#logdir" title="logdir"><tt class="xref py py-attr docutils literal"><span class="pre">logdir</span></tt></a> .</li>
+</ul>
+</dd>
+</dl>
 <div class="highlight-ini"><div class="highlight"><pre><span class="k">[general]</span>
 <span class="na">logdir</span><span class="o">=</span><span class="s">./log</span>
 
@@ -326,7 +353,46 @@ You can use environment variables in form of ${var-name}.</p>
 <dl class="attribute">
 <dt id="loglevel">
 <tt class="descname">loglevel</tt><a class="headerlink" href="#loglevel" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dd><p>Defines a log level respectively a verbosity of Ramona server.</p>
+<dl class="docutils">
+<dt>Following log levels can be used:</dt>
+<dd><table border="1" class="first last docutils">
+<colgroup>
+<col width="8%" />
+<col width="92%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Level</th>
+<th class="head">Meaning</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">DEBUG</span></tt></td>
+<td>Detailed information, typically of interest only when diagnosing problems.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">INFO</span></tt></td>
+<td>Confirmation that things are working as expected.</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">WARNING</span></tt></td>
+<td>An indication that something unexpected happened, or indicative of some problem in the near future. The software is still working as expected.</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">ERROR</span></tt></td>
+<td>Due to a more serious problem, the software has not been able to perform some function.</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">CRITICAL</span></tt></td>
+<td>A serious error, indicating that the program itself may be unable to continue running.</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+<p><em>Default</em>: <tt class="docutils literal"><span class="pre">INFO</span></tt></p>
+<p><em>Required</em>: No</p>
+<p>Example:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[ramona:server]</span>
+<span class="na">loglevel</span><span class="o">=</span><span class="s">DEBUG</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </div>
@@ -374,61 +440,158 @@ History list is persistent and is available across program restarts.</p>
 </div>
 <div class="section" id="ramona-notify-section">
 <h2>[ramona:notify] section<a class="headerlink" href="#ramona-notify-section" title="Permalink to this headline">¶</a></h2>
-<p>TODO</p>
+<p>This is configuration of Ramona notification sub-system. This component (part of Ramona server) is reponsible for sending out email notifications about pre-configured events.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Python <tt class="docutils literal"><span class="pre">smtplib</span></tt> module is used to handle SMTP connectivity.</p>
+</div>
 <dl class="attribute">
 <dt id="delivery">
 <tt class="descname">delivery</tt><a class="headerlink" href="#delivery" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dd><p>URL specifies a default delivery method for notifications.</p>
+<dl class="docutils">
+<dt>Supported scheme is currently only &#8216;smtp&#8217;. Format of URL is <tt class="docutils literal"><span class="pre">smtp://[username][:password]&#64;host[:port]/[;parameters]</span></tt>.</dt>
+<dd><ul class="first last simple">
+<li><tt class="docutils literal"><span class="pre">username</span></tt>: the name of a user that will be used during a SMTP authorization (optional)</li>
+<li><tt class="docutils literal"><span class="pre">password</span></tt>: the password of a user that will be used during a SMTP authorization (optional)</li>
+<li><tt class="docutils literal"><span class="pre">host</span></tt>: the server name or IP address of SMTP <a class="reference external" href="http://en.wikipedia.org/wiki/Message_transfer_agent">MTA</a> (<strong>mandatory</strong>)</li>
+<li><tt class="docutils literal"><span class="pre">port</span></tt>: the port number to be used (optional, port 25 is default)</li>
+<li><tt class="docutils literal"><span class="pre">parameters</span></tt>: set of parameters that will be used to configure STMP communication<ul>
+<li><tt class="docutils literal"><span class="pre">tls</span></tt>: if this paramater is set to <cite>1</cite> then TLS (Transport Layer Security) mode of the STMP connection will be enabled</li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+<p>A missing or empty value efectively disables default delivery option.</p>
+<p><em>Default</em>: (empty)</p>
+<p><em>Required</em>: No</p>
+<p>Examples:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[ramona:notify]</span>
+<span class="na">delivery</span><span class="o">=</span><span class="s">smtp://user:password@smtp.gmail.com:587/;tls=1</span>
+</pre></div>
+</div>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[ramona:notify]</span>
+<span class="na">delivery</span><span class="o">=</span><span class="s">smtp://mail.example.com/</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="sender">
 <tt class="descname">sender</tt><a class="headerlink" href="#sender" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dd><p>The email address of a sender which will be used in <tt class="docutils literal"><span class="pre">From:</span></tt> field of the notification email.</p>
+<p>Magic value <tt class="docutils literal"><span class="pre">&lt;user&gt;</span></tt> will result in email address constructed from a name of an OS user used to launch Ramona server.</p>
+<p><em>Default</em>: <tt class="docutils literal"><span class="pre">&lt;user&gt;</span></tt></p>
+<p><em>Required</em>: No</p>
+<p>Examples:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[ramona:notify]</span>
+<span class="na">sender</span><span class="o">=</span><span class="s">ramona@app.foobar.com</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="receiver">
 <tt class="descname">receiver</tt><a class="headerlink" href="#receiver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Default recipient of all notifications</p>
+<dd><p>The default email address of an recipient of notifications.</p>
+<p>You can provide multiple email addresses separated by comma (<tt class="docutils literal"><span class="pre">,</span></tt>).</p>
+<p><em>Default</em>: (empty)</p>
+<p><em>Required</em>: No</p>
+<p>Examples:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[ramona:notify]</span>
+<span class="na">receiver</span><span class="o">=</span><span class="s">admin@foobar.com,moniting@foobar.com</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="dailyat">
 <tt class="descname">dailyat</tt><a class="headerlink" href="#dailyat" title="Permalink to this definition">¶</a></dt>
-<dd><p>At what time the notifications should be used when <tt class="docutils literal"><span class="pre">daily</span></tt> period is used. The value is in the local timezone of your computer. Use the format <tt class="docutils literal"><span class="pre">HH:MM</span></tt></p>
+<dd><p>At what time the notifications should be used when <tt class="docutils literal"><span class="pre">daily</span></tt> period is used. The value is in the local timezone of your computer. Use the format <tt class="docutils literal"><span class="pre">HH:MM</span></tt> (24-hours).</p>
 <p><em>Default</em>:  <tt class="docutils literal"><span class="pre">09:00</span></tt></p>
 <p><em>Required</em>:  No</p>
+<p>Examples:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[ramona:notify]</span>
+<span class="na">dailyat</span><span class="o">=</span><span class="s">23:00</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </div>
-<div class="section" id="program-x-section">
-<h2>[program:X] section<a class="headerlink" href="#program-x-section" title="Permalink to this headline">¶</a></h2>
-<p>TODO</p>
+<div class="section" id="program-section">
+<h2>[program:...] section<a class="headerlink" href="#program-section" title="Permalink to this headline">¶</a></h2>
+<p>This section of an configuration allows to define program, that will be supervised by Ramona (started, monitored and eventually stopped) including various parameters that describes intended runtime behaviour of given program.</p>
+<p>The <tt class="docutils literal"><span class="pre">...</span></tt> in <tt class="docutils literal"><span class="pre">[program:...]</span></tt> section name should be substituted by name of supervised program. Name should be in ASCII using uppercase and lowecase letters, numbers, underscore (<tt class="docutils literal"><span class="pre">_</span></tt>) but no whitespaces.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Common configuration of Ramona typically contains more than one of <tt class="docutils literal"><span class="pre">[program:...]</span></tt> section.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[program:frontend]</span>
+<span class="na">cmd</span><span class="o">=</span><span class="s">./frontend.py</span>
+
+<span class="k">[program:backend]</span>
+<span class="na">cmd</span><span class="o">=</span><span class="s">./backend.py</span>
+
+<span class="k">[program:integration1]</span>
+<span class="na">cmd</span><span class="o">=</span><span class="s">./integration1.py</span>
+</pre></div>
+</div>
 <dl class="attribute">
 <dt id="command">
 <tt class="descname">command</tt><a class="headerlink" href="#command" title="Permalink to this definition">¶</a></dt>
-<dd><p>expandvars
-TODO</p>
+<dd><p>The command that is used to start a program. Ramona server will issue this command in order to change state of a program to <tt class="docutils literal"><span class="pre">STARTING</span></tt> (and eventual <tt class="docutils literal"><span class="pre">RUNNING</span></tt>) status.</p>
+<p>The command can be either absolute (e.g. <tt class="docutils literal"><span class="pre">/path/to/foobarapp</span></tt>), relative (<tt class="docutils literal"><span class="pre">./bin/foobarapp</span></tt>) or just application executable name (e.g. <tt class="docutils literal"><span class="pre">foobarapp</span></tt>). If last option is used, the environment variable <tt class="docutils literal"><span class="pre">${PATH}</span></tt> will be searched for the executable. Programs can accept arguments, e.g. <tt class="docutils literal"><span class="pre">/path/to/foobarapp</span> <span class="pre">foo</span> <span class="pre">bar</span></tt>.</p>
+<p>Supervised programs should themselves not be <a class="reference external" href="http://en.wikipedia.org/wiki/Daemon_(computing)">daemons</a>, as Ramona server assumes it is responsible for daemonizing itself.</p>
+<p><em>Default</em>: (none)</p>
+<p><em>Required</em>: Yes</p>
 <p>Example:</p>
-<div class="highlight-ini"><div class="highlight"><pre><span class="k">[ramona:server]</span>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[program:dirlist]</span>
 <span class="na">command</span><span class="o">=</span><span class="s">ls -l /</span>
 <span class="na">command@windows</span><span class="o">=</span><span class="s">dir c:\</span>
 </pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>You can take benefit of environment variables expansion when defining this option.</p>
+<div class="last highlight-ini"><div class="highlight"><pre><span class="k">[program:fooapp]</span>
+<span class="na">command</span><span class="o">=</span><span class="s">./fooapp -t ${TMPDIR}</span>
+</pre></div>
+</div>
 </div>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="directory">
 <tt class="descname">directory</tt><a class="headerlink" href="#directory" title="Permalink to this definition">¶</a></dt>
-<dd><p>expandvars
-TODO</p>
+<dd><p>The directory that program should be started in. Ramona server will change a working directory to this value just prior launching relevant program. Change of directory is local only for given program.</p>
+<p>If no or empty value is given, no change of directory is performed, th program will be launched in a working directory of Ramona server.</p>
+<p><em>Default</em>: (none)</p>
+<p><em>Required</em>: No</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>You can take benefit of environment variables expansion when defining this option.</p>
+<div class="last highlight-ini"><div class="highlight"><pre><span class="k">[program:fooapp]</span>
+<span class="na">directory</span><span class="o">=</span><span class="s">${TMPDIR}</span>
+</pre></div>
+</div>
+</div>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="umask">
 <tt class="descname">umask</tt><a class="headerlink" href="#umask" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dd><p>Specifies <em>mask</em> of the program. Mask controls which file permissions are set for files and directories when they are created.</p>
+<p>If no or empty value is given, to umask is set.</p>
+<p><strong>Available only on POSIX platforms.</strong></p>
+<p><em>Default</em>: (none)</p>
+<p><em>Required</em>: No</p>
+<p>Example:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[program:foobarapp]</span>
+<span class="na">umask</span><span class="o">=</span><span class="s">002</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="attribute">
@@ -608,7 +771,7 @@ you can use the following command (works on Linux):</p>
 <li><a class="reference internal" href="#ramona-server-section">[ramona:server] section</a></li>
 <li><a class="reference internal" href="#ramona-console-section">[ramona:console] section</a></li>
 <li><a class="reference internal" href="#ramona-notify-section">[ramona:notify] section</a></li>
-<li><a class="reference internal" href="#program-x-section">[program:X] section</a></li>
+<li><a class="reference internal" href="#program-section">[program:...] section</a></li>
 <li><a class="reference internal" href="#program-ramonahttpfend">[program:ramonahttpfend]</a></li>
 </ul>
 </li>

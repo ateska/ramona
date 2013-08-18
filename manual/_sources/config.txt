@@ -153,7 +153,8 @@ This section provides general configuration of Ramona-equiped application.
 
   The pattern is that if a log file name is ``foobar.log`` then the first (the freshest) rotated log file name is ``foobar.log.1``, the second freshest is ``foobar.log.2`` and so on. Rotated log files are renamed in a process of a log rotation increasing a tail number by one to make a space for a newly rotated file.
 
-  Value 'indefinite' disables log rotation function.
+  Magic values:
+    - ``<inf>``: disables log rotation function.
 
   *Default*: 536870912 (512Mb)
 
@@ -170,6 +171,9 @@ This section provides general configuration of Ramona-equiped application.
 .. attribute:: logbackups
 
   Number of archived rotated log files, rotated log files with a higher tail number that this config value will be removed.
+
+  Magic values:
+    - ``<inf>``: infinite number of rotated log files (disabling removal of old rotated log files)
 
   *Default*: 3
 
@@ -218,7 +222,7 @@ This section provides general configuration of Ramona-equiped application.
 [env] section
 -------------
 
-Environment section allows to specify `environment variables`_ that will be added to the environment variable set that applies to running Ramona server.
+Environment variables section allows to specify `environment variables`_ that will be added to the environment of Ramona server. These will be also propagated to supervised programs during their start.
 
 These variables can be also used in other options via ``${VARNAME}`` placeholders.
 
@@ -237,7 +241,7 @@ Environment variable section example:
 [ramona:server] section
 -----------------------
 
-TODO
+This section configures Ramona server.
 
 
 .. attribute:: consoleuri
@@ -270,9 +274,21 @@ TODO
 
 .. attribute:: pidfile
 
-  TODO
-  You can use environment variables in form of ${var-name}.
+  Specifies location of file with `process identified`_ of Ramona server. This file can be eventually used by other processes or users to look it up.
+
+  If no or empty value is provided, no pid file is created.
+
+  .. _`process identified`: http://en.wikipedia.org/wiki/Process_identifier
   
+  .. note ::
+    
+    You can use environment variables in form of ``${VARNAME}``.
+
+  *Default*: (empty)
+
+  *Required*: No
+
+
   Example:
 
   .. code-block:: ini
@@ -281,9 +297,14 @@ TODO
     pidfile=${TMP}/testramona.pid
 
 
+
 .. attribute:: log
 
-  TODO
+  Specifies where to store a log file of Ramona server.
+
+  *Default*: ``<logdir>``
+
+  *Required*: Yes
 
   Example:
 
@@ -293,7 +314,8 @@ TODO
     log=/var/log/foo.log
 
 
-  Magic variable '<logdir>'
+  Magic variables:
+    - ``<logdir>``: can be used anywhere in a path to refer to a value of ``[general]`` :attr:`logdir` .
 
   .. code-block:: ini
 
@@ -322,7 +344,29 @@ TODO
 
 .. attribute:: loglevel
 
-  TODO
+  Defines a log level respectively a verbosity of Ramona server.
+
+  Following log levels can be used:
+    ============= =============================================================================
+     Level         Meaning
+    ============= =============================================================================
+     ``DEBUG``     Detailed information, typically of interest only when diagnosing problems. 
+     ``INFO``      Confirmation that things are working as expected.
+     ``WARNING``   An indication that something unexpected happened, or indicative of some problem in the near future. The software is still working as expected.
+     ``ERROR``     Due to a more serious problem, the software has not been able to perform some function.
+     ``CRITICAL``  A serious error, indicating that the program itself may be unable to continue running.
+    ============= =============================================================================
+
+  *Default*: ``INFO``
+
+  *Required*: No
+
+  Example:
+
+  .. code-block:: ini
+
+    [ramona:server]
+    loglevel=DEBUG
 
 
 [ramona:console] section
@@ -382,62 +426,204 @@ This section contains configuration used by Ramona console.
 [ramona:notify] section
 -----------------------
 
-TODO
+This is configuration of Ramona notification sub-system. This component (part of Ramona server) is reponsible for sending out email notifications about pre-configured events.
+
+.. note::
+
+  Python ``smtplib`` module is used to handle SMTP connectivity.
 
 
 .. attribute:: delivery
 
-  TODO
+  URL specifies a default delivery method for notifications.
+
+  Supported scheme is currently only 'smtp'. Format of URL is ``smtp://[username][:password]@host[:port]/[;parameters]``.
+    - ``username``: the name of a user that will be used during a SMTP authorization (optional)
+    - ``password``: the password of a user that will be used during a SMTP authorization (optional)
+    - ``host``: the server name or IP address of SMTP MTA_ (**mandatory**)
+    - ``port``: the port number to be used (optional, port 25 is default)
+    - ``parameters``: set of parameters that will be used to configure STMP communication
+
+      * ``tls``: if this paramater is set to `1` then TLS (Transport Layer Security) mode of the STMP connection will be enabled
+
+  .. _MTA: http://en.wikipedia.org/wiki/Message_transfer_agent
+
+
+  A missing or empty value efectively disables default delivery option.
+
+  *Default*: (empty)
+
+  *Required*: No
+
+  Examples:
+
+  .. code-block:: ini
+
+    [ramona:notify]
+    delivery=smtp://user:password@smtp.gmail.com:587/;tls=1
+
+
+  .. code-block:: ini
+
+    [ramona:notify]
+    delivery=smtp://mail.example.com/
+
 
 
 .. attribute:: sender
 
-  TODO
+  The email address of a sender which will be used in ``From:`` field of the notification email.
+
+  Magic value ``<user>`` will result in email address constructed from a name of an OS user used to launch Ramona server.
+
+  *Default*: ``<user>``
+
+  *Required*: No
+
+  Examples:
+
+  .. code-block:: ini
+
+    [ramona:notify]
+    sender=ramona@app.foobar.com
 
 
 .. attribute:: receiver
 
-  Default recipient of all notifications
+  The default email address of an recipient of notifications.
+
+  You can provide multiple email addresses separated by comma (``,``).
+
+  *Default*: (empty)
+
+  *Required*: No
+
+  Examples:
+
+  .. code-block:: ini
+
+    [ramona:notify]
+    receiver=admin@foobar.com,moniting@foobar.com
+
 
 .. attribute:: dailyat
 
-  At what time the notifications should be used when ``daily`` period is used. The value is in the local timezone of your computer. Use the format ``HH:MM``
+  At what time the notifications should be used when ``daily`` period is used. The value is in the local timezone of your computer. Use the format ``HH:MM`` (24-hours).
 
   *Default*:  ``09:00``
 
   *Required*:  No
 
+  Examples:
+
+  .. code-block:: ini
+
+    [ramona:notify]
+    dailyat=23:00
 
 
-[program:X] section
--------------------
 
-TODO
+[program:...] section
+---------------------
+
+This section of an configuration allows to define program, that will be supervised by Ramona (started, monitored and eventually stopped) including various parameters that describes intended runtime behaviour of given program.
+
+The ``...`` in ``[program:...]`` section name should be substituted by name of supervised program. Name should be in ASCII using uppercase and lowecase letters, numbers, underscore (``_``) but no whitespaces.
+
+.. note::
+
+  Common configuration of Ramona typically contains more than one of ``[program:...]`` section.
+
+Example:
+
+.. code-block:: ini
+
+  [program:frontend]
+  cmd=./frontend.py
+
+  [program:backend]
+  cmd=./backend.py
+  
+  [program:integration1]
+  cmd=./integration1.py
+  
 
 
 .. attribute:: command
 
-  expandvars
-  TODO
+  The command that is used to start a program. Ramona server will issue this command in order to change state of a program to ``STARTING`` (and eventual ``RUNNING``) status.
+
+  The command can be either absolute (e.g. ``/path/to/foobarapp``), relative (``./bin/foobarapp``) or just application executable name (e.g. ``foobarapp``). If last option is used, the environment variable ``${PATH}`` will be searched for the executable. Programs can accept arguments, e.g. ``/path/to/foobarapp foo bar``. 
+
+  Supervised programs should themselves not be daemons_, as Ramona server assumes it is responsible for daemonizing itself.
+
+  .. [TODO]: Link to ondaemonizing of Subprocesses (in tools.rst)
+
+  .. _daemons: http://en.wikipedia.org/wiki/Daemon_(computing)
+
+  *Default*: (none)
+
+  *Required*: Yes
 
   Example:
 
   .. code-block:: ini
 
-    [ramona:server]
+    [program:dirlist]
     command=ls -l /
     command@windows=dir c:\
+
+  .. note::
+
+    You can take benefit of environment variables expansion when defining this option.
+
+    .. code-block:: ini
+
+      [program:fooapp]
+      command=./fooapp -t ${TMPDIR}
+
 
 
 .. attribute:: directory
 
-  expandvars
-  TODO
+  The directory that program should be started in. Ramona server will change a working directory to this value just prior launching relevant program. Change of directory is local only for given program.
+
+  If no or empty value is given, no change of directory is performed, th program will be launched in a working directory of Ramona server.
+
+  *Default*: (none)
+
+  *Required*: No
+
+  .. note::
+
+    You can take benefit of environment variables expansion when defining this option.
+
+    .. code-block:: ini
+
+      [program:fooapp]
+      directory=${TMPDIR}
+
 
 
 .. attribute:: umask
 
-  TODO
+  Specifies *mask* of the program. Mask controls which file permissions are set for files and directories when they are created.
+
+  If no or empty value is given, to umask is set.
+
+  **Available only on POSIX platforms.**
+
+  *Default*: (none)
+
+  *Required*: No
+
+  Example:
+
+  .. code-block:: ini
+
+    [program:foobarapp]
+    umask=002
+
 
 
 .. attribute:: starttimeout

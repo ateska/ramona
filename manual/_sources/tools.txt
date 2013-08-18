@@ -7,6 +7,7 @@ TODO
 
 .. [TODO]: Using Ramona to execute unit tests
 
+.. [TODO]: Nondaemonizing of Subprocesses (see http://supervisord.org/subprocess.html#nondaemonizing-of-subprocesses)
 
 Windows service manual control
 ------------------------------
