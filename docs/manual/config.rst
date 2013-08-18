@@ -551,8 +551,19 @@ Example:
 
 .. attribute:: command
 
-  expandvars
-  TODO
+  The command that is used to start a program. Ramona server will issue this command in order to change state of a program to ``STARTING`` (and eventual ``RUNNING``) status.
+
+  The command can be either absolute (e.g. ``/path/to/foobarapp``), relative (``./bin/foobarapp``) or just application executable name (e.g. ``foobarapp``). If last option is used, the environment variable ``${PATH}`` will be searched for the executable. Programs can accept arguments, e.g. ``/path/to/foobarapp foo bar``. 
+
+  Supervised programs should themselves not be daemons_, as Ramona server assumes it is responsible for daemonizing itself.
+
+  .. [TODO]: Link to ondaemonizing of Subprocesses (in tools.rst)
+
+  .. _daemons: http://en.wikipedia.org/wiki/Daemon_(computing)
+
+  *Default*: (none)
+
+  *Required*: Yes
 
   Example:
 
@@ -562,16 +573,57 @@ Example:
     command=ls -l /
     command@windows=dir c:\
 
+  .. note::
+
+    You can take benefit of environment variables expansion when defining this option.
+
+    .. code-block:: ini
+
+      [program:fooapp]
+      command=./fooapp -t ${TMPDIR}
+
+
 
 .. attribute:: directory
 
-  expandvars
-  TODO
+  The directory that program should be started in. Ramona server will change a working directory to this value just prior launching relevant program. Change of directory is local only for given program.
+
+  If no or empty value is given, no change of directory is performed, th program will be launched in a working directory of Ramona server.
+
+  *Default*: (none)
+
+  *Required*: No
+
+  .. note::
+
+    You can take benefit of environment variables expansion when defining this option.
+
+    .. code-block:: ini
+
+      [program:fooapp]
+      directory=${TMPDIR}
+
 
 
 .. attribute:: umask
 
-  TODO
+  Specifies *mask* of the program. Mask controls which file permissions are set for files and directories when they are created.
+
+  If no or empty value is given, to umask is set.
+
+  **Available only on POSIX platforms.**
+
+  *Default*: (none)
+
+  *Required*: No
+
+  Example:
+
+  .. code-block:: ini
+
+    [program:foobarapp]
+    umask=002
+
 
 
 .. attribute:: starttimeout
