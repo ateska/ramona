@@ -136,7 +136,7 @@ class notificator(object):
 			elif isinstance(recipient, basestring):
 				recipient = [recipient]
 
-			self.delivery.send_mail(recipient, subject, text)
+			self.delivery.send(recipient, subject, text)
 
 		except:
 			L.exception('Exception during sending mail - ignoring')

@@ -56,7 +56,7 @@ class send_mail(object):
 		return True
 
 
-	def send_mail(self, recipients, subject, mail_body, sender=None):
+	def send(self, recipients, subject, mail_body, sender=None):
 
 		if sender is None: sender = self.sender
 
