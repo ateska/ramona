@@ -626,19 +626,45 @@ Example:
 
 
 
-.. attribute:: starttimeout
+.. attribute:: killby
 
-  TODO
+  The sequence of signals that will be used to terminate a given program. Ramona server, when asked to stop a program, will send first signal (using POSIX `kill` functionality) from this sequence to given program and set its status to ``STOPPING``. If the program doesn't terminate, next signal from this sequence is sent after time defined by :attr:`stoptimeout`.
+
+  When end of this sequence is reached, the KILL signal sent periodically to force program exit.
+
+  *Default*:  ``TERM, TERM, TERM, QUIT, QUIT, INT, INT, KILL``
+
+  *Required*: No
+
+  Example:
+
+  .. code-block:: ini
+
+    [program:foobarapp]
+    killby=USR1,USR2,TERM,INT,KILL
 
 
 .. attribute:: stoptimeout
 
-  TODO
+  This defines a timeout interval between each terminate/kill attempt during ``STOPPING`` phase of program life cycle. 
+
+  *Default*: 3 *seconds*
+
+  *Required*: No
 
 
-.. attribute:: killby
 
-  TODO
+.. attribute:: starttimeout
+
+  How long to keep the program in a ``STARTING`` status prior switching in to ``RUNNING``.
+  The program termination during ``STARTING`` period is considered as a fatal error, the termination during ``RUNNING`` period is considered as likely recoverable and restart attempt will be triggered.
+
+  Value is in seconds and is an integer or a floating point number.
+
+  *Default*: 0.5 *second*
+
+  *Required*: No
+
 
 
 .. attribute:: stdin
