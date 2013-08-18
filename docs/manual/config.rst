@@ -523,10 +523,30 @@ This is configuration of Ramona notification sub-system. This component (part of
 
 
 
-[program:X] section
--------------------
+[program:...] section
+---------------------
 
-TODO
+This section of an configuration allows to define program, that will be supervised by Ramona (started, monitored and eventually stopped) including various parameters that describes intended runtime behaviour of given program.
+
+The ``...`` in ``[program:...]`` section name should be substituted by name of supervised program. Name should be in ASCII using uppercase and lowecase letters, numbers, underscore (``_``) but no whitespaces.
+
+.. note::
+
+  Common configuration of Ramona typically contains more than one of ``[program:...]`` section.
+
+Example:
+
+.. code-block:: ini
+
+  [program:frontend]
+  cmd=./frontend.py
+
+  [program:backend]
+  cmd=./backend.py
+  
+  [program:integration1]
+  cmd=./integration1.py
+  
 
 
 .. attribute:: command
@@ -538,7 +558,7 @@ TODO
 
   .. code-block:: ini
 
-    [ramona:server]
+    [program:dirlist]
     command=ls -l /
     command@windows=dir c:\
 
