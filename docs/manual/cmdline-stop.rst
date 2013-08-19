@@ -1,7 +1,11 @@
+.. _cmdline-stop:
+
 stop (command-line)
 ===================
 
-TODO
+Stop supervised program(s).
+
+Optionally also terminate Ramona server.
 
 .. code-block:: bash
 
@@ -10,29 +14,30 @@ TODO
 
 .. describe:: program
 
-  TODO
+  Optionally specify program(s) in scope of the command. If none is given, all programs are considered in scope.
 
 
 .. cmdoption:: stop -i
                stop --immediate-return
 
-  TODO
+  Dont wait for termination of programs and exit ASAP.
 
 
 .. cmdoption:: stop -c
                stop --core-dump
 
-  TODO
+  Stop program(s) to produce core dump (core dump must be enabled in program configuration). 
+  It is archived by sending signal that lead to dumping of a core file.
 
 
 .. cmdoption:: stop -E
-               stop --stop-and-exi
+               stop --stop-and-exit
 
-  TODO
+  Stop all programs and exit Ramona server.
+  This is a default behaviour of the ``stop`` command.
 
 
-.. cmdoption:: stop -T
+.. cmdoption:: stop -S
                stop --stop-and-stay
 
-  TODO
-
+  Stop all programs but keep Ramona server running.

@@ -5,7 +5,7 @@ from ..winsvc import w32_uninstall_svc
 ###
 
 name = 'winuninstall'
-cmdhelp = 'Uninstall Ramona as Windows Service (Windows only)'
+cmdhelp = 'Uninstall the Ramona Windows Service (Windows only)'
 
 ###
 

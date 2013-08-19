@@ -12,7 +12,7 @@ Features
 - configuration is ConfigParser compatible
 - priority (order) in which programs are started/stopped
 - Following environment variables are available:
-	- RAMONA_CONFIGS (filled by console, list of config files as given on command line or by default mechanism, delimiter is ';')
+	- RAMONA_CONFIGS (filled by console, list of config files as given on command line or by default mechanism)
 	- RAMONA_SECTION (name of [program:?] section in config that is relevant for current program)
 
 - Force start/restart of programs in 'FATAL' state (-f option)
@@ -22,6 +22,7 @@ Features
 - start command has option -S to launch server only (no program is started ... usable during development)
 - @tool support (in methods in console_app class)
 - @proxy_tool support (in methods in console_app class)
+- @tool can be method or class (class is useful when commandline arguments for tool needs to be used)
 - working directory is changed during console start to the location of console app script (should be root of the app)
 - immediate/yield modes of start/stop/restart commands
 - core dump enabled stop of program
@@ -113,7 +114,7 @@ Empty variable (e.g. CLASSPATH in previous example) will explicitly remove menti
 Mailing to admin
 ----------------
 - Scan output streams of the program for keywords (by default 'error', 'fatal', 'exception') and send email when such event occurs
-- Config sample (from [program:x]): logscan_stdout=error>mailto:foo2@bar.com,fatal>now,exception>now,warn>daily
+- Config sample (from [program:x]): logscan_stdout=error>now:foo2@bar.com,fatal>now,exception>now,warn>daily
 
 HTTP frontend
 -------------

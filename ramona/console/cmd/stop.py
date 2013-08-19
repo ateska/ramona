@@ -6,16 +6,16 @@ from ._completions import complete_ident
 ###
 
 name = 'stop'
-cmdhelp = 'Terminate subprocess(es)'
+cmdhelp = 'Stop program(s)'
 
 ###
 
 def init_parser(parser):
-	parser.add_argument('program', nargs='*', help='Optionally specify program(s) in scope of the command')
-	parser.add_argument('-i','--immediate-return', action='store_true', help='Dont wait for start of subprocesses and return ASAP')
-	parser.add_argument('-c','--core-dump', action='store_true', help='Stop and dump core (core dump must be enabled in program configuration)')
+	parser.add_argument('-i','--immediate-return', action='store_true', help='Dont wait for termination of programs and exit ASAP')
+	parser.add_argument('-c','--core-dump', action='store_true', help='Stop program(s) to produce core dump (has to be also enabled in program configuration).')
 	parser.add_argument('-E','--stop-and-exit', action='store_true', help='Stop all programs and exit Ramona server. Command-line default for:\n%(prog)s')
-	parser.add_argument('-T','--stop-and-stay', action='store_true', help='Stop all programs and keep server running.')
+	parser.add_argument('-S','--stop-and-stay', action='store_true', help='Stop all programs but keep Ramona server running')
+	parser.add_argument('program', nargs='*', help='Optionally specify program(s) in scope of the command. If none is given, all programs are considered in scope')
 
 ###
 

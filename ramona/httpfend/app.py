@@ -1,6 +1,6 @@
 import sys, os, socket, ConfigParser, errno, logging, signal, threading, itertools, collections
 import pyev
-from ..config import config, read_config, get_numeric_loglevel
+from ..config import config, read_config, get_numeric_loglevel, config_defaults
 from .. import socketuri
 from ._request_handler import ramona_http_req_handler
 
@@ -35,7 +35,7 @@ class httpfend_app(object):
 		try:
 			self.listenaddr = config.get(os.environ['RAMONA_SECTION'], 'listen')
 		except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
-			self.listenaddr = "tcp://localhost:5588"
+			self.listenaddr = config_defaults['ramona:httpfend']['listenaddr']
 		
 		self.username = None
 		self.password = None 

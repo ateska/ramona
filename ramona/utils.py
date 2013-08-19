@@ -21,7 +21,7 @@ All file descriptors above 2 are closed.
 
 	# Prepare environment variable RAMONA_CONFIG
 	from .config import config_files
-	os.environ['RAMONA_CONFIG'] = ';'.join(config_files)
+	os.environ['RAMONA_CONFIG'] = os.pathsep.join(config_files)
 
 	# Prepare command line
 	cmdline = ["-m", "ramona.server"]
@@ -51,8 +51,10 @@ In comparison to launch_server() it returns.
 	from .config import config
 
 	logfname = config.get('ramona:server','log')
-	if logfname == '<logdir>':
-		logfname = os.path.join(config.get('general','logdir'), 'ramona.log')
+	if logfname.find('<logdir>') == 0:
+		lastfname = logfname[8:].strip().lstrip('/')
+		if len(lastfname) == 0: lastfname = 'ramona.log'
+		logfname = os.path.join(config.get('general','logdir'), lastfname)
 	elif logfname[:1] == '<':
 		L.error("Unknown log option in [server] section - server not started")
 		return
@@ -92,6 +94,13 @@ def parse_signals(signals):
 		signum = signame2signum.get(signame)
 		if signum is None: raise RuntimeError("Unknown signal '{0}'".format(signame))
 		ret.append(signum)
+	return ret
+
+
+def get_signal_name(signum):
+	sigdict = dict((num, name) for name, num in signal.__dict__.iteritems() if name.startswith('SIG') and not name.startswith('SIG_'))
+	ret = sigdict.get(signum)
+	if ret is None: ret = "SIG({})".format(str(signum))
 	return ret
 
 ###

@@ -36,10 +36,10 @@ class send_mail(object):
 				elif self.sender[:1] == '<':
 					raise RuntimeError('Invalid sender option: {0}'.format(self.sender))
 
-				self.receiver = config.get('ramona:notify', 'receiver').split(',')
-
 		else:
 			raise RuntimeError("Unknown delivery method in {0}".format(deliveryuri))
+
+		self.receiver = config.get('ramona:notify', 'receiver').split(',')
 
 
 	def connection_test(self):
@@ -56,7 +56,7 @@ class send_mail(object):
 		return True
 
 
-	def send_mail(self, recipients, subject, mail_body, sender=None):
+	def send(self, recipients, subject, mail_body, sender=None):
 
 		if sender is None: sender = self.sender
 

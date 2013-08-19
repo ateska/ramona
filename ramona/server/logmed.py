@@ -1,7 +1,6 @@
 import re, collections, os, glob, weakref, logging, gzip
 from ..config import config
 from ..kmpsearch import kmp_search
-from ..cnscom import svrcall_error
 from .svrappsingl import get_svrapp
 
 ###
@@ -48,22 +47,32 @@ class log_mediator(object):
 			with open(self.fname, "r") as logf:
 				logf.seek(0, os.SEEK_END)
 				fsize = logf.tell()
-				fsize -= self.linehistory * 512;
+				fsize -= self.linehistory * 512
 				if fsize <0: fsize = 0
 				logf.seek(fsize, os.SEEK_SET)
 				
 				for line in logf:
 					self.__add_to_tailbuf(line)
 
+
 		# Configure log rotation
-		try:
-			self.logmaxsize = config.getint('general','logmaxsize')
-			self.logbackups = config.getint('general','logbackups')
-			self.logcompress = config.getboolean('general', 'logcompress')
-		except Exception, e:
+		if config.get('general','logmaxsize') == '<inf>':
 			self.logbackups = self.logmaxsize = 0
 			self.logcompress = False
-			L.warning("Invalid configuration of log rotation: {0} - log rotation disabled".format(e))
+		else:			
+			try:
+				# TODO: Parse human-friendly logmaxsize ... e.g. 10Mb
+				self.logmaxsize = config.getint('general','logmaxsize')
+				x = config.getint('general','logbackups')
+				if x == '<inf>':
+					self.logbackups = 0
+				else:
+					self.logbackups = int(x)
+				self.logcompress = config.getboolean('general', 'logcompress')
+			except Exception, e:
+				self.logbackups = self.logmaxsize = 0
+				self.logcompress = False
+				L.warning("Invalid configuration of log rotation: {0} - log rotation disabled".format(e))
 
 
 	def open(self):
@@ -105,11 +114,11 @@ class log_mediator(object):
 				tail = ""
 				for i in range(-3,0):
 					try:
-						tail += self.tailbuf[i][0]
+						tail += self.tailbuf[i]
 					except IndexError:
 						pass
 				tail = tail[-2048:] # Limit result to 2kb of text
-
+				
 				svrapp = get_svrapp()
 				if svrapp is not None:
 					svrapp.notificator.publish(
@@ -249,7 +258,7 @@ class _log_scanner(kmp_search):
 
 	def __init__(self, prog_ident, stream_name, pattern, target):
 		kmp_search.__init__(self, pattern)
-		assert target in ('now','daily') or target.startswith('mailto:')
+		assert target.startswith(('now','daily'))
 		self.target = target
 		self.prog_ident = prog_ident
 		self.stream_name = stream_name

@@ -5,15 +5,15 @@ from ._completions import complete_ident
 ###
 
 name = 'restart'
-cmdhelp = 'Restart subprocess(es)'
+cmdhelp = 'Restart program(s)'
 
 ###
 
 def init_parser(parser):
-	parser.add_argument('-n','--no-server-start', action='store_true', help='Avoid eventual automatic server start')
-	parser.add_argument('-i','--immediate-return', action='store_true', help='Dont wait for start of subprocesses and return ASAP')
-	parser.add_argument('-f','--force-start', action='store_true', help='Force restart of processes in FATAL state')
-	parser.add_argument('program', nargs='*', help='Optionally specify program(s) in scope of the command')
+	parser.add_argument('-n','--no-server-start', action='store_true', help='Avoid eventual automatic Ramona server start')
+	parser.add_argument('-i','--immediate-return', action='store_true', help="Don't wait for restart of programs and exit ASAP")
+	parser.add_argument('-f','--force-start', action='store_true', help='Force restart of programs even in FATAL state')
+	parser.add_argument('program', nargs='*', help='Optionally specify program(s) in scope of the command. If none is given, all programs are considered in scope.')
 
 ###
 

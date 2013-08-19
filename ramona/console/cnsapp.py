@@ -1,4 +1,4 @@
-import sys, os, socket, errno, logging, time, json
+import sys, os, socket, errno, logging, time, json, inspect
 from ..config import config, read_config, config_files
 from ..utils import launch_server_daemonized
 from .. import cnscom, socketuri
@@ -79,6 +79,11 @@ Console application (base for custom implementations)
 			L.debug("Debug output is enabled.")
 
 		L.debug("Configuration read from: {0}".format(', '.join(config_files)))
+
+		logdir = self.config.get('general', 'logdir')
+		if not os.path.isdir(logdir):
+			L.warning("Log directory '{}' not found.".format(logdir))
+
 
 		# Prepare server connection factory
 		self.cnsconuri = socketuri.socket_uri(config.get('ramona:console','serveruri'))
@@ -196,7 +201,16 @@ def tool(fn):
 
 	Marks function object by '.__tool' attribute
 	'''
-	fn.__tool = fn.func_name
+
+	if inspect.isfunction(fn):
+		fn.__tool = fn.func_name
+
+	elif inspect.isclass(fn):
+		fn.__tool = fn.__name__
+
+	else:
+		raise RuntimeError("Unknown type decorated as Ramona tool: {0}".format(fn))
+
 	return fn
 
 #

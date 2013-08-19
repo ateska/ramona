@@ -34,5 +34,5 @@ Release procedure
 Follow-ups
 ----------
 - Update manual (documentation) and propagate that to github pages
-- Mark release in Google Analyst
+- Mark release in Google Analytics
 - Publish release to Freecode

@@ -5,7 +5,7 @@ from ._completions import complete_ident
 ###
 
 name = 'status'
-cmdhelp = 'Show status of subprocess(es)'
+cmdhelp = 'Show status of program(s)'
 
 ###
 
@@ -14,7 +14,7 @@ L = logging.getLogger('status')
 ###
 
 def init_parser(parser):
-	parser.add_argument('program', nargs='*', help='Optionally specify program(s) in scope of the command')
+	parser.add_argument('program', nargs='*', help='Optionally specify program(s) in scope of the command. If none is given, all programs are considered in scope')
 
 ###
 
@@ -54,6 +54,12 @@ def main(cnsapp, args):
 
 		t = sp.pop('exit_time', None)
 		if t is not None: details["exit_time"] = time.strftime("%d-%m-%Y %H:%M:%S",time.localtime(t))
+
+		# Format uptime
+		t = sp.pop('uptime', None)
+		if t is not None:
+			# TODO: Print pretty (e.g. uptime:2d 2h)
+			details['uptime'] = "{0:.2f}s".format(t)
 
 		state = sp.pop('state')
 		stlbl = cnscom.program_state_enum.labels.get(state, "({0})".format(state))

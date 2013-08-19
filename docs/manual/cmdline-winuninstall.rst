@@ -3,11 +3,13 @@
 winuninstall (command-line)
 ===========================
 
-TODO
+**Windows only !**
+
+Uninstall the Ramona Windows Service.
+
+For more details, see :ref:`features-windowsservice`.
 
 .. code-block:: bash
 
   <console.py> winuninstall [-h]
 
-
-Windows only !

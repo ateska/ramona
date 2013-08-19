@@ -63,6 +63,24 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 		consoleuri = config.get("ramona:server", "consoleuri")
 		for cnsuri in consoleuri.split(','):
 			socket_factory = socketuri.socket_uri(cnsuri)
+			
+			# Special casing for UNIX domain socket 
+			# There can be abandoned/stalled file entry - we need to find out if this is the case ...
+			# (see http://stackoverflow.com/questions/7405932/how-to-know-whether-any-process-is-bound-to-a-unix-domain-socket)
+			if socket_factory.protocol == 'unix':
+				# Try to connect ...
+				if os.path.exists(socket_factory.uri.path):
+					try:
+						s = socket_factory.create_socket_connect()
+					except socket.error, e:
+						if e.errno == errno.ECONNREFUSED:
+							L.debug("Removing stalled UNIX socket '{0}'".format(socket_factory.uri.path))
+							os.unlink(socket_factory.uri.path)
+					else:
+						s.close()
+						L.fatal("It looks like that server is already running, there is active UNIX socket '{0}'".format(socket_factory.uri.path))
+						sys.exit(1)
+
 			try:
 				socks = socket_factory.create_socket_listen()
 			except socket.error, e:

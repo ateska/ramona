@@ -32,11 +32,11 @@ It is implementation of "SELECT * FROM programs GROUP BY priority" with a little
 	def next(self):
 		assert self.active is None
 		try:
-			mink=min(self.sequence.iterkeys())
+			maxk=max(self.sequence.iterkeys())
 		except ValueError:
 			# We are at the end of the launch sequence
 			return None
-		self.active = self.sequence.pop(mink)
+		self.active = self.sequence.pop(maxk)
 		return self.active[:] # Return copy (it is safer)
 
 

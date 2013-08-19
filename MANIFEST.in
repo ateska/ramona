@@ -5,6 +5,8 @@ include README.md
 recursive-include ramona *.py
 
 include ramona/httpfend/index.tmpl.html
+include ramona/httpfend/401.tmpl.html
+include ramona/httpfend/log_frame.tmpl.html
 recursive-include ramona/httpfend/static/bootstrap *.css
 recursive-include ramona/httpfend/static/miniajax *.js
 recursive-include ramona/httpfend/static/img *.ico *.gif

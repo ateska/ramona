@@ -5,7 +5,7 @@ from ..winsvc import w32_install_svc
 ###
 
 name = 'wininstall'
-cmdhelp = 'Install Ramona as Windows Service (Windows only)'
+cmdhelp = 'Install the Ramona server as a Windows Service (Windows only)'
 
 ###
 
@@ -15,10 +15,10 @@ L = logging.getLogger('wininstall')
 ###
 
 def init_parser(parser):
-	parser.add_argument('-d', '--dont-start', action='store_true', help="Don't start service after installation.")
+	parser.add_argument('-d', '--dont-start', action='store_true', help="Don't start service after installation")
 	
-	parser.add_argument('-S','--server-only', action='store_true', help='Start only server, programs are not launched when service is launched')
-	parser.add_argument('program', nargs='*', help='Optionally specify program(s) to start when service is launched (if nothing is specified, all enabled programs will be launched)')
+	parser.add_argument('-S','--server-only', action='store_true', help='When service is acticated start only the Ramona server, not programs')
+	parser.add_argument('program', nargs='*', help='Optionally specify program(s) in scope of the command. If none is given, all programs are considered in scope')
 
 	#TODO: Auto-start of service (after reboot) enable (default) / disable
 

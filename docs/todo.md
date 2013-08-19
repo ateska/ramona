@@ -4,7 +4,6 @@ TODO list
 Generic
 -------
 - add version check to console-server communication handshake (and print warning if not matching)
-- split demo to demo&test (code that is more about testing and intentionally fails should not be in demo)
 - exitcodes option for autorestart (autorestart=1,2,3)
 - (low prio): SSL (optional) for protecting console-server channel
 - ulimit/resources (similar to core dump) -> minfds, minprocs
@@ -19,6 +18,13 @@ Generic
 - 'user' option - If ramona runs as root, this UNIX user account will be used as the account which runs the program. If ramona is not running as root, this option has no effect.
 - configuration platform selector should support OR operator (e.g. pidfile@linux|darwin)
 - configuration platform selector should support families (e.g. pidfile@posix); posix is so far only identified family (expanded to linux|darwin|cygwin)
+- `tail -f *` to show log of **ALL** running programs
+- Add support for [var] section - similar to [env] but in this case, values are not propagated into environment variables
+	Otherwise it remains complementary (useful for ${VAR} expressions on command-line).
+	Maybe this can be archived in a different (more elegant) way (e.g. not introduce [var]/[env] duality).
+- Better error message when directory of socket file does not exist: 
+    Current message when server starts: 2013-01-04 01:09:17,846 CRITICAL: It looks like that server is already running: [Errno 2] No such file or directory
+- Explore eventuality of forking TTY when launching program: http://stackoverflow.com/questions/1922254/python-when-to-use-pty-fork-versus-os-fork
 
 Logging
 -------
@@ -27,7 +33,7 @@ Logging
 
 Configuration
 -------------
-- environment variables expansion in configuration
+- (environment) variables expansion in configuration
 
 Watchdog
 --------
@@ -56,10 +62,6 @@ HTTP frontend
 Cron
 ----
 - Ramona can be used to trigger tasks (tools) by given time - emulating functionality of cron
-
-Deployment
-----------
-- Consider https://help.github.com/articles/splitting-a-subpath-out-into-a-new-repo for embedded deployments (for released versions)
 
 Cluster
 -------

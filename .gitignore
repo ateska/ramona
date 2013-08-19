@@ -28,10 +28,13 @@ pip-log.txt
 .mr.developer.cfg
 
 # Ramona specific ignores
-ramona.sublime-project
+*.sublime-*
+
 demo_history
 log/*.log
 log
+
+MANIFEST
 
 # Eclipse/PyDev
 .project
