@@ -634,7 +634,7 @@ Example:
 
   When end of this sequence is reached, the KILL signal sent periodically to force program exit.
 
-  *Default*:  ``TERM, TERM, TERM, QUIT, QUIT, INT, INT, KILL``
+  *Default*:  ``TERM, INT, TERM, INT, TERM, INT, KILL``
 
   *Required*: No
 
@@ -643,9 +643,20 @@ Example:
   .. code-block:: ini
 
     [program:foobarapp]
-    killby=USR1,USR2,TERM,INT,KILL
+    killby=TERM,KILL
 
 
+  List of useful signals:
+
+  ======== =============
+   Signal   Description
+  ======== =============  
+   TERM     The SIGTERM signal is sent to a process to request its termination. Unlike the SIGKILL signal, it can be caught and interpreted or ignored by the process. This allows the process to perform nice termination releasing resources and saving state if appropriate. It should be noted that SIGINT is nearly identical to SIGTERM.
+   INT      The SIGINT signal is sent to a process when a user wishes to interrupt the process. This is equivalent to pressing Control-C.
+   KILL     The SIGKILL signal is sent to a process to cause it to terminate immediately. In contrast to SIGTERM and SIGINT, this signal cannot be caught or ignored, and the receiving process cannot perform any clean-up upon receiving this signal.
+   QUIT     The SIGQUIT signal is sent to a process when the user requests that the process perform a core dump. See :attr:`coredump`.
+   ABRT     The SIGABRT signal is sent to a process to tell it to abort, i.e. to terminate. The signal is usually initiated by the process itself, but it can be sent to the process from Ramona server as well.
+  ======== =============
 
 .. attribute:: stoptimeout
 
@@ -778,6 +789,7 @@ Example:
   **Available only on POSIX platforms.**
 
 
+
 .. attribute:: logscan_stdout
 
   Configures log scanner for standard output stream. 
@@ -808,6 +820,7 @@ Example:
      - ``fatal>now`` -- Whenever keyword *fatal* is found in the stdout, send an email immediatelly (now) to the default nofitication recipient configured in ``[ramona:notify]`` :attr:`receiver` configuration option
      - ``exception>now`` -- same as fatal (above) just detecting different keyword (*exception*)
      - ``warn>daily:foo3@bar.com`` -- Cummulate all the log messages containing the keyword *warn* and send them to address *foo3@bar.com* once a day.
+
 
 
 .. attribute:: logscan_stderr

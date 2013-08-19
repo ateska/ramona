@@ -31,7 +31,7 @@ class program(object):
 		'umask': None,
 		'starttimeout': 0.5,
 		'stoptimeout': 3,
-		'killby': 'TERM,TERM,TERM,QUIT,QUIT,INT,INT,KILL',
+		'killby': 'TERM,INT,TERM,INT,TERM,INT,KILL',
 		'stdin': '<null>', # TODO: This can be very probably removed as there is no reasonable use
 		'stdout': '<stderr>',
 		'stderr': '<logdir>',
