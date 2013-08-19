@@ -231,6 +231,10 @@ foobar.log.1
 foobar.log.2
 foobar.log.3 &lt;-- this one will be removed</pre>
 </div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Extensive flooding of log streams can lead to unwanted loss of log files due to rotatation mechanism (log files periodically exceeding <a class="reference internal" href="#logmaxsize" title="logmaxsize"><tt class="xref py py-attr docutils literal"><span class="pre">logmaxsize</span></tt></a>). To prevent this loss, set <a class="reference internal" href="#logbackups" title="logbackups"><tt class="xref py py-attr docutils literal"><span class="pre">logbackups</span></tt></a> to <tt class="docutils literal"><span class="pre">inf</span></tt> and remove log files manually.</p>
+</div>
 </dd></dl>
 
 <dl class="attribute">
