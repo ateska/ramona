@@ -160,7 +160,7 @@ class program(object):
 
 		# Stdout settings
 		if stdout_cnf == '<logdir>':
-			if stderr_cnf  in ('<stderr>','<null>') :
+			if stderr_cnf  in ('<stdout>','<null>') :
 				fname = os.path.join(config.get('general','logdir'), self.ident + '.log')
 			else:
 				fname = os.path.join(config.get('general','logdir'), self.ident + '-out.log')
