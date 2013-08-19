@@ -595,75 +595,200 @@ History list is persistent and is available across program restarts.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="starttimeout">
-<tt class="descname">starttimeout</tt><a class="headerlink" href="#starttimeout" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dt id="killby">
+<tt class="descname">killby</tt><a class="headerlink" href="#killby" title="Permalink to this definition">¶</a></dt>
+<dd><p>The sequence of signals that will be used to terminate a given program. Ramona server, when asked to stop a program, will send first signal (using POSIX <cite>kill</cite> functionality) from this sequence to given program and set its status to <tt class="docutils literal"><span class="pre">STOPPING</span></tt>. If the program doesn&#8217;t terminate, next signal from this sequence is sent after time defined by <a class="reference internal" href="#stoptimeout" title="stoptimeout"><tt class="xref py py-attr docutils literal"><span class="pre">stoptimeout</span></tt></a>.</p>
+<p>POSIX signal names are used.</p>
+<p>When end of this sequence is reached, the KILL signal sent periodically to force program exit.</p>
+<p><em>Default</em>:  <tt class="docutils literal"><span class="pre">TERM,</span> <span class="pre">INT,</span> <span class="pre">TERM,</span> <span class="pre">INT,</span> <span class="pre">TERM,</span> <span class="pre">INT,</span> <span class="pre">KILL</span></tt></p>
+<p><em>Required</em>: No</p>
+<p>Example:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[program:foobarapp]</span>
+<span class="na">killby</span><span class="o">=</span><span class="s">TERM,KILL</span>
+</pre></div>
+</div>
+<p>List of useful signals:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="2%" />
+<col width="98%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Signal</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>TERM</td>
+<td>The SIGTERM signal is sent to a process to request its termination. Unlike the SIGKILL signal, it can be caught and interpreted or ignored by the process. This allows the process to perform nice termination releasing resources and saving state if appropriate. It should be noted that SIGINT is nearly identical to SIGTERM.</td>
+</tr>
+<tr class="row-odd"><td>INT</td>
+<td>The SIGINT signal is sent to a process when a user wishes to interrupt the process. This is equivalent to pressing Control-C.</td>
+</tr>
+<tr class="row-even"><td>KILL</td>
+<td>The SIGKILL signal is sent to a process to cause it to terminate immediately. In contrast to SIGTERM and SIGINT, this signal cannot be caught or ignored, and the receiving process cannot perform any clean-up upon receiving this signal.</td>
+</tr>
+<tr class="row-odd"><td>QUIT</td>
+<td>The SIGQUIT signal is sent to a process when the user requests that the process perform a core dump. See <a class="reference internal" href="#coredump" title="coredump"><tt class="xref py py-attr docutils literal"><span class="pre">coredump</span></tt></a>.</td>
+</tr>
+<tr class="row-even"><td>ABRT</td>
+<td>The SIGABRT signal is sent to a process to tell it to abort, i.e. to terminate. The signal is usually initiated by the process itself, but it can be sent to the process from Ramona server as well.</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stoptimeout">
 <tt class="descname">stoptimeout</tt><a class="headerlink" href="#stoptimeout" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dd><p>This defines a timeout interval between each terminate/kill attempt during <tt class="docutils literal"><span class="pre">STOPPING</span></tt> phase of a program life cycle.</p>
+<p><em>Default</em>: 3 <em>seconds</em></p>
+<p><em>Required</em>: No</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="killby">
-<tt class="descname">killby</tt><a class="headerlink" href="#killby" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="stdin">
-<tt class="descname">stdin</tt><a class="headerlink" href="#stdin" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dt id="starttimeout">
+<tt class="descname">starttimeout</tt><a class="headerlink" href="#starttimeout" title="Permalink to this definition">¶</a></dt>
+<dd><p>How long to keep the program in a <tt class="docutils literal"><span class="pre">STARTING</span></tt> status prior switching in to <tt class="docutils literal"><span class="pre">RUNNING</span></tt>.
+The program termination during <tt class="docutils literal"><span class="pre">STARTING</span></tt> period is considered as a fatal error, the termination during <tt class="docutils literal"><span class="pre">RUNNING</span></tt> period is considered as likely recoverable and restart attempt will be triggered.</p>
+<p>Value is in seconds and is an integer or a floating point number.</p>
+<p><em>Default</em>: 0.5 <em>second</em></p>
+<p><em>Required</em>: No</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stdout">
 <tt class="descname">stdout</tt><a class="headerlink" href="#stdout" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dd><p>Configures how to handle standard output stream of a program. Use one of magic values or specify filesystem path to file, where to store log of a stream.</p>
+<dl class="docutils">
+<dt><em>Magic values</em>:</dt>
+<dd><ul class="first last simple">
+<li><tt class="docutils literal"><span class="pre">&lt;null&gt;</span></tt> - don&#8217;t store standard output in any file</li>
+<li><tt class="docutils literal"><span class="pre">&lt;stderr&gt;</span></tt> - redirect standard output to standard error</li>
+<li><tt class="docutils literal"><span class="pre">&lt;logdir&gt;</span></tt> - use file in directory specified by <a class="reference internal" href="#logdir" title="logdir"><tt class="xref py py-attr docutils literal"><span class="pre">logdir</span></tt></a>, name of the file is <tt class="docutils literal"><span class="pre">[programname]-out.log</span></tt> or <tt class="docutils literal"><span class="pre">[programname].log</span></tt> if standard error is redirected to stdout</li>
+</ul>
+</dd>
+</dl>
+<p><em>Default</em>: <tt class="docutils literal"><span class="pre">&lt;stderr&gt;</span></tt></p>
+<p><em>Required</em>: No</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="stderr">
 <tt class="descname">stderr</tt><a class="headerlink" href="#stderr" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dd><p>Configures how to handle standard error stream of a program. Use one of magic values or specify filesystem path to file, where to store log of a stream.</p>
+<dl class="docutils">
+<dt><em>Magic values</em>:</dt>
+<dd><ul class="first last simple">
+<li><tt class="docutils literal"><span class="pre">&lt;null&gt;</span></tt> - don&#8217;t store standard output in any file</li>
+<li><tt class="docutils literal"><span class="pre">&lt;stdout&gt;</span></tt> - redirect standard error to standard output</li>
+<li><tt class="docutils literal"><span class="pre">&lt;logdir&gt;</span></tt> - use file in directory specified by <a class="reference internal" href="#logdir" title="logdir"><tt class="xref py py-attr docutils literal"><span class="pre">logdir</span></tt></a>, name of the file is <tt class="docutils literal"><span class="pre">[programname]-err.log</span></tt> or <tt class="docutils literal"><span class="pre">[programname].log</span></tt> if standard error is redirected to stdout</li>
+</ul>
+</dd>
+</dl>
+<p><em>Default</em>: <tt class="docutils literal"><span class="pre">&lt;logdir&gt;</span></tt></p>
+<p><em>Required</em>: No</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="priority">
 <tt class="descname">priority</tt><a class="headerlink" href="#priority" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dd><p>Priority is used to determine a sequence in which programs are started. Higher priority ensures sooner position in start sequence.</p>
+<p>Value has to be an integer, can be negative.</p>
+<p><em>Default</em>: <tt class="docutils literal"><span class="pre">100</span></tt></p>
+<p><em>Required</em>: No</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="disabled">
 <tt class="descname">disabled</tt><a class="headerlink" href="#disabled" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dd><p>Set program state to <tt class="docutils literal"><span class="pre">DISABLED</span></tt> - efectively excludes any option to start this program by Ramona server.</p>
+<dl class="docutils">
+<dt><em>Type</em>: boolean</dt>
+<dd><ul class="first last simple">
+<li>&#8220;1&#8221;, &#8220;yes&#8221;, &#8220;true&#8221;, or &#8220;on&#8221; for disabling program</li>
+<li>&#8220;0&#8221;, no&#8221;, &#8220;false&#8221;, and &#8220;off&#8221; for keeping it enabled</li>
+</ul>
+</dd>
+</dl>
+<p><em>Default</em>: <tt class="docutils literal"><span class="pre">no</span></tt></p>
+<p><em>Required</em>: No</p>
+<p>Example:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[program:foobarposix]</span>
+<span class="na">disabled@windows</span><span class="o">=</span><span class="s">yes</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="coredump">
 <tt class="descname">coredump</tt><a class="headerlink" href="#coredump" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dd><p>If enabled, Ramona server sets ulimit (user limit) for <cite>core file size</cite> (<tt class="docutils literal"><span class="pre">RLIMIT_CORE</span></tt>) to infinite, efectively enabling creation of core dump file when process is terminated by QUIT signal. Actual core dump is requested by <tt class="docutils literal"><span class="pre">-c</span></tt> argument in <a class="reference internal" href="cmdline-stop.html#cmdline-stop"><em>stop (command-line)</em></a>.</p>
+<dl class="docutils">
+<dt><em>Type</em>: boolean</dt>
+<dd><ul class="first last simple">
+<li>&#8220;1&#8221;, &#8220;yes&#8221;, &#8220;true&#8221;, or &#8220;on&#8221; for enabling core dump program</li>
+<li>&#8220;0&#8221;, no&#8221;, &#8220;false&#8221;, and &#8220;off&#8221; for keeping it disabled</li>
+</ul>
+</dd>
+</dl>
+<p><em>Default</em>: <tt class="docutils literal"><span class="pre">no</span></tt></p>
+<p><em>Required</em>: No</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="autorestart">
 <tt class="descname">autorestart</tt><a class="headerlink" href="#autorestart" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dd><p>Enables/disables auto-restart of the program. If enabled, Ramona server will automatically start the relevant supervised program when it terminates unexpectedly (e.g. crash of the program). If program is terminated using <a class="reference internal" href="cmdline-stop.html#cmdline-stop"><em>stop (command-line)</em></a> command, it will not be restarted.</p>
+<dl class="docutils">
+<dt><em>Type</em>: boolean</dt>
+<dd><ul class="first last simple">
+<li>&#8220;1&#8221;, &#8220;yes&#8221;, &#8220;true&#8221;, or &#8220;on&#8221; for enabling auto-restart feature</li>
+<li>&#8220;0&#8221;, no&#8221;, &#8220;false&#8221;, and &#8220;off&#8221; for disabling auto-restart feature</li>
+</ul>
+</dd>
+</dl>
+<p><em>Default</em>: <tt class="docutils literal"><span class="pre">no</span></tt></p>
+<p><em>Required</em>: No</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="processgroup">
 <tt class="descname">processgroup</tt><a class="headerlink" href="#processgroup" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dd><p>If enabled, program will be started in dedicated process group by using POSIX <tt class="docutils literal"><span class="pre">setsid(2)</span></tt> call. If disabled, program will stay in process group of Ramona server.</p>
+<dl class="docutils">
+<dt><em>Type</em>: boolean</dt>
+<dd><ul class="first last simple">
+<li>&#8220;1&#8221;, &#8220;yes&#8221;, &#8220;true&#8221;, or &#8220;on&#8221; for enabling creation of own process group</li>
+<li>&#8220;0&#8221;, no&#8221;, &#8220;false&#8221;, and &#8220;off&#8221; for disabling creation of own process group</li>
+</ul>
+</dd>
+</dl>
+<p><em>Default</em>: <tt class="docutils literal"><span class="pre">yes</span></tt></p>
+<p><em>Required</em>: No</p>
+<p><strong>Available only on POSIX platforms.</strong></p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="logscan_stdout">
 <tt class="descname">logscan_stdout</tt><a class="headerlink" href="#logscan_stdout" title="Permalink to this definition">¶</a></dt>
-<dd><p>Example:</p>
+<dd><p>Configures log scanner for standard output stream.
+See <a class="reference internal" href="features.html#features-logging"><em>Logging and log scanning</em></a> for more details.</p>
+<p>Stream is scanned even if <a class="reference internal" href="#stdout" title="stdout"><tt class="xref py py-attr docutils literal"><span class="pre">stdout</span></tt></a> is set to <tt class="docutils literal"><span class="pre">&lt;null&gt;</span></tt>.</p>
+<p>Value is sequence of comma-separated (<tt class="docutils literal"><span class="pre">,</span></tt>) scanner rules. Each rule consist of <cite>keyword</cite> and <cite>action</cite> in format <tt class="docutils literal"><span class="pre">keyword&gt;action</span></tt>.</p>
+<dl class="docutils">
+<dt><cite>keyword</cite></dt>
+<dd>Case-insensitive string that the scanner is trying to detect in a scanned stream.</dd>
+<dt><cite>action</cite></dt>
+<dd><ul class="first last simple">
+<li><tt class="docutils literal"><span class="pre">now</span></tt>: immediately send email notification using defaults from [ramona:notify]</li>
+<li><tt class="docutils literal"><span class="pre">now:&lt;email</span> <span class="pre">address&gt;</span></tt>: immediately send email notification to given email address</li>
+<li><tt class="docutils literal"><span class="pre">daily</span></tt>: stash notification and eventually send in daily bulk email using defaults from [ramona:notify]</li>
+<li><tt class="docutils literal"><span class="pre">daily:&lt;email</span> <span class="pre">address&gt;</span></tt>: stash notification and eventually send in daily bulk email given email address</li>
+</ul>
+</dd>
+</dl>
+<p>Example:</p>
 <div class="highlight-ini"><div class="highlight"><pre><span class="na">logscan_stdout</span><span class="o">=</span><span class="s">error&gt;now:foo2@bar.com,fatal&gt;now,exception&gt;now,warn&gt;daily:foo3@bar.com</span>
 </pre></div>
 </div>
@@ -671,7 +796,7 @@ History list is persistent and is available across program restarts.</p>
 <dt>The meaning is following:</dt>
 <dd><ul class="first last simple">
 <li><tt class="docutils literal"><span class="pre">error&gt;now:foo2&#64;bar.com</span></tt> &#8211; Whenever keyword <em>error</em> is found in the stdout, send an email immediatelly (now) to email address <em>foo2&#64;bar.com</em></li>
-<li><tt class="docutils literal"><span class="pre">fatal&gt;now</span></tt> &#8211; Whenever keyword <em>fatal</em> is found in the stdout, send an email immediatelly (now) to the default nofitication recipient configured in <tt class="docutils literal"><span class="pre">[ramona:notify]</span></tt> &gt; <a class="reference internal" href="#receiver">receiver</a> configuration option</li>
+<li><tt class="docutils literal"><span class="pre">fatal&gt;now</span></tt> &#8211; Whenever keyword <em>fatal</em> is found in the stdout, send an email immediatelly (now) to the default nofitication recipient configured in <tt class="docutils literal"><span class="pre">[ramona:notify]</span></tt> <a class="reference internal" href="#receiver" title="receiver"><tt class="xref py py-attr docutils literal"><span class="pre">receiver</span></tt></a> configuration option</li>
 <li><tt class="docutils literal"><span class="pre">exception&gt;now</span></tt> &#8211; same as fatal (above) just detecting different keyword (<em>exception</em>)</li>
 <li><tt class="docutils literal"><span class="pre">warn&gt;daily:foo3&#64;bar.com</span></tt> &#8211; Cummulate all the log messages containing the keyword <em>warn</em> and send them to address <em>foo3&#64;bar.com</em> once a day.</li>
 </ul>
@@ -682,7 +807,7 @@ History list is persistent and is available across program restarts.</p>
 <dl class="attribute">
 <dt id="logscan_stderr">
 <tt class="descname">logscan_stderr</tt><a class="headerlink" href="#logscan_stderr" title="Permalink to this definition">¶</a></dt>
-<dd><p>Same as <a class="reference internal" href="#logscan_stdout">logscan_stdout</a>, just scanning stderr stream.</p>
+<dd><p>Same as <a class="reference internal" href="#logscan_stdout">logscan_stdout</a>, just scanning standard error stream.</p>
 </dd></dl>
 
 </div>

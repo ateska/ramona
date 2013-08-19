@@ -79,7 +79,7 @@ Each program in this roaster has a status that reflects its current phase of lif
 <p>User can also add their custom commands (see <a class="reference internal" href="#custom-tools">custom tools</a>) to cover all needs of its application.</p>
 </div>
 <div class="section" id="logging-and-log-scanning">
-<h2>Logging and log scanning<a class="headerlink" href="#logging-and-log-scanning" title="Permalink to this headline">¶</a></h2>
+<span id="features-logging"></span><h2>Logging and log scanning<a class="headerlink" href="#logging-and-log-scanning" title="Permalink to this headline">¶</a></h2>
 <p>Ramona monitors <a class="reference external" href="http://en.wikipedia.org/wiki/Standard_streams">standard output</a> and <a class="reference external" href="http://en.wikipedia.org/wiki/Standard_streams">standard error</a> streams of all its supervisored programs. These streams are persisted to files on a filesystem in a highly configurable way. It is a primary way of how Ramona approaches logging so programs are advised to log using standard streams instead on logging into log files. It also enables Ramona to capture any other textual output of the program that may not be captured by typical logging mechanism like unexpected kills or top-level exceptions.</p>
 <p>Ramona also allows to configure scanner that seeks thru log streams for given patterns and if such a pattern is found, then Ramona notifies about such an event via email.</p>
 </div>
