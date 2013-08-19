@@ -35,6 +35,8 @@ This approach simplifies maintenance of the application and allow easy operating
 User can also add their custom commands (see `custom tools`_) to cover all needs of its application.
 
 
+.. _features-logging:
+
 Logging and log scanning
 ------------------------
 

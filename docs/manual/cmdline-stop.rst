@@ -1,3 +1,5 @@
+.. _cmdline-stop:
+
 stop (command-line)
 ===================
 

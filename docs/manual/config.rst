@@ -630,6 +630,8 @@ Example:
 
   The sequence of signals that will be used to terminate a given program. Ramona server, when asked to stop a program, will send first signal (using POSIX `kill` functionality) from this sequence to given program and set its status to ``STOPPING``. If the program doesn't terminate, next signal from this sequence is sent after time defined by :attr:`stoptimeout`.
 
+  POSIX signal names are used.
+
   When end of this sequence is reached, the KILL signal sent periodically to force program exit.
 
   *Default*:  ``TERM, TERM, TERM, QUIT, QUIT, INT, INT, KILL``
@@ -644,9 +646,10 @@ Example:
     killby=USR1,USR2,TERM,INT,KILL
 
 
+
 .. attribute:: stoptimeout
 
-  This defines a timeout interval between each terminate/kill attempt during ``STOPPING`` phase of program life cycle. 
+  This defines a timeout interval between each terminate/kill attempt during ``STOPPING`` phase of a program life cycle. 
 
   *Default*: 3 *seconds*
 
@@ -667,47 +670,132 @@ Example:
 
 
 
-.. attribute:: stdin
-
-  TODO
-
-
 .. attribute:: stdout
 
-  TODO
+  Configures how to handle standard output stream of a program. Use one of magic values or specify filesystem path to file, where to store log of a stream.
+
+  *Magic values*:
+    - ``<null>`` - don't store standard output in any file
+    - ``<stderr>`` - redirect standard output to standard error
+    - ``<logdir>`` - use file in directory specified by :attr:`logdir`, name of the file is ``[programname]-out.log`` or ``[programname].log`` if standard error is redirected to stdout
+
+
+  *Default*: ``<stderr>``
+
+  *Required*: No
+
 
 
 .. attribute:: stderr
 
-  TODO
+  Configures how to handle standard error stream of a program. Use one of magic values or specify filesystem path to file, where to store log of a stream.
+
+  *Magic values*:
+    - ``<null>`` - don't store standard output in any file
+    - ``<stdout>`` - redirect standard error to standard output
+    - ``<logdir>`` - use file in directory specified by :attr:`logdir`, name of the file is ``[programname]-err.log`` or ``[programname].log`` if standard error is redirected to stdout
+
+
+  *Default*: ``<logdir>``
+
+  *Required*: No
+
 
 
 .. attribute:: priority
 
-  TODO
+  Priority is used to determine a sequence in which programs are started. Higher priority ensures sooner position in start sequence.
+
+  Value has to be an integer, can be negative.
+
+  *Default*: ``100``
+
+  *Required*: No
+
 
 
 .. attribute:: disabled
 
-  TODO
+  Set program state to ``DISABLED`` - efectively excludes any option to start this program by Ramona server.
+
+  *Type*: boolean
+    - "1", "yes", "true", or "on" for disabling program
+    - "0", no", "false", and "off" for keeping it enabled
+
+  *Default*: ``no``
+
+  *Required*: No
+
+  Example:
+
+  .. code-block:: ini
+
+    [program:foobarposix]
+    disabled@windows=yes
+
 
 
 .. attribute:: coredump
 
-  TODO
+  If enabled, Ramona server sets ulimit (user limit) for `core file size` (``RLIMIT_CORE``) to infinite, efectively enabling creation of core dump file when process is terminated by QUIT signal. Actual core dump is requested by ``-c`` argument in :ref:`cmdline-stop`.
+
+  *Type*: boolean
+    - "1", "yes", "true", or "on" for enabling core dump program
+    - "0", no", "false", and "off" for keeping it disabled
+
+  *Default*: ``no``
+
+  *Required*: No
+
 
 
 .. attribute:: autorestart
 
-  TODO
+  Enables/disables auto-restart of the program. If enabled, Ramona server will automatically start the relevant supervised program when it terminates unexpectedly (e.g. crash of the program). If program is terminated using :ref:`cmdline-stop` command, it will not be restarted.
+
+  *Type*: boolean
+    - "1", "yes", "true", or "on" for enabling auto-restart feature
+    - "0", no", "false", and "off" for disabling auto-restart feature
+
+  *Default*: ``no``
+
+  *Required*: No
+
 
 
 .. attribute:: processgroup
 
-  TODO
+  If enabled, program will be started in dedicated process group by using POSIX ``setsid(2)`` call. If disabled, program will stay in process group of Ramona server.
+
+  *Type*: boolean
+    - "1", "yes", "true", or "on" for enabling creation of own process group
+    - "0", no", "false", and "off" for disabling creation of own process group
+
+  *Default*: ``yes``
+
+  *Required*: No
+
+  **Available only on POSIX platforms.**
 
 
 .. attribute:: logscan_stdout
+
+  Configures log scanner for standard output stream. 
+  See :ref:`features-logging` for more details. 
+
+  Stream is scanned even if :attr:`stdout` is set to ``<null>``.
+
+  Value is sequence of comma-separated (``,``) scanner rules. Each rule consist of `keyword` and `action` in format ``keyword>action``.
+
+  `keyword`
+    Case-insensitive string that the scanner is trying to detect in a scanned stream.
+
+  `action`
+    - ``now``: immediately send email notification using defaults from [ramona:notify]
+    - ``now:<email address>``: immediately send email notification to given email address
+    - ``daily``: stash notification and eventually send in daily bulk email using defaults from [ramona:notify]
+    - ``daily:<email address>``: stash notification and eventually send in daily bulk email given email address
+
 
   Example:
   
@@ -717,14 +805,14 @@ Example:
    
   The meaning is following:
      - ``error>now:foo2@bar.com`` -- Whenever keyword *error* is found in the stdout, send an email immediatelly (now) to email address *foo2@bar.com*
-     - ``fatal>now`` -- Whenever keyword *fatal* is found in the stdout, send an email immediatelly (now) to the default nofitication recipient configured in ``[ramona:notify]`` > receiver_ configuration option
+     - ``fatal>now`` -- Whenever keyword *fatal* is found in the stdout, send an email immediatelly (now) to the default nofitication recipient configured in ``[ramona:notify]`` :attr:`receiver` configuration option
      - ``exception>now`` -- same as fatal (above) just detecting different keyword (*exception*)
      - ``warn>daily:foo3@bar.com`` -- Cummulate all the log messages containing the keyword *warn* and send them to address *foo3@bar.com* once a day.
 
 
 .. attribute:: logscan_stderr
 
-  Same as logscan_stdout_, just scanning stderr stream.
+  Same as logscan_stdout_, just scanning standard error stream.
 
 
 .. _config-ramonahttpfend:
