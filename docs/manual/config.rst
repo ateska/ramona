@@ -196,6 +196,10 @@ This section provides general configuration of Ramona-equiped application.
     foobar.log.2
     foobar.log.3 <-- this one will be removed
 
+  .. note::
+
+    Extensive logging can lead to unwanted loss of log files due to the rotation mechanism (e.g. log files quickly exceeding :attr:`logmaxsize`). To prevent this loss, set :attr:`logbackups` to ``inf`` and remove log files manually.
+
 
 .. attribute:: logcompress
 
