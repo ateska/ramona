@@ -233,7 +233,7 @@ foobar.log.3 &lt;-- this one will be removed</pre>
 </div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">Extensive flooding of log streams can lead to unwanted loss of log files due to rotatation mechanism (log files periodically exceeding <a class="reference internal" href="#logmaxsize" title="logmaxsize"><tt class="xref py py-attr docutils literal"><span class="pre">logmaxsize</span></tt></a>). To prevent this loss, set <a class="reference internal" href="#logbackups" title="logbackups"><tt class="xref py py-attr docutils literal"><span class="pre">logbackups</span></tt></a> to <tt class="docutils literal"><span class="pre">inf</span></tt> and remove log files manually.</p>
+<p class="last">Extensive logging can lead to unwanted loss of log files due to the rotation mechanism (e.g. log files quickly exceeding <a class="reference internal" href="#logmaxsize" title="logmaxsize"><tt class="xref py py-attr docutils literal"><span class="pre">logmaxsize</span></tt></a>). To prevent this loss, set <a class="reference internal" href="#logbackups" title="logbackups"><tt class="xref py py-attr docutils literal"><span class="pre">logbackups</span></tt></a> to <tt class="docutils literal"><span class="pre">inf</span></tt> and remove log files manually.</p>
 </div>
 </dd></dl>
 
@@ -284,7 +284,7 @@ You can specify more network interfaces, protocols or ports, URIs are comma-sepa
 <p>Supported connection variants:</p>
 <ul class="simple">
 <li>UNIX sockets (where available)<ul>
-<li>optional parameter &#8216;mode&#8217; specifies UNIX file permissions for created socket file system entry (in octal representation)</li>
+<li>optional <cite>query string</cite> argument &#8216;mode&#8217; specifies UNIX file permissions for created socket file system entry (in octal representation)</li>
 </ul>
 </li>
 <li>TCP IPv4</li>
@@ -295,7 +295,7 @@ You can specify more network interfaces, protocols or ports, URIs are comma-sepa
 <p><em>Required</em>: Yes (but default will work)</p>
 <p>Example:</p>
 <div class="highlight-ini"><div class="highlight"><pre><span class="k">[ramona:server]</span>
-<span class="na">consoleuri</span><span class="o">=</span><span class="s">unix:///tmp/demoramona.sock;mode=0600,tcp://localhost:5566</span>
+<span class="na">consoleuri</span><span class="o">=</span><span class="s">unix:///tmp/demoramona.sock?mode=0600,tcp://localhost:5566</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -454,13 +454,13 @@ History list is persistent and is available across program restarts.</p>
 <tt class="descname">delivery</tt><a class="headerlink" href="#delivery" title="Permalink to this definition">¶</a></dt>
 <dd><p>URL specifies a default delivery method for notifications.</p>
 <dl class="docutils">
-<dt>Supported scheme is currently only &#8216;smtp&#8217;. Format of URL is <tt class="docutils literal"><span class="pre">smtp://[username][:password]&#64;host[:port]/[;parameters]</span></tt>.</dt>
+<dt>Supported scheme is currently only &#8216;smtp&#8217;. Format of URL is <tt class="docutils literal"><span class="pre">smtp://[username][:password]&#64;host[:port]/[?parameters]</span></tt>.</dt>
 <dd><ul class="first last simple">
 <li><tt class="docutils literal"><span class="pre">username</span></tt>: the name of a user that will be used during a SMTP authorization (optional)</li>
 <li><tt class="docutils literal"><span class="pre">password</span></tt>: the password of a user that will be used during a SMTP authorization (optional)</li>
 <li><tt class="docutils literal"><span class="pre">host</span></tt>: the server name or IP address of SMTP <a class="reference external" href="http://en.wikipedia.org/wiki/Message_transfer_agent">MTA</a> (<strong>mandatory</strong>)</li>
 <li><tt class="docutils literal"><span class="pre">port</span></tt>: the port number to be used (optional, port 25 is default)</li>
-<li><tt class="docutils literal"><span class="pre">parameters</span></tt>: set of parameters that will be used to configure STMP communication<ul>
+<li><tt class="docutils literal"><span class="pre">parameters</span></tt>: set of parameters that will be used to configure STMP communication in form of URI query string - separated by <tt class="docutils literal"><span class="pre">&amp;</span></tt><ul>
 <li><tt class="docutils literal"><span class="pre">tls</span></tt>: if this paramater is set to <cite>1</cite> then TLS (Transport Layer Security) mode of the STMP connection will be enabled</li>
 </ul>
 </li>
@@ -472,7 +472,7 @@ History list is persistent and is available across program restarts.</p>
 <p><em>Required</em>: No</p>
 <p>Examples:</p>
 <div class="highlight-ini"><div class="highlight"><pre><span class="k">[ramona:notify]</span>
-<span class="na">delivery</span><span class="o">=</span><span class="s">smtp://user:password@smtp.gmail.com:587/;tls=1</span>
+<span class="na">delivery</span><span class="o">=</span><span class="s">smtp://user:password@smtp.gmail.com:587/?tls=1</span>
 </pre></div>
 </div>
 <div class="highlight-ini"><div class="highlight"><pre><span class="k">[ramona:notify]</span>
@@ -547,7 +547,8 @@ History list is persistent and is available across program restarts.</p>
 <tt class="descname">command</tt><a class="headerlink" href="#command" title="Permalink to this definition">¶</a></dt>
 <dd><p>The command that is used to start a program. Ramona server will issue this command in order to change state of a program to <tt class="docutils literal"><span class="pre">STARTING</span></tt> (and eventual <tt class="docutils literal"><span class="pre">RUNNING</span></tt>) status.</p>
 <p>The command can be either absolute (e.g. <tt class="docutils literal"><span class="pre">/path/to/foobarapp</span></tt>), relative (<tt class="docutils literal"><span class="pre">./bin/foobarapp</span></tt>) or just application executable name (e.g. <tt class="docutils literal"><span class="pre">foobarapp</span></tt>). If last option is used, the environment variable <tt class="docutils literal"><span class="pre">${PATH}</span></tt> will be searched for the executable. Programs can accept arguments, e.g. <tt class="docutils literal"><span class="pre">/path/to/foobarapp</span> <span class="pre">foo</span> <span class="pre">bar</span></tt>.</p>
-<p>Supervised programs should themselves not be <a class="reference external" href="http://en.wikipedia.org/wiki/Daemon_(computing)">daemons</a>, as Ramona server assumes it is responsible for daemonizing itself.</p>
+<p>Supervised programs should themselves not be <a class="reference external" href="http://en.wikipedia.org/wiki/Daemon_(computing)">daemons</a>, as Ramona server assumes it is responsible for daemonizing itself.
+See <a class="reference internal" href="nondeamon.html#nondaemon"><em>Nondaemonizing of Programs</em></a> section for more details.</p>
 <p><em>Default</em>: (none)</p>
 <p><em>Required</em>: Yes</p>
 <p>Example:</p>

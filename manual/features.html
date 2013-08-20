@@ -115,8 +115,8 @@ Each program in this roaster has a status that reflects its current phase of lif
 <p class="last">This manual is actually build using this feature, by executing <tt class="docutils literal"><span class="pre">./ramona.py</span> <span class="pre">manual</span></tt>.</p>
 </div>
 </div>
-<div class="section" id="ramona-environment-variables">
-<h2>Ramona environment variables<a class="headerlink" href="#ramona-environment-variables" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="environment-variables">
+<h2>Environment variables<a class="headerlink" href="#environment-variables" title="Permalink to this headline">¶</a></h2>
 <p>Ramona sets following environment variables to propagate certain information to programs, that are launched as Ramona subprocesses.
 This allows exchange of configuration information in a control way, helping to keep overall configuration nice and tidy.</p>
 <dl class="attribute">
@@ -125,6 +125,12 @@ This allows exchange of configuration information in a control way, helping to k
 <dd><p>This environment variable specifies list of configuration files that has been used to configure Ramona server.
 List is ordered (configuration values can overlap so correct override behaviour needs to be maintained) and its separator is &#8216;:&#8217; for POSIX or &#8216;;&#8217; for Windows. See <tt class="docutils literal"><span class="pre">os.pathsep</span></tt> in Python.</p>
 <p>Client application can use this variable to read configuration from same place(s) as Ramona did.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="RAMONA_CONFIG_WINC">
+<tt class="descname">RAMONA_CONFIG_WINC</tt><a class="headerlink" href="#RAMONA_CONFIG_WINC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Content and format is the same as in <a class="reference internal" href="#RAMONA_CONFIG" title="RAMONA_CONFIG"><tt class="xref py py-attr docutils literal"><span class="pre">RAMONA_CONFIG</span></tt></a> however this one contains also expanded includes (see <tt class="docutils literal"><span class="pre">[general]</span></tt> <a class="reference internal" href="config.html#include" title="include"><tt class="xref py py-attr docutils literal"><span class="pre">include</span></tt></a> configuration option). The order of loading is kept correctly.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -187,7 +193,7 @@ It also depends on <tt class="docutils literal"><span class="pre">pythonservice.
 <li><a class="reference internal" href="#command-line-console">Command-line console</a></li>
 <li><a class="reference internal" href="#logging-and-log-scanning">Logging and log scanning</a></li>
 <li><a class="reference internal" href="#custom-tools">Custom tools</a></li>
-<li><a class="reference internal" href="#ramona-environment-variables">Ramona environment variables</a></li>
+<li><a class="reference internal" href="#environment-variables">Environment variables</a></li>
 <li><a class="reference internal" href="#web-console">Web console</a></li>
 <li><a class="reference internal" href="#windows-service">Windows service</a></li>
 </ul>

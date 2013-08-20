@@ -1,0 +1,162 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Nondaemonizing of Programs &mdash; Ramona 0.9 beta 8 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.9 beta 8',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Ramona 0.9 beta 8 documentation" href="index.html" />
+    <link rel="next" title="Tools Cookbook" href="tools.html" />
+    <link rel="prev" title="winuninstall (command-line)" href="cmdline-winuninstall.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="tools.html" title="Tools Cookbook"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="cmdline-winuninstall.html" title="winuninstall (command-line)"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Ramona 0.9 beta 8 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="nondaemonizing-of-programs">
+<span id="nondaemon"></span><h1>Nondaemonizing of Programs<a class="headerlink" href="#nondaemonizing-of-programs" title="Permalink to this headline">¶</a></h1>
+<p>Supervised programs should not <a class="reference external" href="http://en.wikipedia.org/wiki/Daemon_(computing)">daemonize</a> themselves. Instead, they should run in the foreground.</p>
+<p>You need to consult a specific program manual or help to find out how to disable its eventual daemonizing. You can check actual behaviour of a program by launching it from command-line (e.g. bash). The program should not detach from console, you basically need to press Ctrl-C to get back to shell prompt; in such a case, program is configured correctly for begin used with Ramona. Otherwise, if program detaches, you will be given by a shell prompt without any action needed, then program very likely has daemonized and it will not operated in Ramona properly.</p>
+<p>Daemonizing of a program will basically break connection between Ramona and relevant program. Ramona will likely mark the program being in <tt class="docutils literal"><span class="pre">FATAL</span></tt> state (maybe even after several attempts to launch it) and certainly Ramona will not controll deamonized process (e.g. you will not be able to terminate it using Ramona tools).</p>
+<div class="section" id="examples-of-program-configurations">
+<h2>Examples of Program Configurations<a class="headerlink" href="#examples-of-program-configurations" title="Permalink to this headline">¶</a></h2>
+<p>Here are some &#8220;real world&#8221; program configuration examples:</p>
+<div class="section" id="mongodb">
+<h3>MongoDB<a class="headerlink" href="#mongodb" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[program:mongodb]</span>
+<span class="na">command</span><span class="o">=</span><span class="s">/path/to/bin/mongod -f /path/to/mongodb.conf</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="rabbitmq">
+<h3>RabbitMQ<a class="headerlink" href="#rabbitmq" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[program:rabbitmq]</span>
+<span class="na">command</span><span class="o">=</span><span class="s">/path/to/rabbitmq/bin/rabbitmq-server</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="apache-2-x">
+<h3>Apache 2.x<a class="headerlink" href="#apache-2-x" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[program:apache2]</span>
+<span class="na">command</span><span class="o">=</span><span class="s">/path/to/httpd -c &quot;ErrorLog /dev/stdout&quot; -DFOREGROUND</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Nondaemonizing of Programs</a><ul>
+<li><a class="reference internal" href="#examples-of-program-configurations">Examples of Program Configurations</a><ul>
+<li><a class="reference internal" href="#mongodb">MongoDB</a></li>
+<li><a class="reference internal" href="#rabbitmq">RabbitMQ</a></li>
+<li><a class="reference internal" href="#apache-2-x">Apache 2.x</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="cmdline-winuninstall.html"
+                        title="previous chapter">winuninstall (command-line)</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="tools.html"
+                        title="next chapter">Tools Cookbook</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/nondeamon.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="tools.html" title="Tools Cookbook"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="cmdline-winuninstall.html" title="winuninstall (command-line)"
+             >previous</a> |</li>
+        <li><a href="index.html">Ramona 0.9 beta 8 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Ales Teska.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-34843194-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+  </body>
+</html>
