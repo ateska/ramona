@@ -1,13 +1,10 @@
 Tools Cookbook
 ==============
 
-TODO
-
 .. [TODO]: Example of init.d script (and modern alternatives like init) for ramona-based app
 
 .. [TODO]: Using Ramona to execute unit tests
 
-.. [TODO]: Nondaemonizing of Subprocesses (see http://supervisord.org/subprocess.html#nondaemonizing-of-subprocesses)
 
 Windows service manual control
 ------------------------------

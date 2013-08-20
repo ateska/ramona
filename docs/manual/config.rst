@@ -560,8 +560,7 @@ Example:
   The command can be either absolute (e.g. ``/path/to/foobarapp``), relative (``./bin/foobarapp``) or just application executable name (e.g. ``foobarapp``). If last option is used, the environment variable ``${PATH}`` will be searched for the executable. Programs can accept arguments, e.g. ``/path/to/foobarapp foo bar``. 
 
   Supervised programs should themselves not be daemons_, as Ramona server assumes it is responsible for daemonizing itself.
-
-  .. [TODO]: Link to ondaemonizing of Subprocesses (in tools.rst)
+  See :ref:`nondaemon` section for more details.
 
   .. _daemons: http://en.wikipedia.org/wiki/Daemon_(computing)
 
