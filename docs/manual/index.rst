@@ -27,6 +27,7 @@ Content
    features.rst
    config.rst
    cmdline.rst
+   nondeamon.rst
    tools.rst
    credits.rst
 

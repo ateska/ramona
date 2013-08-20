@@ -87,8 +87,8 @@ Example of tool class:
   This manual is actually build using this feature, by executing ``./ramona.py manual``.
 
 
-Ramona environment variables
-----------------------------
+Environment variables
+---------------------
 
 Ramona sets following environment variables to propagate certain information to programs, that are launched as Ramona subprocesses.
 This allows exchange of configuration information in a control way, helping to keep overall configuration nice and tidy.
@@ -99,6 +99,11 @@ This allows exchange of configuration information in a control way, helping to k
   List is ordered (configuration values can overlap so correct override behaviour needs to be maintained) and its separator is ':' for POSIX or ';' for Windows. See ``os.pathsep`` in Python.
 
   Client application can use this variable to read configuration from same place(s) as Ramona did.
+
+
+.. attribute:: RAMONA_CONFIG_WINC
+
+  Content and format is the same as in :attr:`RAMONA_CONFIG` however this one contains also expanded includes (see ``[general]`` :attr:`include` configuration option). The order of loading is kept correctly.
 
 
 .. attribute:: RAMONA_SECTION

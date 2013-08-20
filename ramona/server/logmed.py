@@ -63,7 +63,7 @@ class log_mediator(object):
 			try:
 				# TODO: Parse human-friendly logmaxsize ... e.g. 10Mb
 				self.logmaxsize = config.getint('general','logmaxsize')
-				x = config.getint('general','logbackups')
+				x = config.get('general','logbackups')
 				if x == '<inf>':
 					self.logbackups = 0
 				else:

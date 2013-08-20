@@ -196,6 +196,10 @@ This section provides general configuration of Ramona-equiped application.
     foobar.log.2
     foobar.log.3 <-- this one will be removed
 
+  .. note::
+
+    Extensive logging can lead to unwanted loss of log files due to the rotation mechanism (e.g. log files quickly exceeding :attr:`logmaxsize`). To prevent this loss, set :attr:`logbackups` to ``inf`` and remove log files manually.
+
 
 .. attribute:: logcompress
 
@@ -556,8 +560,7 @@ Example:
   The command can be either absolute (e.g. ``/path/to/foobarapp``), relative (``./bin/foobarapp``) or just application executable name (e.g. ``foobarapp``). If last option is used, the environment variable ``${PATH}`` will be searched for the executable. Programs can accept arguments, e.g. ``/path/to/foobarapp foo bar``. 
 
   Supervised programs should themselves not be daemons_, as Ramona server assumes it is responsible for daemonizing itself.
-
-  .. [TODO]: Link to ondaemonizing of Subprocesses (in tools.rst)
+  See :ref:`nondaemon` section for more details.
 
   .. _daemons: http://en.wikipedia.org/wiki/Daemon_(computing)
 
