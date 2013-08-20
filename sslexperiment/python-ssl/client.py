@@ -1,7 +1,7 @@
 import socket, ssl, pprint
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
+# s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 ssl_sock = ssl.wrap_socket(s,
                  keyfile="../ca/console1.pem",
                  certfile="../ca/console1.crt",
@@ -12,6 +12,7 @@ ssl_sock = ssl.wrap_socket(s,
                 )
 
 ssl_sock.connect(('localhost', 10024))
+# ssl_sock.connect("/tmp/aaaaaaa")
 
 print repr(ssl_sock.getpeername())
 print ssl_sock.cipher()

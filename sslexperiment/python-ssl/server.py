@@ -1,7 +1,11 @@
 import socket, ssl, pprint
 
-bindsocket = socket.socket()
+bindsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# bindsocket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+
 bindsocket.bind(('localhost', 10024))
+# bindsocket.bind("/tmp/aaaaaaa")
+
 bindsocket.listen(5)
 
 while True:
