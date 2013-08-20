@@ -1,4 +1,4 @@
-import os, sys, re, signal, logging
+import os, sys, re, signal, logging, itertools
 try:
 	import resource
 except ImportError:
@@ -19,9 +19,10 @@ All file descriptors above 2 are closed.
 	'''
 	if server_only: assert (programs is None or len(programs) == 0)
 
-	# Prepare environment variable RAMONA_CONFIG
-	from .config import config_files
+	# Prepare environment variable RAMONA_CONFIG and RAMONA_CONFIG_FULL
+	from .config import config_files, config_includes
 	os.environ['RAMONA_CONFIG'] = os.pathsep.join(config_files)
+	os.environ['RAMONA_CONFIG_WINC'] = os.pathsep.join(itertools.chain(config_files, config_includes))
 
 	# Prepare command line
 	cmdline = ["-m", "ramona.server"]
