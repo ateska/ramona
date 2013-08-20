@@ -353,12 +353,8 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 		elif callid == cnscom.callid_who:
 			ret = []
 			for c in self.conns:
-				print dir(c.sock)
 				ret.append({
-					"family": c.sock.family,
-					"type": c.sock.type,
-					"proto": c.sock.proto,
-					"ssl": False, #TODO: This ...
+					"descr": c.descr,
 					"address": c.address,
 					"connected_at": c.connected_at.isoformat()
 				})

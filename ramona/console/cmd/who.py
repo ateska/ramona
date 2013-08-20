@@ -22,15 +22,19 @@ def main(cnsapp, args):
 		auto_connect=True
 	)
 	whoparsed = json.loads(ret)
-	for who in whoparsed:
+	for whoitem in whoparsed:
 		# TODO: Better text representation
-		print "{} {} {} {} {}--- {}".format(
-			who['family'],
-			who['type'],
-			who['proto'],
-			who['address'],
-			'SSL ' if who['ssl'] else '',
-			who['connected_at']			
+		print " {} @ {}".format(
+			nice_addr(whoitem['descr'], whoitem['address']),
+			whoitem['connected_at']			
 		)
-	
-	
+
+def nice_addr(descr, address):
+	sock_family, sock_type, sock_proto, sock_ssl = descr
+
+	if sock_proto == 'IPPROTO_TCP':
+		return " TCP {}:{}{}".format(address[0], address[1], ' SSL' if sock_ssl else '')
+	elif sock_family == 'AF_UNIX':
+		return "UNIX {}{}".format(address, ' SSL' if sock_ssl else '')
+	else:
+		return "{} {}".format(descr, address)
