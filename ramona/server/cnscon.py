@@ -1,4 +1,4 @@
-import sys, socket, errno, struct, weakref, json, select, logging
+import sys, socket, errno, struct, weakref, json, select, logging, datetime
 import pyev
 from .. import cnscom
 ###
@@ -24,6 +24,7 @@ class console_connection(object):
 
 		self.sock = sock
 		self.address = address
+		self.connected_at = datetime.datetime.utcnow()
 		self.sock.setblocking(0)
 		
 		self.read_buf = ""
