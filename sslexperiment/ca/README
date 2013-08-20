@@ -24,7 +24,16 @@ Similarly, keys for servers are created -- just use a different file name
 
 ===========================================
 Sign a certificate request by the CA
+1. Check that the certificate request is valid -- most importantly check the CN (Common name) as this can be used for eventual authorization:
+openssl x509 -in console1.crt -noout -text
+
+2. If the certificate request seems OK, sign it. This will produce signed certificate "console1.crt" which is the certificate to be used
+for connection by the client.
 openssl x509 -req -days 365 -in console1.csr -CA demo-ca.crt -CAkey demo-ca.pem -CAcreateserial -out console1.crt
+
+NOTE: This is the very basic way of signing user certificate by CA. Of course you can use your existing CA toolkit for this.
+
+
 
 
 ===========================================
