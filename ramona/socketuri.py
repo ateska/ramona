@@ -49,15 +49,8 @@ class socket_uri(object):
 				
 				if self.uriquery.get("ssl", None) == "1":
 					import ssl
-					certfile = self.uriquery.get("certfile", None)
-					if certfile is None:
-						raise RuntimeError("certfile parametr has to be provided in URI if ssl=1")
-					# Keyfile can be None -- in that case the private key is expected to be part of the certificate
-					keyfile = self.uriquery.get("keyfile", None)
-					cacerts = self.uriquery.get("cacerts", None)
-					if cacerts is None:
-						raise RuntimeError("cacerts parametr has to be provided in URI if ssl=1")
-					s = ssl.wrap_socket(s, keyfile=keyfile, certfile=certfile, True, ca_certs=cacerts)
+					certfile, keyfile, cert_reqs, ca_certs = self._get_ssl_params()
+					s = ssl.wrap_socket(s, keyfile=keyfile, certfile=certfile, server_side=True, ca_certs=ca_certs, cert_reqs=cert_reqs)
 					
 				s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) 
 				s.bind(sockaddr)
@@ -86,6 +79,16 @@ class socket_uri(object):
 			for family, socktype, proto, canonname, sockaddr in socket.getaddrinfo(self.uri.hostname, self.uri.port, 0, socket.SOCK_STREAM):
 				try:
 					s = socket.socket(family, socktype, proto)
+					if self.uriquery.get("ssl", None) == "1":
+						import ssl
+						certfile, keyfile, cert_reqs, ca_certs = self._get_ssl_params()
+						
+						s = ssl.wrap_socket(s,
+							keyfile=keyfile,
+							certfile=certfile,
+							ca_certs=ca_certs,
+							cert_reqs=ssl.CERT_REQUIRED
+						)
 					s.connect(sockaddr)
 					return s
 				except Exception, e:
@@ -100,6 +103,33 @@ class socket_uri(object):
 
 		else:
 			raise RuntimeError("Unknown/unsuported protocol '{0}'".format(self.protocol))
+	
+	
+	def _get_ssl_params(self):
+		'''
+		Helper function to read the ssl related parameter from connection URI
+		Besides returing the configuration values, this function raises RuntimeError if one of the required
+		configuration attributes is missing.
+		
+		@return tuple: certfile, keyfile, cert_reqs, ca_certs
+		'''
+		import ssl
+		certfile = self.uriquery.get("certfile", None)
+		if certfile is None:
+			raise RuntimeError("certfile parametr has to be provided in URI if ssl=1")
+		# Keyfile can be None -- in that case the private key is expected to be part of the certificate
+		keyfile = self.uriquery.get("keyfile", None)
+		
+		sslauth = self.uriquery.get("sslauth", None)
+		cert_reqs = ssl.CERT_NONE
+		ca_certs = None
+		if sslauth != "0":
+			cert_reqs = ssl.CERT_REQUIRED
+			ca_certs = self.uriquery.get("cacerts", None)
+			if ca_certs is None:
+				raise RuntimeError("cacerts parametr has to be provided in URI if ssl=1")
+		
+		return certfile, keyfile, cert_reqs, ca_certs
 
 ###
 
