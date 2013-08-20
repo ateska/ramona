@@ -9,7 +9,7 @@ class socket_uri(object):
 	'''
 
 	# Configure urlparse
-	if 'unix' not in urlparse.uses_params: urlparse.uses_params.append('unix')
+	if 'unix' not in urlparse.uses_query: urlparse.uses_query.append('unix')
 	if 'tcp' not in urlparse.uses_query: urlparse.uses_query.append('tcp')
 
 	def __init__(self, uri):
@@ -55,15 +55,19 @@ class socket_uri(object):
 					certfile = self.uriquery.get("certfile", None)
 					if certfile is None:
 						raise RuntimeError("certfile parametr has to be provided in URI if ssl=1")
+					# Keyfile can be None -- in that case the private key is expected to be part of the certificate
 					keyfile = self.uriquery.get("keyfile", None)
-					s = ssl.wrap_socket(s, keyfile, certfile, True)
+					cacerts = self.uriquery.get("cacerts", None)
+					if cacerts is None:
+						raise RuntimeError("cacerts parametr has to be provided in URI if ssl=1")
+					s = ssl.wrap_socket(s, keyfile=keyfile, certfile=certfile, True, ca_certs=cacerts)
 					
 				s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) 
 				s.bind(sockaddr)
 				retsocks.append(s)
 
 		elif self.protocol == 'unix':
-			mode = self.uriparams.get('mode',None)
+			mode = self.uriquery.get('mode',None)
 			if mode is None: mode = 0o600
 			else: mode = int(mode,8)
 			oldmask = os.umask(mode ^ 0o777)
