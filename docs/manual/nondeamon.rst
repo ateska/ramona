@@ -10,3 +10,35 @@ You need to consult a specific program manual or help to find out how to disable
 Daemonizing of a program will basically break connection between Ramona and relevant program. Ramona will likely mark the program being in ``FATAL`` state (maybe even after several attempts to launch it) and certainly Ramona will not controll deamonized process (e.g. you will not be able to terminate it using Ramona tools).
 
 .. _daemonize: http://en.wikipedia.org/wiki/Daemon_(computing)
+
+
+Examples of Program Configurations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Here are some "real world" program configuration examples:
+
+
+MongoDB
++++++++
+.. code-block:: ini
+
+	[program:mongodb]
+	command=/path/to/bin/mongod -f /path/to/mongodb.conf
+
+
+RabbitMQ
+++++++++
+.. code-block:: ini
+
+	[program:rabbitmq]
+	command=/path/to/rabbitmq/bin/rabbitmq-server
+
+
+Apache 2.x
+++++++++++
+.. code-block:: ini
+
+   [program:apache2]
+   command=/path/to/httpd -c "ErrorLog /dev/stdout" -DFOREGROUND
+
+
