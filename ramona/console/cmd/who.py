@@ -16,7 +16,7 @@ def init_parser(parser):
 	return
 
 def main(cnsapp, args):
-	print "getting users..."
+	print "Connected clients:"
 	ret = cnsapp.cnssvrcall(
 		cnscom.callid_who, 
 		auto_connect=True
@@ -24,6 +24,13 @@ def main(cnsapp, args):
 	whoparsed = json.loads(ret)
 	for who in whoparsed:
 		# TODO: Better text representation
-		print str(who['address']) + " --- " + who['connected_at']
+		print "{} {} {} {} {}--- {}".format(
+			who['family'],
+			who['type'],
+			who['proto'],
+			who['address'],
+			'SSL ' if who['ssl'] else '',
+			who['connected_at']			
+		)
 	
 	
