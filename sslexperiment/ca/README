@@ -1,0 +1,33 @@
+http://pages.cs.wisc.edu/~zmiller/ca-howto/
+http://gagravarr.org/writing/openssl-certs/ca.shtml
+
+===========================================
+Certificate Authority key and certificate
+
+Create CA key:
+openssl genrsa 2048 > demo-ca.pem
+
+Create CA certificate (valid for 10 years):
+openssl req -new -x509 -days 3650 -key demo-ca.pem -out demo-ca.crt
+
+
+===========================================
+Keys for the clients (consoles):
+
+Key for the console1:
+openssl genrsa 2048 > console1.pem
+
+Certificate request for console1:
+openssl req -new -key console1.pem -out console1.csr
+
+Similarly, keys for servers are created -- just use a different file name
+
+===========================================
+Sign a certificate request by the CA
+openssl x509 -req -days 365 -in console1.csr -CA demo-ca.crt -CAkey demo-ca.pem -CAcreateserial -out console1.crt
+
+
+===========================================
+For test purposes create a self-signed key + certificate, which should not be allowed to connect:
+openssl genrsa 2048 > selfsigned.pem
+openssl req -new -x509 -key selfsigned.pem -out selfsigned.crt
