@@ -14,7 +14,7 @@ class socket_uri(object):
 
 	def __init__(self, uri):
 		self.uri = urlparse.urlparse(uri.strip())
-		self.uriparams = dict(urlparse.parse_qsl(self.uri.params))
+		self.uriquery = dict(urlparse.parse_qsl(self.uri.query))
 
 		self.protocol = self.uri.scheme.lower()
 		if self.protocol == 'tcp':
@@ -44,7 +44,6 @@ class socket_uri(object):
 		retsocks = []
 
 		if self.protocol == 'tcp':
-
 			for family, socktype, proto, canonname, sockaddr in socket.getaddrinfo(self.uri.hostname, self.uri.port, 0, socket.SOCK_STREAM):
 				s = socket.socket(family, socktype, proto)
 				s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
