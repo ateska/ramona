@@ -9,7 +9,8 @@ class socket_uri(object):
 	'''
 
 	# Configure urlparse
-	if 'unix' not in urlparse.uses_params: urlparse.uses_params.append('unix')
+	if 'unix' not in urlparse.uses_query: urlparse.uses_query.append('unix')
+	if 'tcp' not in urlparse.uses_query: urlparse.uses_query.append('tcp')
 
 	def __init__(self, uri):
 		self.uri = urlparse.urlparse(uri.strip())
@@ -18,7 +19,7 @@ class socket_uri(object):
 		self.protocol = self.uri.scheme.lower()
 		if self.protocol == 'tcp':
 			try:
-				_port = self.uri.port
+				_port = int(self.uri.port)
 			except ValueError:
 				raise RuntimeError("Invalid port number in socket URI {0}".format(uri))
 
@@ -51,7 +52,7 @@ class socket_uri(object):
 				retsocks.append(s)
 
 		elif self.protocol == 'unix':
-			mode = self.uriparams.get('mode',None)
+			mode = self.uriquery.get('mode',None)
 			if mode is None: mode = 0o600
 			else: mode = int(mode,8)
 			oldmask = os.umask(mode ^ 0o777)

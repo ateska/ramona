@@ -8,7 +8,7 @@ L = logging.getLogger('sendmail')
 ###
 
 # Configure urlparse
-if 'smtp' not in urlparse.uses_params: urlparse.uses_params.append('smtp')
+if 'smtp' not in urlparse.uses_query: urlparse.uses_query.append('smtp')
 
 ###
 
@@ -24,7 +24,7 @@ class send_mail(object):
 				self.port = delurl.port if delurl.port is not None else 25
 				self.username = delurl.username
 				self.password = delurl.password
-				self.params = dict(urlparse.parse_qsl(delurl.params))
+				self.params = dict(urlparse.parse_qsl(delurl.query))
 
 				if sender is None:
 					self.sender = config.get('ramona:notify','sender')

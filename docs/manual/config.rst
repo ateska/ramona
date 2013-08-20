@@ -257,7 +257,7 @@ This section configures Ramona server.
 
   - UNIX sockets (where available)
   
-    - optional parameter 'mode' specifies UNIX file permissions for created socket file system entry (in octal representation)
+    - optional query argument 'mode' specifies UNIX file permissions for created socket file system entry (in octal representation)
 
   - TCP IPv4
   - TCP IPv6
@@ -273,7 +273,7 @@ This section configures Ramona server.
   .. code-block:: ini
 
     [ramona:server]
-    consoleuri=unix:///tmp/demoramona.sock;mode=0600,tcp://localhost:5566
+    consoleuri=unix:///tmp/demoramona.sock?mode=0600,tcp://localhost:5566
 
 
 .. attribute:: pidfile
@@ -441,12 +441,12 @@ This is configuration of Ramona notification sub-system. This component (part of
 
   URL specifies a default delivery method for notifications.
 
-  Supported scheme is currently only 'smtp'. Format of URL is ``smtp://[username][:password]@host[:port]/[;parameters]``.
+  Supported scheme is currently only 'smtp'. Format of URL is ``smtp://[username][:password]@host[:port]/[?parameters]``.
     - ``username``: the name of a user that will be used during a SMTP authorization (optional)
     - ``password``: the password of a user that will be used during a SMTP authorization (optional)
     - ``host``: the server name or IP address of SMTP MTA_ (**mandatory**)
     - ``port``: the port number to be used (optional, port 25 is default)
-    - ``parameters``: set of parameters that will be used to configure STMP communication
+    - ``parameters``: set of parameters that will be used to configure STMP communication in form of URI query string - separated by ``&``
 
       * ``tls``: if this paramater is set to `1` then TLS (Transport Layer Security) mode of the STMP connection will be enabled
 
@@ -464,7 +464,7 @@ This is configuration of Ramona notification sub-system. This component (part of
   .. code-block:: ini
 
     [ramona:notify]
-    delivery=smtp://user:password@smtp.gmail.com:587/;tls=1
+    delivery=smtp://user:password@smtp.gmail.com:587/?tls=1
 
 
   .. code-block:: ini
