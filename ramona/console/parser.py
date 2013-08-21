@@ -22,6 +22,7 @@ class _parser_base(argparse.ArgumentParser):
 		self.subcommands = {}
 		for cmd in self.build_cmdlist():
 			subparser = self.subparsers.add_parser(cmd.name, help=cmd.cmdhelp, **self.subparser_kwargs)
+			subparser.description = cmd.cmdhelp
 			cmd.init_parser(subparser)
 			self.subcommands[cmd.name] = cmd
 
@@ -65,6 +66,9 @@ class _parser_base(argparse.ArgumentParser):
 
 		from .cmd import tail
 		yield tail
+
+		from .cmd import who
+		yield who
 
 		if sys.platform == 'win32':
 			from .cmd import wininstall

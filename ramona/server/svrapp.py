@@ -350,6 +350,17 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 			
 			return program.tailf_stop(cnscon, **kwargs)
 
+		elif callid == cnscom.callid_who:
+			ret = []
+			for c in self.conns:
+				ret.append({
+					"me": cnscon == c,
+					"descr": c.descr,
+					"address": c.address,
+					"connected_at": c.connected_at
+				})
+			return json.dumps(ret)
+
 		else:
 			L.error("Received unknown callid: {0}".format(callid))
 
