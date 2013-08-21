@@ -354,6 +354,7 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 			ret = []
 			for c in self.conns:
 				ret.append({
+					"me": cnscon == c,
 					"descr": c.descr,
 					"address": c.address,
 					"connected_at": c.connected_at

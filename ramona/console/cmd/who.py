@@ -23,7 +23,8 @@ def main(cnsapp, args):
 	)
 	whoparsed = json.loads(ret)
 	for whoitem in whoparsed:
-		print " {} @ {}".format(
+		print "{}{} @ {}".format(
+			'*' if whoitem['me'] else ' ',
 			nice_addr(whoitem['descr'], whoitem['address']),
 			time.strftime("%d-%m-%Y %H:%M:%S", time.localtime(whoitem['connected_at']))
 		)
