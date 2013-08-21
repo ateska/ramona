@@ -27,6 +27,7 @@ def complete(console, text, line, begidx, endidx):
 ###
 
 def main(cnsapp, args):
+
 	if args.server_only:
 		if len(args.program) > 0:
 			raise exception.parameters_error('Cannot specify programs and -S option at once.')
@@ -45,4 +46,3 @@ def main(cnsapp, args):
 		auto_connect=args.no_server_start,
 		auto_server_start=not args.no_server_start
 	)
-
