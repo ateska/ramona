@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>server (command-line) &mdash; Ramona 0.9 beta 8 documentation</title>
+    <title>who (command-line) &mdash; Ramona 0.9 beta 8 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -25,8 +25,8 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Ramona 0.9 beta 8 documentation" href="index.html" />
     <link rel="up" title="Command line console" href="cmdline.html" />
-    <link rel="next" title="who (command-line)" href="cmdline-who.html" />
-    <link rel="prev" title="console (command-line)" href="cmdline-console.html" /> 
+    <link rel="next" title="wininstall (command-line)" href="cmdline-wininstall.html" />
+    <link rel="prev" title="server (command-line)" href="cmdline-server.html" /> 
   </head>
   <body>
     <div class="related">
@@ -36,10 +36,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="cmdline-who.html" title="who (command-line)"
+          <a href="cmdline-wininstall.html" title="wininstall (command-line)"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="cmdline-console.html" title="console (command-line)"
+          <a href="cmdline-server.html" title="server (command-line)"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Ramona 0.9 beta 8 documentation</a> &raquo;</li>
           <li><a href="cmdline.html" accesskey="U">Command line console</a> &raquo;</li> 
@@ -51,27 +51,19 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="server-command-line">
-<h1>server (command-line)<a class="headerlink" href="#server-command-line" title="Permalink to this headline">¶</a></h1>
-<p>Start the Ramona server in the foreground.
-You can use <cite>Ctrl-C</cite> to terminate server interactively. Also you will be able to see output of a Ramona server directly on a terminal.</p>
-<div class="highlight-bash"><div class="highlight"><pre>&lt;console.py&gt; server <span class="o">[</span>-h<span class="o">]</span> <span class="o">[</span>-S<span class="o">]</span> <span class="o">[</span>program <span class="o">[</span>program ...<span class="o">]]</span>
+  <div class="section" id="who-command-line">
+<h1>who (command-line)<a class="headerlink" href="#who-command-line" title="Permalink to this headline">¶</a></h1>
+<p>Show <em>who</em> is connected to the Ramona server.</p>
+<p>Ramona server allows multiple clients to be connected at the same time. This command allows users to check who is connected to given Ramona server.</p>
+<div class="highlight-bash"><div class="highlight"><pre>&lt;console.py&gt; who <span class="o">[</span>-h<span class="o">]</span>
 </pre></div>
 </div>
-<dl class="describe">
-<dt>
-<tt class="descname">program</tt></dt>
-<dd><p>Optionally specify program(s) in scope of the command. If none is given, all programs are considered in scope.</p>
-</dd></dl>
-
-<dl class="cmdoption">
-<dt id="cmdoption-S">
-<tt class="descname">-S</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-S" title="Permalink to this definition">¶</a></dt>
-<dt id="cmdoption--server-only">
-<tt class="descname">--server-only</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption--server-only" title="Permalink to this definition">¶</a></dt>
-<dd><p>Start only Ramona server, programs are not launched.</p>
-</dd></dl>
-
+<p>Output example:</p>
+<div class="highlight-python"><pre>Connected clients:
+*UNIX /tmp/ramona-dev.sock @ 21-08-2013 19:49:10
+  TCP 127.0.0.1:53211 @ 21-08-2013 19:55:22
+  TCP [::1]:53211 @ 21-08-2013 18:35:16</pre>
+</div>
 </div>
 
 
@@ -81,14 +73,14 @@ You can use <cite>Ctrl-C</cite> to terminate server interactively. Also you will
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="cmdline-console.html"
-                        title="previous chapter">console (command-line)</a></p>
+  <p class="topless"><a href="cmdline-server.html"
+                        title="previous chapter">server (command-line)</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="cmdline-who.html"
-                        title="next chapter">who (command-line)</a></p>
+  <p class="topless"><a href="cmdline-wininstall.html"
+                        title="next chapter">wininstall (command-line)</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
-    <li><a href="_sources/cmdline-server.txt"
+    <li><a href="_sources/cmdline-who.txt"
            rel="nofollow">Show Source</a></li>
   </ul>
 <div id="searchbox" style="display: none">
@@ -115,10 +107,10 @@ You can use <cite>Ctrl-C</cite> to terminate server interactively. Also you will
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="cmdline-who.html" title="who (command-line)"
+          <a href="cmdline-wininstall.html" title="wininstall (command-line)"
              >next</a> |</li>
         <li class="right" >
-          <a href="cmdline-console.html" title="console (command-line)"
+          <a href="cmdline-server.html" title="server (command-line)"
              >previous</a> |</li>
         <li><a href="index.html">Ramona 0.9 beta 8 documentation</a> &raquo;</li>
           <li><a href="cmdline.html" >Command line console</a> &raquo;</li> 
