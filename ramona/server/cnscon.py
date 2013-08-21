@@ -1,4 +1,4 @@
-import sys, socket, errno, struct, weakref, json, select, logging, datetime
+import sys, socket, errno, struct, weakref, json, select, logging, time
 import pyev
 from .. import cnscom
 ###
@@ -24,7 +24,7 @@ class console_connection(object):
 	
 		self.sock = sock
 		self.sock.setblocking(0)
-
+		# Tuple of (socket family, socket type, socket protocol, ssl) 
 		self.descr = (
 			_socket_families_map.get(self.sock.family, self.sock.family),
 			_socket_type_map.get(self.sock.type, self.sock.type),
@@ -32,9 +32,8 @@ class console_connection(object):
 			None #TODO: SSL goes here ...
 		)
 		self.address = address
-
-		self.connected_at = datetime.datetime.utcnow()
-
+		
+		self.connected_at = time.time()
 		
 		self.read_buf = ""
 		self.write_buf = None

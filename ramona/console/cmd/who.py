@@ -1,4 +1,4 @@
-import json, logging
+import json, logging, time
 from ... import cnscom
 
 ###
@@ -23,10 +23,9 @@ def main(cnsapp, args):
 	)
 	whoparsed = json.loads(ret)
 	for whoitem in whoparsed:
-		# TODO: Better text representation
 		print " {} @ {}".format(
 			nice_addr(whoitem['descr'], whoitem['address']),
-			whoitem['connected_at']			
+			time.strftime("%d-%m-%Y %H:%M:%S", time.localtime(whoitem['connected_at']))
 		)
 
 def nice_addr(descr, address):
