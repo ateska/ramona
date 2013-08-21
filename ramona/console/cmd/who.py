@@ -4,7 +4,7 @@ from ... import cnscom
 ###
 
 name = 'who'
-cmdhelp = 'Show connected consoles'
+cmdhelp = 'Show is currently connected the server'
 
 ###
 
