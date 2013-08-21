@@ -1,6 +1,13 @@
 import sys, socket, errno, struct, weakref, json, select, logging, time
 import pyev
 from .. import cnscom
+
+# Conditional import of ssl module
+try:
+	import ssl
+except ImportError:
+	ssl = None
+
 ###
 
 L = logging.getLogger("cnscon")
@@ -24,12 +31,22 @@ class console_connection(object):
 	
 		self.sock = sock
 		self.sock.setblocking(0)
-		# Tuple of (socket family, socket type, socket protocol, ssl) 
+		ssl_cert = None
+		if ssl is not None and isinstance(sock, ssl.SSLSocket):
+			ssl_cert = sock.getpeercert()
+			if ssl_cert is not None:
+				cert_subj_dict = {}
+				for subjcomp in ssl_cert.get("subject", {}):
+					if len(subjcomp) > 0 and len(subjcomp[0]) >= 2:
+						cert_subj_dict[subjcomp[0][0]] = subjcomp[0][1]
+				ssl_cert['subject'] = cert_subj_dict
+			
+		# Tuple of (socket family, socket type, socket protocol, ssl peer certificate)
 		self.descr = (
 			_socket_families_map.get(self.sock.family, self.sock.family),
 			_socket_type_map.get(self.sock.type, self.sock.type),
 			_socket_proto_map.get(self.sock.proto, self.sock.proto),
-			None #TODO: SSL goes here ...
+			ssl_cert
 		)
 		self.address = address
 		

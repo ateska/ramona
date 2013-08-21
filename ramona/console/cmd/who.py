@@ -30,13 +30,19 @@ def main(cnsapp, args):
 		)
 
 def nice_addr(descr, address):
-	sock_family, sock_type, sock_proto, sock_ssl = descr
+	sock_family, sock_type, sock_proto, ssl_cert = descr
 
 	if sock_proto == 'IPPROTO_TCP' and sock_family == 'AF_INET6':
-		return " TCP [{}]:{}{}".format(address[0], address[1], ' SSL' if sock_ssl else '')
+		return " TCP [{}]:{}{}".format(address[0], address[1], nice_ssl(ssl_cert))
 	elif sock_proto == 'IPPROTO_TCP' and sock_family == 'AF_INET':
-		return " TCP {}:{}{}".format(address[0], address[1], ' SSL' if sock_ssl else '')
+		return " TCP {}:{}{}".format(address[0], address[1], nice_ssl(ssl_cert))
 	elif sock_family == 'AF_UNIX':
-		return "UNIX {}{}".format(address, ' SSL' if sock_ssl else '')
+		return "UNIX {}{}".format(address, nice_ssl(ssl_cert))
 	else:
 		return "{} {}".format(descr, address)
+
+def nice_ssl(ssl_cert):
+	if ssl_cert is None:
+		return ""
+	cert_subj = ssl_cert.get("subject", {})
+	return " SSL (cn={})".format(cert_subj.get("commonName"))
