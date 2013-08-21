@@ -1,4 +1,4 @@
-import sys, socket, errno, struct, weakref, json, select, logging
+import sys, socket, errno, struct, weakref, json, select, logging, time
 import pyev
 from .. import cnscom
 ###
@@ -21,10 +21,19 @@ class console_connection(object):
 
 	def __init__(self, sock, address, serverapp):
 		self.serverapp = serverapp
-
+	
 		self.sock = sock
-		self.address = address
 		self.sock.setblocking(0)
+		# Tuple of (socket family, socket type, socket protocol, ssl) 
+		self.descr = (
+			_socket_families_map.get(self.sock.family, self.sock.family),
+			_socket_type_map.get(self.sock.type, self.sock.type),
+			_socket_proto_map.get(self.sock.proto, self.sock.proto),
+			None #TODO: SSL goes here ...
+		)
+		self.address = address
+		
+		self.connected_at = time.time()
 		
 		self.read_buf = ""
 		self.write_buf = None
@@ -233,3 +242,20 @@ class message_yield_loghandler(logging.Handler):
 ###
 
 class deffered_return(object): pass # This is just a symbol definition
+
+#
+
+_socket_families_map = {
+	socket.AF_UNIX: 'AF_UNIX',
+	socket.AF_INET: 'AF_INET',
+	socket.AF_INET6: 'AF_INET6',
+}
+
+_socket_type_map = {
+	socket.SOCK_STREAM: 'SOCK_STREAM',
+	socket.SOCK_DGRAM: 'SOCK_DGRAM',
+}
+
+_socket_proto_map = {
+	socket.IPPROTO_TCP: 'IPPROTO_TCP',
+}

@@ -66,6 +66,9 @@ class _parser_base(argparse.ArgumentParser):
 		from .cmd import tail
 		yield tail
 
+		from .cmd import who
+		yield who
+
 		if sys.platform == 'win32':
 			from .cmd import wininstall
 			yield wininstall
