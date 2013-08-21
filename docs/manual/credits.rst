@@ -1,6 +1,7 @@
 Credits
 =======
 
+
 Project links
 -------------
 
@@ -18,6 +19,7 @@ Project links
 .. _`Bug tracker`: https://github.com/ateska/ramona/issues
 .. _`Documentation`: http://ateska.github.com/ramona/manual
 
+
 Contributors
 ------------
 
@@ -26,6 +28,15 @@ Contributors
 
 .. _`Ales Teska`: https://github.com/ateska
 .. _`Jan Stastny`: https://github.com/jstastny
+
+
+Inspiration
+-----------
+ 
+Ramona is stronly influenced and inspired by supervisord_, another supervising tool.
+
+.. _supervisord: http://supervisord.org/
+
 
 License
 -------
@@ -58,3 +69,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   This is the `BSD 2-Clause License`_.
 
 .. _`BSD 2-Clause License`: http://opensource.org/licenses/bsd-license.php
+
+
+Documentation licence
+---------------------
+
+Ramona Documentation is available under `Creative Commons Attribution-ShareAlike 3.0 Unported license`_ conditions.
+
+.. _`Creative Commons Attribution-ShareAlike 3.0 Unported license`: http://creativecommons.org/licenses/by-sa/3.0/
+
+.. note::
+   
+   Ramona Documentation uses texts from Wikipedia_.
+
+.. _Wikipedia: http://wikipedia.org/
+

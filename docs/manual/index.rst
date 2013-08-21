@@ -39,18 +39,3 @@ Indices and tables
 * :ref:`search`
 
 .. * :ref:`modindex`
-
-
-Copyright
-=========
-
-Ramona Documentation is available under `Creative Commons Attribution-ShareAlike 3.0 Unported license`_ conditions.
-
-.. _`Creative Commons Attribution-ShareAlike 3.0 Unported license`: http://creativecommons.org/licenses/by-sa/3.0/
-
-.. note::
-   
-   Ramona Documentation uses texts from Wikipedia_.
-
-.. _Wikipedia: http://wikipedia.org/
-

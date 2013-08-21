@@ -257,7 +257,7 @@ This section configures Ramona server.
 
   - UNIX sockets (where available)
   
-    - optional query argument 'mode' specifies UNIX file permissions for created socket file system entry (in octal representation)
+    - optional `query string` argument 'mode' specifies UNIX file permissions for created socket file system entry (in octal representation)
 
   - TCP IPv4
   - TCP IPv6

@@ -19,7 +19,7 @@ class socket_uri(object):
 		self.protocol = self.uri.scheme.lower()
 		if self.protocol == 'tcp':
 			try:
-				_port = self.uri.port
+				_port = int(self.uri.port)
 			except ValueError:
 				raise RuntimeError("Invalid port number in socket URI {0}".format(uri))
 
