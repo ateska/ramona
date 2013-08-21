@@ -69,16 +69,19 @@ class socket_uri(object):
 
 	def create_socket_connect(self):
 		if self.protocol == 'tcp':
-			errors = []
+			last_error = None
 			for family, socktype, proto, canonname, sockaddr in socket.getaddrinfo(self.uri.hostname, self.uri.port, 0, socket.SOCK_STREAM):
 				try:
 					s = socket.socket(family, socktype, proto)
 					s.connect(sockaddr)
 					return s
 				except Exception, e:
-					errors.append("{0}: {1}".format(sockaddr, e))
+					last_error = e
 					continue
-			raise RuntimeError("Connection failed: {0}".format('; '.join(errors)))
+
+			# Raise last error from eventual sequence ...
+			if last_error is not None: raise last_error
+			raise RuntimeError("Unexpected error condition during server connect.")
 
 		elif self.protocol == 'unix':
 			s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
