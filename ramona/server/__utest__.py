@@ -24,12 +24,12 @@ class TestSequenceController(unittest.TestCase):
 		sc = sequence_controller()
 
 		# Build launchpad sequence
-		sc.add(self._dummy_program('a',1))
-		sc.add(self._dummy_program('b',2))
-		sc.add(self._dummy_program('c',1))
-		sc.add(self._dummy_program('d',2))
-		sc.add(self._dummy_program('e',1))
-		sc.add(self._dummy_program('f',4))
+		sc.add(self._dummy_program('a',9))
+		sc.add(self._dummy_program('b',8))
+		sc.add(self._dummy_program('c',9))
+		sc.add(self._dummy_program('d',8))
+		sc.add(self._dummy_program('e',9))
+		sc.add(self._dummy_program('f',6))
 
 		# Get first set
 		actps = sc.next()
@@ -92,9 +92,9 @@ class TestSequenceController(unittest.TestCase):
 		sc = sequence_controller()
 
 		# Build launchpad sequence
-		sc.add(self._dummy_program('a',1))
-		sc.add(self._dummy_program('b',2))
-		sc.add(self._dummy_program('c',1))
+		sc.add(self._dummy_program('a',9))
+		sc.add(self._dummy_program('b',8))
+		sc.add(self._dummy_program('c',9))
 
 		# Get first set
 		actps = sc.next()

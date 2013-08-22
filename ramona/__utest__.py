@@ -50,7 +50,7 @@ class TestSendMail(unittest.TestCase):
 
 	def test_sendmail_uri_04(self):
 		'''Simulating Google SMTP parametrization'''
-		u = sendmail.send_mail('smtp://user:password@smtp.gmail.com:587/;tls=1')
+		u = sendmail.send_mail('smtp://user:password@smtp.gmail.com:587?tls=1')
 		self.assertEqual(u.hostname, 'smtp.gmail.com')
 		self.assertEqual(u.port, 587)
 		self.assertEqual(u.username, 'user')
