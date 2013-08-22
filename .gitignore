@@ -42,3 +42,4 @@ MANIFEST
 .settings
 /log-test
 *.pid
+/ramona-test-site.conf
