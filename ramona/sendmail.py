@@ -1,4 +1,4 @@
-import urlparse, smtplib, logging, getpass, socket, os
+import urlparse, smtplib, logging, getpass, socket, os, string
 from email.mime.text import MIMEText
 from .config import config
 ###
@@ -39,7 +39,8 @@ class send_mail(object):
 		else:
 			raise RuntimeError("Unknown delivery method in {0}".format(deliveryuri))
 
-		self.receiver = config.get('ramona:notify', 'receiver').split(',')
+		self.receiver = map(string.strip, config.get('ramona:notify', 'receiver').split(','))
+		
 
 
 	def connection_test(self):

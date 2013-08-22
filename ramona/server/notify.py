@@ -98,6 +98,7 @@ class notificator(object):
 		nfttext += '\n'+'-'*50+'\n'
 
 		targettime, _, recipientconf = target.partition(":")
+		recipientconf = recipientconf.strip()
 		if recipientconf != "":
 			recipients = [recipientconf]
 		else:
