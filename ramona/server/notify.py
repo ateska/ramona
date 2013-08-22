@@ -77,7 +77,7 @@ class notificator(object):
 					appname,
 					hostname)
 			sep = '\n'+'='*50+'\n'
-			self._send_mail(subj, sep.join(textssend), recipient)
+			self._send_mail(subj, sep.join(textssend), [recipient])
 
 
 	def publish(self, target, prog_ident, stream_name, pattern, tail):
@@ -97,10 +97,11 @@ class notificator(object):
 		nfttext += tail	
 		nfttext += '\n'+'-'*50+'\n'
 
-		targettime, _, recipient = target.partition(":")
-		if recipient == "":
-			# Take recipient from config
-			recipient = config.get("ramona:notify", "receiver")
+		targettime, _, recipientconf = target.partition(":")
+		if recipientconf != "":
+			recipients = [recipientconf]
+		else:
+			recipients = self.delivery.receiver
 		
 		
 		if targettime == "now":
@@ -111,32 +112,33 @@ class notificator(object):
 					hostname,
 					), 
 				nfttext,
-				recipient
+				recipients
 			)
 		elif targettime == "daily":
-			if not self.dailystash.has_key(recipient):
-				self.dailystash[recipient] = list()
-			self.dailystash[recipient].append(nfttext)
+			for recipient in recipients:
+				if not self.dailystash.has_key(recipient):
+					self.dailystash[recipient] = list()
+				self.dailystash[recipient].append(nfttext)
 			
 		else:
 			L.warn("Target {} not implemented!".format(targettime))
 			
 
 
-	def _send_mail(self, subject, text, recipient=None):
+	def _send_mail(self, subject, text, recipients):
+		'''
+		@param subject: Subject of the email message
+		@param text: Text to be sent (it is prefixed with greeting and signature by this method)
+		@param recipients: List of message recipients
+		'''
 		try:
 			text = ''.join([
 				'Hello,\n\nRamona detected following condition:\n',
 				text,
 				'\nBest regards,\nYour Ramona\n\nhttp://ateska.github.com/ramona\n'
 			])
-
-			if recipient is None:
-				recipient = self.recipient
-			elif isinstance(recipient, basestring):
-				recipient = [recipient]
-
-			self.delivery.send(recipient, subject, text)
+			
+			self.delivery.send(recipients, subject, text)
 
 		except:
 			L.exception('Exception during sending mail - ignoring')
