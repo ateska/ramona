@@ -9,6 +9,7 @@ Project links
 - `Source code`_ @ GitHub
 - `Binaries`_ @ PyPi (Python Package Index)
 - `Documentation`_
+- `Mailing list`_
 - `Bug tracker`_
 - `Summary`_ @ Ohloh
 
@@ -18,6 +19,7 @@ Project links
 .. _`Summary`: https://www.ohloh.net/p/ateska_ramona
 .. _`Bug tracker`: https://github.com/ateska/ramona/issues
 .. _`Documentation`: http://ateska.github.com/ramona/manual
+.. _`Mailing list`: https://groups.google.com/forum/#!forum/ramona-supervisor
 
 
 Contributors
