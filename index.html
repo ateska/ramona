@@ -7,7 +7,7 @@
 
 		<link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
 
-		<title>Ramona : Enterprise-grade runtime supervisor</title>
+		<title>Ramona : Enterprise-grade application supervisor</title>
 	</head>
 
 	<body>
@@ -19,17 +19,21 @@
 					<a id="pypi_banner" href="http://pypi.python.org/pypi/ramona">Download from PyPi</a>
 
 					<h1 id="project_title">Ramona</h1>
-					<h2 id="project_tagline">Your next favorite runtime supervisor</h2>
+					<h2 id="project_tagline">Your next favorite application supervisor</h2>
 				</header>
 		</div>
 
 		<!-- MAIN CONTENT -->
 		<div id="main_content_wrap" class="outer">
 			<section id="main_content" class="inner">
+<h3>What is Ramona?</h3>
+<p><em>Ramona</em> is a library or a component that is meant to be used by application developers to built convinient command-line interface of their applications for administrators, monitoring crew and even developers.</p>
 
-<p><em>Ramona</em> is an enterprise-grade runtime supervisor that allows controlling and monitoring software programs during their execution life cycle.</p>
-<p>It provides supervisor/console functionality of init.d-like start/stop control, continuous integration (e.g. unit/functional/performance test launcher), deployment automation and other command-line oriented features. </p>
-<p>Target platforms are all modern UNIXes, BSD derivates and Windows.</p>
+<p>Among other features, it mainly ensures that each component (process) of an application is running, automates relevant restarts in case of a crash, monitors logs and process outputs and sends email notifications to administrators whenever error condition is detected.</p>
+
+<p>Ramona <em style="text-decoration: underline;">is not</em> an alternative to UNIX <a href="http://en.wikipedia.org/wiki/Init" target="_blank">init</a> process (nor to <a href="http://en.wikipedia.org/wiki/Systemd" target="_blank">systemd</a>, nor to <a href="http://en.wikipedia.org/wiki/Upstart">Upstart</a>). However, it enables the application to interact with such systems smoothly.</p>
+
+<p>Target platforms are all modern UNIXes, BSD derivates and Windows.<br/>It is especially usefull in the environment of enterprise (large-scale) applications.</p>
 
 <h3>Quick introduction</h3>
 
@@ -53,8 +57,8 @@ There is also optional web-based user interface:<br/>
 
 <h3>Documentation and help</h3>
 <p>
-<a href="manual/index.html">Ramona Manual</a><br>
-<a href="https://groups.google.com/forum/#!forum/ramona-supervisor">Ramona mailing list</a><br>
+<a href="manual/index.html">Manual</a><br>
+<a href="https://groups.google.com/forum/#!forum/ramona-supervisor">Mailing list</a><br>
 </p>
 
 <h3>Download and Installation</h3>
