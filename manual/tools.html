@@ -51,8 +51,50 @@
             
   <div class="section" id="tools-cookbook">
 <h1>Tools Cookbook<a class="headerlink" href="#tools-cookbook" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="windows-service-manual-control">
-<h2>Windows service manual control<a class="headerlink" href="#windows-service-manual-control" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="smtp-configurations">
+<span id="smtp-configs"></span><h2>SMTP configurations<a class="headerlink" href="#smtp-configurations" title="Permalink to this headline">¶</a></h2>
+<p>Here is a list of common SMTP configurations usable with Ramona email notification delivery subsystem (see <a class="reference internal" href="config.html#delivery" title="delivery"><tt class="xref py py-attr docutils literal"><span class="pre">delivery</span></tt></a> in [ramona:notify] configuration section).</p>
+<div class="section" id="gmail">
+<h3>GMail<a class="headerlink" href="#gmail" title="Permalink to this headline">¶</a></h3>
+<p>GMail from Google.</p>
+<blockquote>
+<div><div class="highlight-ini"><div class="highlight"><pre><span class="k">[ramona:notify]</span>
+<span class="na">delivery</span><span class="o">=</span><span class="s">smtp://[user@gmail.com]:[password]@smtp.gmail.com:587/?tls=1</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>Credentials &#8216;user&#8217; and &#8216;password&#8217; need to be valid Google GMail account.</p>
+<p>Example:</p>
+<blockquote>
+<div><div class="highlight-ini"><div class="highlight"><pre><span class="k">[ramona:notify]</span>
+<span class="na">delivery</span><span class="o">=</span><span class="s">smtp://joe.doe@gmail.com:password123@smtp.gmail.com:587/?tls=1</span>
+</pre></div>
+</div>
+</div></blockquote>
+</div>
+<div class="section" id="mandrill">
+<h3>Mandrill<a class="headerlink" href="#mandrill" title="Permalink to this headline">¶</a></h3>
+<p>Transactional Email from MailChimp.</p>
+<blockquote>
+<div><div class="highlight-ini"><div class="highlight"><pre><span class="k">[ramona:notify]</span>
+<span class="na">delivery</span><span class="o">=</span><span class="s">smtp://[user]:[API key]@smtp.mandrillapp.com:587</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>Credentials are from &#8220;SMTP &amp; API Credentials&#8221; section in Mandrill settings.
+User is &#8220;SMTP Username&#8221; respectively your account name at Mandrill.</p>
+<p>API key can be created and obtained from this page in Mandrill settings too, if you don&#8217;t have any, you can create one by pressing &#8216;New API key&#8217; button.</p>
+<p>Example:</p>
+<blockquote>
+<div><div class="highlight-ini"><div class="highlight"><pre><span class="k">[ramona:notify]</span>
+<span class="na">delivery</span><span class="o">=</span><span class="s">smtp://joe.doe@example.com:WJWZcoAaEQjggzVG1Y@smtp.mandrillapp.com:587</span>
+</pre></div>
+</div>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="windows-service-control">
+<h2>Windows service control<a class="headerlink" href="#windows-service-control" title="Permalink to this headline">¶</a></h2>
 <p>Few generic advices how to manage Windows service manually.
 Ramona system provides <a class="reference internal" href="cmdline-wininstall.html#cmdline-wininstall"><em>wininstall (command-line)</em></a> and <a class="reference internal" href="cmdline-winuninstall.html#cmdline-winuninstall"><em>winuninstall (command-line)</em></a> that are equivalents but generic way can sometimes become handy.</p>
 <p>To start service:</p>
@@ -79,7 +121,12 @@ Ramona system provides <a class="reference internal" href="cmdline-wininstall.ht
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Tools Cookbook</a><ul>
-<li><a class="reference internal" href="#windows-service-manual-control">Windows service manual control</a></li>
+<li><a class="reference internal" href="#smtp-configurations">SMTP configurations</a><ul>
+<li><a class="reference internal" href="#gmail">GMail</a></li>
+<li><a class="reference internal" href="#mandrill">Mandrill</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#windows-service-control">Windows service control</a></li>
 </ul>
 </li>
 </ul>
