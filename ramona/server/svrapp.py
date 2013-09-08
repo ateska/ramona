@@ -361,6 +361,11 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 				})
 			return json.dumps(ret)
 
+
+		elif callid == cnscom.callid_notify:
+			self.notificator.publish('now', 'body', 'subject')
+			return "OK"
+
 		else:
 			L.error("Received unknown callid: {0}".format(callid))
 

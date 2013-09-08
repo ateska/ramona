@@ -70,6 +70,9 @@ class _parser_base(argparse.ArgumentParser):
 		from .cmd import who
 		yield who
 
+		from .cmd import notify
+		yield notify
+
 		if sys.platform == 'win32':
 			from .cmd import wininstall
 			yield wininstall
