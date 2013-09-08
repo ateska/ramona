@@ -80,46 +80,30 @@ class notificator(object):
 			self._send_mail(subj, sep.join(textssend), [recipient])
 
 
-	def publish(self, target, prog_ident, stream_name, pattern, tail):
-
-		appname = config.get('general','appname')
-		hostname = socket.gethostname()
-		fqdn = socket.getfqdn()
-
-		nfttext = 'Application: {0}\n'.format(appname)
-		nfttext += 'Program: {0}\n'.format(prog_ident)
-		nfttext += 'Pattern: {0}\n'.format(pattern)
-		if hostname != fqdn :
-			nfttext += 'Hostname: {0} / {1}\n'.format(hostname, fqdn)
-		else:
-			nfttext += 'Hostname: {0}\n'.format(hostname)
-		nfttext += '\n'+'-'*50+'\n'
-		nfttext += tail	
-		nfttext += '\n'+'-'*50+'\n'
+	def publish(self, target, ntfbody, ntfsubj):
 
 		targettime, _, recipientconf = target.partition(":")
 		recipientconf = recipientconf.strip()
 		if recipientconf != "":
 			recipients = [recipientconf]
 		else:
+			if self.delivery is None:
+				L.warning("No default delivery set for notifications.")
+				return
 			recipients = self.delivery.receiver
-		
+
 		
 		if targettime == "now":
-			self._send_mail('{0} / {1} / {2} / {3}'.format(
-					appname,
-					prog_ident,
-					pattern,
-					hostname,
-					), 
-				nfttext,
+			self._send_mail(
+				ntfsubj, 
+				ntfbody,
 				recipients
 			)
 		elif targettime == "daily":
 			for recipient in recipients:
 				if not self.dailystash.has_key(recipient):
 					self.dailystash[recipient] = list()
-				self.dailystash[recipient].append(nfttext)
+				self.dailystash[recipient].append(ntfbody) #TODO: Add also ntfsubj (subject)
 			
 		else:
 			L.warn("Target {} not implemented!".format(targettime))
@@ -132,11 +116,24 @@ class notificator(object):
 		@param text: Text to be sent (it is prefixed with greeting and signature by this method)
 		@param recipients: List of message recipients
 		'''
+
+		fqdn = socket.getfqdn()
+		appname = config.get('general','appname')
+		hostname = socket.gethostname()
+
+		subject = '{0} / {1} / {2} (by Ramona)'.format(appname, hostname, subject)
+
+		sysident = 'Application: {0}\n'.format(appname)
+		if hostname != fqdn :
+			sysident += 'Hostname: {0} / {1}'.format(hostname, fqdn)
+		else:
+			sysident += 'Hostname: {0}'.format(hostname)
+
 		try:
 			text = ''.join([
-				'Hello,\n\nRamona detected following condition:\n',
-				text,
-				'\nBest regards,\nYour Ramona\n\nhttp://ateska.github.com/ramona\n'
+				'Hello,\n\nRamona produced following notification:\n', text,
+				'\n\nSystem info:\n', sysident,
+				'\n\nBest regards,\nYour Ramona\n\nhttp://ateska.github.com/ramona\n'
 			])
 			
 			self.delivery.send(recipients, subject, text)

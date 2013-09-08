@@ -62,7 +62,7 @@ class send_mail(object):
 		if sender is None: sender = self.sender
 
 		msg = MIMEText(mail_body, 'plain', 'utf-8')
-		msg['Subject'] = subject + ' by Ramona'
+		msg['Subject'] = subject
 		msg['From'] = sender
 		msg['To'] = ', '.join(recipients)
 

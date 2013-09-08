@@ -121,13 +121,13 @@ class log_mediator(object):
 				
 				svrapp = get_svrapp()
 				if svrapp is not None:
-					svrapp.notificator.publish(
-						s.target,
-						s.prog_ident,
-						s.stream_name,
-						''.join(s.pattern),
-						tail
-					)
+					nfttext  = 'Program: {0}\n'.format(s.prog_ident)
+					nfttext += 'Pattern: {0}\n'.format(''.join(s.pattern))
+					nfttext += '\n'+'-'*50+'\n'
+					nfttext += tail	
+					nfttext += '\n'+'-'*50+'\n'
+
+					svrapp.notificator.publish(s.target, ntftext, "{} / {}",format(prog_ident, pattern))
 
 
 
