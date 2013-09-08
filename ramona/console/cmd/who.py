@@ -4,7 +4,7 @@ from ... import cnscom
 ###
 
 name = 'who'
-cmdhelp = 'Show is currently connected the server'
+cmdhelp = 'Show users currently connected the server'
 
 ###
 
