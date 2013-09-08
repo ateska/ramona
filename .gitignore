@@ -43,3 +43,5 @@ MANIFEST
 /log-test
 *.pid
 /ramona-test-site.conf
+gource.log
+gource.mp4

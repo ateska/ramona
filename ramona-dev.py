@@ -82,6 +82,25 @@ class RamonaDevConsoleApp(ramona.console_app):
 		os.system('LC_ALL=en_US.UTF-8 make -C docs/manual html')
 
 
+	@ramona.tool
+	def gource(self):
+		import subprocess, re
+
+		cmd= r"""git log --pretty=format:user:%aN%n%ct --reverse --raw --encoding=UTF-8 --no-renames"""
+		gitlog = subprocess.check_output(cmd, shell=True)
+
+		gitlog = re.sub(r'\nuser:Ales Teska\n','\nuser:ateska\n',gitlog)
+		gitlog = re.sub(r'\nuser:Jan Stastny\n','\nuser:jstastny\n',gitlog)
+
+		cmd  = r"""gource -1280x720 --stop-at-end --highlight-users --seconds-per-day .5 --title "Ramona" --log-format git -o - -"""
+		cmd += " | "
+		cmd += r"ffmpeg -y -r 60 -f image2pipe -vcodec ppm -i - -vcodec libx264 -preset ultrafast -pix_fmt yuv420p -crf 16 -threads 0 -bf 0 gource.mp4"
+
+		x = subprocess.Popen(cmd, stdin=subprocess.PIPE, shell=True)
+		x.communicate(gitlog)
+
+
+
 if __name__ == '__main__':
 	app = RamonaDevConsoleApp(configuration='./ramona.conf')
 	app.run()
