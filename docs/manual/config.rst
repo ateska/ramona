@@ -459,19 +459,14 @@ This is configuration of Ramona notification sub-system. This component (part of
 
   *Required*: No
 
-  Examples:
-
-  .. code-block:: ini
-
-    [ramona:notify]
-    delivery=smtp://user:password@smtp.gmail.com:587/?tls=1
-
+  Example:
 
   .. code-block:: ini
 
     [ramona:notify]
     delivery=smtp://mail.example.com/
 
+For real-life examples, see :ref:`smtp-configs`.
 
 
 .. attribute:: sender
