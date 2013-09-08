@@ -81,7 +81,7 @@ class notificator(object):
 
 
 	def publish(self, target, ntfbody, ntfsubj):
-
+		if ntfsubj is None: ntfsubj = 'Ramona notification'
 		targettime, _, recipientconf = target.partition(":")
 		recipientconf = recipientconf.strip()
 		if recipientconf != "":
@@ -99,6 +99,7 @@ class notificator(object):
 				ntfbody,
 				recipients
 			)
+
 		elif targettime == "daily":
 			for recipient in recipients:
 				if not self.dailystash.has_key(recipient):

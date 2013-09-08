@@ -363,7 +363,8 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 
 
 		elif callid == cnscom.callid_notify:
-			self.notificator.publish('now', 'body', 'subject')
+			kwargs = cnscom.parse_json_kwargs(params)
+			self.notificator.publish(kwargs['target'], kwargs['text'], kwargs['subject'])
 			return "OK"
 
 		else:
