@@ -472,20 +472,23 @@ class program(object):
 
 
 	def __read_stdfd(self, watcher, revents):
-		while 1:
-			try:
-				data = os.read(watcher.fd, 4096)
-			except OSError, e:
-				if e.errno == errno.EAGAIN: return # No more data to read (would block)
-				raise
+		try:
+			while 1:
+				try:
+					data = os.read(watcher.fd, 4096)
+				except OSError, e:
+					if e.errno == errno.EAGAIN: return # No more data to read (would block)
+					raise
 
-			if len(data) == 0: # File descriptor is closed
-				watcher.stop()
-				return 
+				if len(data) == 0: # File descriptor is closed
+					watcher.stop()
+					return 
+				
+				if watcher.data == 0: self.log_out.write(data)
+				elif watcher.data == 1: self.log_err.write(data)
+		except:
+			L.exception("Error during __read_stdfd:")
 			
-			if watcher.data == 0: self.log_out.write(data)
-			elif watcher.data == 1: self.log_err.write(data)
-
 
 	def win32_read_stdfd(self):
 		'''Alternative implementation of stdout/stderr non-blocking read for Windows

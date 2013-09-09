@@ -104,9 +104,12 @@ class log_mediator(object):
 		self.__add_to_tailbuf(data)
 
 		# Search for patterns
-		if len(self.scanners) > 0:
+		svrapp = get_svrapp()
+		if len(self.scanners) > 0 and svrapp is not None:
+
 			stext = data.lower()
 			for s in self.scanners:
+
 				r = s.search(stext)
 				if r < 0: continue
 
@@ -119,15 +122,14 @@ class log_mediator(object):
 						pass
 				tail = tail[-2048:] # Limit result to 2kb of text
 				
-				svrapp = get_svrapp()
-				if svrapp is not None:
-					nfttext  = 'Program: {0}\n'.format(s.prog_ident)
-					nfttext += 'Pattern: {0}\n'.format(''.join(s.pattern))
-					nfttext += '\n'+'-'*50+'\n'
-					nfttext += tail	
-					nfttext += '\n'+'-'*50+'\n'
+				pattern = ''.join(s.pattern)
+				ntftext  = 'Program: {0}\n'.format(s.prog_ident)
+				ntftext += 'Pattern: {0}\n'.format(pattern)
+				ntftext += '\n'+'-'*50+'\n'
+				ntftext += tail	
+				ntftext += '\n'+'-'*50+'\n'
 
-					svrapp.notificator.publish(s.target, ntftext, "{} / {}",format(prog_ident, pattern))
+				svrapp.notificator.publish(s.target, ntftext, "{} / {}".format(s.prog_ident, pattern))
 
 
 
