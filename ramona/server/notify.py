@@ -81,7 +81,7 @@ class notificator(object):
 
 
 	def publish(self, target, ntfbody, ntfsubj):
-		if ntfsubj is None: ntfsubj = 'Ramona notification'
+		if ntfsubj is None: ntfsubj = 'notification'
 		targettime, _, recipientconf = target.partition(":")
 		recipientconf = recipientconf.strip()
 		if recipientconf != "":
