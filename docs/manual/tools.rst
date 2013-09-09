@@ -57,7 +57,7 @@ Example:
 
 .. note:: 
 
-  It seems that Mandrill is sensitive to :attr:`sender` configuration; if it is not properly formulated, Mandill silently ignores an email.
+  It seems that Mandrill is somehow sensitive to :attr:`sender` configuration; if it is not properly formulated, Mandill silently ignores an email.
 
 
 Windows service control
