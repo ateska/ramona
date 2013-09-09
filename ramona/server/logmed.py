@@ -110,27 +110,38 @@ class log_mediator(object):
 			stext = data.lower()
 			for s in self.scanners:
 
+				startpos = s.startpos
 				r = s.search(stext)
 				if r < 0: continue
 
-				# Take last three tail entries (very likely lines)
-				tail = ""
-				for i in range(-3,0):
-					try:
-						tail += self.tailbuf[i]
-					except IndexError:
-						pass
-				tail = tail[-2048:] # Limit result to 2kb of text
+				# Calculate position in the stream
+				startpos = r - startpos
+				if startpos < 0: startpos = 0
+
+				# Identify starting position 
+				errstart = startpos
+				for _ in range(3): # Number of lines before pattern hit
+					errstart = stext.rfind('\n', 0, errstart)
+					if errstart < 0:
+						errstart = 0
+						break
+
+				# Identify end position 
+				errend = startpos
+				for _ in range(3):
+					errend = stext.find('\n', errend+1)
+					if errend < 0:
+						errend = -1
+						break
 				
 				pattern = ''.join(s.pattern)
 				ntftext  = 'Program: {0}\n'.format(s.prog_ident)
 				ntftext += 'Pattern: {0}\n'.format(pattern)
 				ntftext += '\n'+'-'*50+'\n'
-				ntftext += tail	
+				ntftext += data[errstart:errend].strip('\n')
 				ntftext += '\n'+'-'*50+'\n'
 
 				svrapp.notificator.publish(s.target, ntftext, "{} / {}".format(s.prog_ident, pattern))
-
 
 
 	def rotate(self):
@@ -174,6 +185,7 @@ class log_mediator(object):
 		with open(fname, 'rb') as f_in, gzip.open('{0}.gz'.format(fname), 'wb') as f_out:
 			f_out.writelines(f_in)
 		os.unlink(fname)
+
 
 	def __tailbuf_append(self, data, nlt):
 		if self.tailbufnl:
