@@ -181,6 +181,7 @@ class log_mediator(object):
 		finally:
 			self.outf = open(self.fname,'a')		
 	
+	
 	def __compress_logfile(self, fname):
 		with open(fname, 'rb') as f_in, gzip.open('{0}.gz'.format(fname), 'wb') as f_out:
 			f_out.writelines(f_in)
