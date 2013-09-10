@@ -43,6 +43,7 @@ class program(object):
 		'processgroup': True,
 		'logscan_stdout': '',
 		'logscan_stderr': '',
+		'notify_fatal': '<global>',
 	}
 
 	def __init__(self, svrapp, config_section):
@@ -198,7 +199,6 @@ class program(object):
 		if stdout_cnf == '<stderr>':
 			self.log_out = self.log_err
 
-
 		# Log scans
 		for stream, logmed in [('stdout', self.log_out),('stderr', self.log_err)]:
 			for logscanseg in self.config.get('logscan_{0}'.format(stream)).split(','):
@@ -212,18 +212,16 @@ class program(object):
 					self.state = program_state_enum.CFGERROR
 					return
 
-				if not target.startswith(('now','daily')):
+				if not validate_notify_target(target):
 					L.error("Unknown 'logscan_{2}' option '{0}' in {1} -> CFGERROR".format(target, config_section, stream))
 					self.state = program_state_enum.CFGERROR
 					return
 
 				logmed.add_scanner(pattern, target)
 
-
 		# Environment variables
 		self.env = os.environ.copy()
-		
-		
+				
 		try:
 			alt_env = config.get(config_section, "env")
 			alt_env = "env:{0}".format(alt_env)
@@ -239,6 +237,18 @@ class program(object):
 				else:
 					self.env.pop(name, 0)
 		self.env['RAMONA_SECTION'] = config_section
+
+		# Notification on state change to FATAL
+		self.notify_fatal_target = self.config.get('notify_fatal', '<global>')
+		if self.notify_fatal_target == '<global>':
+			self.notify_fatal_target = config.get('ramona:notify','notify_fatal', 'now')
+
+		if self.notify_fatal_target == '<none>':
+			self.notify_fatal_target = None
+
+		if (self.notify_fatal_target is not None) and not validate_notify_target(self.notify_fatal_target):
+			L.warning("Invalid notify_fatal target: '{}'".format(self.notify_fatal_target))
+			self.notify_fatal_target = None
 
 
 	def __repr__(self):
@@ -422,7 +432,7 @@ class program(object):
 			Lmy.error("{0} exited too quickly (exit_status:{1}, now in FATAL state)".format(self.ident, self.exit_status))
 			L.error("{0} exited too quickly -> FATAL".format(self))
 			self.state = program_state_enum.FATAL
-			self.notify_state_change(program_state_enum.STARTING)
+			self.notify_fatal_state(program_state_enum.STARTING)
 
 		elif self.state == program_state_enum.STOPPING:
 			Lmy.info("{0} is now STOPPED (exit_status:{1})".format(self.ident, self.exit_status))
@@ -436,13 +446,13 @@ class program(object):
 				L.error("{0} exited unexpectedly -> FATAL -> autorestart".format(self))
 				self.state = program_state_enum.FATAL
 				self.autorestart_cnt += 1
-				self.notify_state_change(orig_state, autorestart=True)
+				self.notify_fatal_state(orig_state, autorestart=True)
 				self.start(reset_autorestart_cnt=False)
 			else:
 				Lmy.error("{0} exited unexpectedly (exit_status:{1}, now in FATAL state)".format(self.ident, self.exit_status))
 				L.error("{0} exited unexpectedly -> FATAL".format(self))
 				self.state = program_state_enum.FATAL
-				self.notify_state_change(orig_state)
+				self.notify_fatal_state(orig_state)
 
 
 	def on_tick(self, now):
@@ -565,12 +575,11 @@ class program(object):
 		self.coredump_enabled = True
 
 
-	def notify_state_change(self, orig_state, autorestart=False):
+	def notify_fatal_state(self, orig_state, autorestart=False):
+		if self.notify_fatal_target is None: return
+
 		svrapp = get_svrapp()
 		if svrapp is None: return
-
-		#TODO: Configure this on program and global [ramona:notification] level; allow disabling of this feature
-		target = 'now'
 
 		ntftext  = 'Program: {}\n'.format(self.ident)
 		ntftext += 'Changed status: {} -> {}\n'.format(
@@ -604,5 +613,18 @@ class program(object):
 			ntftext += ''.join(log)
 			ntftext += '\n'+'-'*50+'\n'
 
-		svrapp.notificator.publish(target, ntftext, "{} / {}".format(self.ident, program_state_enum.labels.get(self.state, '?')))
+		svrapp.notificator.publish(self.notify_fatal_target, ntftext, "{} / {}".format(self.ident, program_state_enum.labels.get(self.state, '?')))
+
+
+def validate_notify_target(target):
+	x = target.split(':',1)
+	if len(x) == 1:
+		if target not in ('now', 'daily'): return False
+	elif len(x) == 2:
+		target, email = x
+		if target not in ('now', 'daily'): return False
+	else:
+		return False
+
+	return True
 

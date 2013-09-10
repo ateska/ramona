@@ -32,10 +32,10 @@ class notificator(object):
 		if self.delivery is not None:
 			svrapp.watchers.append(pyev.Periodic(self.__get_daily_time_offset(), 24*3600, svrapp.loop, self.__send_daily))
 
-
 		#TODO: <sendmail> - see http://stackoverflow.com/questions/73781/sending-mail-via-sendmail-from-python
 		#TODO: cmd:custom.sh
-		
+
+
 	def __get_daily_time_offset(self):
 		sendtimestr = config.get("ramona:notify", "dailyat")
 		
@@ -92,7 +92,6 @@ class notificator(object):
 				return
 			recipients = self.delivery.receiver
 
-		
 		if targettime == "now":
 			self._send_mail(
 				ntfsubj, 
