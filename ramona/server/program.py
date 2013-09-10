@@ -329,6 +329,8 @@ class program(object):
 				except Exception, e:
 					os.write(2, "WARNING: Setting ulimit '{1}' failed: {0}\n".format(e, k))
 
+		#TODO: Load shell profile if configured (can be used e.g. for virtual-env bootstrap)
+
 
 	def stop(self):
 		'''Transition to state STOPPING'''
