@@ -132,8 +132,8 @@ class notificator(object):
 
 		try:
 			text = ''.join([
-				'Hello,\n\nRamona produced following notification:\n', text,
-				'\n\nSystem info:\n', sysident,
+				'Hello,\n\nRamona produced following notification:\n\n', text,
+				'\nSystem info:\n', sysident,
 				'\n\nBest regards,\nYour Ramona\n\nhttp://ateska.github.com/ramona\n'
 			])
 			
