@@ -129,10 +129,10 @@ def read_config(configs=None, use_env=True):
 	if config_platform_selector is not None and config_platform_selector != '':
 		for section in config.sections():
 			for name, value in config.items(section):
-		 		r = psrg.match(name)
-		 		if r is None: continue
-		 		if (r.group(2) != config_platform_selector): continue
-		 		config.set(section, r.group(1), value)
+				r = psrg.match(name)
+				if r is None: continue
+				if (r.group(2) != config_platform_selector): continue
+				config.set(section, r.group(1), value)
 
 	# Special treatment of some values
 	if config.get('general', 'logdir') == '<env>':
