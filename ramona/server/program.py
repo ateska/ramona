@@ -1,9 +1,10 @@
 import sys, os, time, logging, shlex, signal, subprocess, errno
 import pyev
 from ..config import config, get_boolean
-from ..utils import parse_signals, close_fds, expandvars, enable_nonblocking, disable_nonblocking, get_python_exec, get_signal_name
+from ..utils import parse_signals, expandvars, enable_nonblocking, disable_nonblocking, get_python_exec, get_signal_name
 from ..cnscom import program_state_enum, svrcall_error
 from .logmed import log_mediator
+from .svrappsingl import get_svrapp
 
 
 if sys.platform == 'win32':
@@ -241,7 +242,7 @@ class program(object):
 
 
 	def __repr__(self):
-		ret = "<{0} {1} state={2}".format(self.__class__.__name__, self.ident, program_state_enum.labels[self.state])
+		ret = "<{0} {1} state={2}".format(self.__class__.__name__, self.ident, program_state_enum.labels.get(self.state, '?'))
 		if self.subproc is not None:
 			ret +=  ' pid={}'.format(self.subproc.pid)
 		if self.exit_status is not None:
@@ -320,7 +321,6 @@ class program(object):
 				os.write(2, "FATAL: Set umask {0} failed: {1}\n".format(umask, e))
 				raise
 
-
 		# Set ulimits
 		if resource is not None:
 			for k,v in self.ulimits.iteritems():
@@ -369,7 +369,6 @@ class program(object):
 		else:
 			self.exit_status = "?"
 
-
 		# Close process stdout and stderr pipes (including vacuum of actual content)
 		if sys.platform != 'win32':
 			self.watchers[0].stop()
@@ -412,8 +411,7 @@ class program(object):
 		self.subproc = None
 
 		# Close log files
-
-		self.log_err.write("\n-=[ EXITED on {0} {1} ]=-\n".format(time.strftime("%Y-%m-%d %H:%M:%S"), self.exit_status))
+		self.log_err.write("\n-=[ EXITED on {0} with status {1} ]=-\n".format(time.strftime("%Y-%m-%d %H:%M:%S"), self.exit_status))
 		self.log_out.close()
 		self.log_err.close()
 
@@ -422,6 +420,7 @@ class program(object):
 			Lmy.error("{0} exited too quickly (exit_status:{1}, now in FATAL state)".format(self.ident, self.exit_status))
 			L.error("{0} exited too quickly -> FATAL".format(self))
 			self.state = program_state_enum.FATAL
+			self.notify_state_change(program_state_enum.STARTING)
 
 		elif self.state == program_state_enum.STOPPING:
 			Lmy.info("{0} is now STOPPED (exit_status:{1})".format(self.ident, self.exit_status))
@@ -429,16 +428,19 @@ class program(object):
 			self.state = program_state_enum.STOPPED
 
 		else:
+			orig_state = self.state
 			if self.autorestart:
 				Lmy.error("{0} exited unexpectedly and going to be restarted (exit_status:{1})".format(self.ident, self.exit_status))
 				L.error("{0} exited unexpectedly -> FATAL -> autorestart".format(self))
 				self.state = program_state_enum.FATAL
 				self.autorestart_cnt += 1
+				self.notify_state_change(orig_state, autorestart=True)
 				self.start(reset_autorestart_cnt=False)
 			else:
 				Lmy.error("{0} exited unexpectedly (exit_status:{1}, now in FATAL state)".format(self.ident, self.exit_status))
 				L.error("{0} exited unexpectedly -> FATAL".format(self))
 				self.state = program_state_enum.FATAL
+				self.notify_state_change(orig_state)
 
 
 	def on_tick(self, now):
@@ -559,3 +561,46 @@ class program(object):
 			Lmy.warning("Program {0} is not configured to dump code".format(self.ident))
 			return
 		self.coredump_enabled = True
+
+
+	def notify_state_change(self, orig_state, autorestart=False):
+		svrapp = get_svrapp()
+		if svrapp is None: return
+
+		#TODO: Configure this on program and global [ramona:notification] level; allow disabling of this feature
+		target = 'now'
+
+		ntftext  = 'Program: {}\n'.format(self.ident)
+		ntftext += 'Changed status: {} -> {}\n'.format(
+			program_state_enum.labels.get(orig_state, '?'),
+			program_state_enum.labels.get(self.state, '?')
+		)
+		if self.subproc is not None:
+			ntftext += 'Pid: {}\n'.format(self.subproc.pid)
+		if self.exit_status is not None:
+			ntftext += 'Exit status: {}\n'.format(self.exit_status)
+		if self.state == program_state_enum.FATAL:
+			if autorestart:
+				ntftext += 'Auto-restart: YES (count={})\n'.format(self.autorestart_cnt)
+			else:
+				ntftext += 'Auto-restart: NO (count={})\n'.format(self.autorestart_cnt)
+
+		ntftext += '\Standard output:\n'+'-'*50+'\n'
+		log = []
+		for i, line in enumerate(reversed(self.log_out.tailbuf)):
+			if i > 20: break
+			log.insert(0, line)
+		ntftext += ''.join(log)
+		ntftext += '\n'+'-'*50+'\n'
+
+		if  self.log_err != self.log_out:
+			ntftext += '\Standard error:\n'+'-'*50+'\n'
+			log = []
+			for i, line in enumerate(reversed(self.log_err.tailbuf)):
+				if i > 20: break
+				log.insert(0, line)
+			ntftext += ''.join(log)
+			ntftext += '\n'+'-'*50+'\n'
+
+		svrapp.notificator.publish(target, ntftext, "{} / {}".format(self.ident, program_state_enum.labels.get(self.state, '?')))
+
