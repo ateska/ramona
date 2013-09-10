@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os, sys, logging, re, platform, ConfigParser
 ###
 
@@ -113,7 +114,7 @@ def read_config(configs=None, use_env=True):
 				]
 				includes[i:i+1] = siteconfs
 			elif include[:1] == '<':
-				L.warning('Unknown include fragment: {0}'.format(include))
+				print('WARNING: Unknown include fragment: {0}'.format(include), file=sys.stderr)
 				continue
 
 		for include in includes:
@@ -142,6 +143,15 @@ def read_config(configs=None, use_env=True):
 		config.set('general','logdir',logdir)
 	elif config.get('general', 'logdir').strip()[:1] == '<':
 		raise RuntimeError("FATAL: Unknown magic value in [general] logdir: '{}'".format(config.get('general', 'logdir')))
+	
+	for (sec, valname) in (("ramona:server", "consoleuri"), ("ramona:notify", "delivery")):
+		if ";" in config.get(sec, valname):
+			print(
+				"WARNING: ';' character was found in URI: {}. Please note that ';' has been replaced '?' in Ramona 1.0. This can lead to Ramona apparent freeze during start.".format(
+					config.get(sec, valname)
+				),
+				file=sys.stderr
+			)
 
 ###
 
