@@ -3,13 +3,14 @@
 wininstall (command-line)
 =========================
 
-**Windows only !**
+.. warning::
 
-Install the Ramona server as a Windows Service.
+   Windows only !
 
-An user application will be able to run as Windows Service using this Ramona feature.
+Install the Ramona server as a Windows service.
+
+An user application will be able to run as Windows service using this Ramona feature.
 For more details, see :ref:`features-windowsservice`.
-
 
 .. code-block:: bash
 
