@@ -512,9 +512,38 @@ History list is persistent and is available across program restarts.</p>
 <dd><p>At what time the notifications should be used when <tt class="docutils literal"><span class="pre">daily</span></tt> period is used. The value is in the local timezone of your computer. Use the format <tt class="docutils literal"><span class="pre">HH:MM</span></tt> (24-hours).</p>
 <p><em>Default</em>:  <tt class="docutils literal"><span class="pre">09:00</span></tt></p>
 <p><em>Required</em>:  No</p>
-<p>Examples:</p>
+<p>Example:</p>
 <div class="highlight-ini"><div class="highlight"><pre><span class="k">[ramona:notify]</span>
 <span class="na">dailyat</span><span class="o">=</span><span class="s">23:00</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="notify_fatal">
+<tt class="descname">notify_fatal</tt><a class="headerlink" href="#notify_fatal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configure notification, that will be eventually triggered when any supervised program unexpectedly terminates and ends in FATAL state. This is done by specifying the <cite>action</cite>.</p>
+<p>You can override this option by <cite>notify_fatal</cite> entry in given <tt class="docutils literal"><span class="pre">[program:...]</span></tt> section.</p>
+<dl class="docutils">
+<dt><cite>action</cite></dt>
+<dd><ul class="first last simple">
+<li><tt class="docutils literal"><span class="pre">now</span></tt>: immediately send email notification using defaults from [ramona:notify]</li>
+<li><tt class="docutils literal"><span class="pre">now:&lt;email</span> <span class="pre">address&gt;</span></tt>: immediately send email notification to given email address</li>
+<li><tt class="docutils literal"><span class="pre">daily</span></tt>: stash notification and eventually send in daily bulk email using defaults from [ramona:notify]</li>
+<li><tt class="docutils literal"><span class="pre">daily:&lt;email</span> <span class="pre">address&gt;</span></tt>: stash notification and eventually send in daily bulk email given email address</li>
+</ul>
+</dd>
+<dt><em>Magic values</em> of <cite>action</cite> field:</dt>
+<dd><ul class="first last simple">
+<li><tt class="docutils literal"><span class="pre">&lt;none&gt;</span></tt> - don&#8217;t publish any notification</li>
+</ul>
+</dd>
+</dl>
+<p><em>Default</em>:  <tt class="docutils literal"><span class="pre">now</span></tt></p>
+<p><em>Required</em>:  No</p>
+<p>Examples:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[ramona:notify]</span>
+<span class="na">notify_fatal</span><span class="o">=</span><span class="s">now:admin@foo.bar.com</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -810,6 +839,35 @@ See <a class="reference internal" href="features.html#features-logging"><em>Logg
 <dt id="logscan_stderr">
 <tt class="descname">logscan_stderr</tt><a class="headerlink" href="#logscan_stderr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Same as <a class="reference internal" href="#logscan_stdout">logscan_stdout</a>, just scanning standard error stream.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<tt class="descname">notify_fatal</tt></dt>
+<dd><p>Configure notification, that will be eventually triggered when this program unexpectedly terminates and ends in FATAL state. This is done by specifying the <cite>action</cite>.</p>
+<dl class="docutils">
+<dt><cite>action</cite></dt>
+<dd><ul class="first last simple">
+<li><tt class="docutils literal"><span class="pre">now</span></tt>: immediately send email notification using defaults from <cite>[ramona:notify]</cite></li>
+<li><tt class="docutils literal"><span class="pre">now:&lt;email</span> <span class="pre">address&gt;</span></tt>: immediately send email notification to given email address</li>
+<li><tt class="docutils literal"><span class="pre">daily</span></tt>: stash notification and eventually send in daily bulk email using defaults from [ramona:notify]</li>
+<li><tt class="docutils literal"><span class="pre">daily:&lt;email</span> <span class="pre">address&gt;</span></tt>: stash notification and eventually send in daily bulk email given email address</li>
+</ul>
+</dd>
+<dt><em>Magic values</em> of <cite>action</cite> field:</dt>
+<dd><ul class="first last simple">
+<li><tt class="docutils literal"><span class="pre">&lt;none&gt;</span></tt> - don&#8217;t publish any notification</li>
+<li><tt class="docutils literal"><span class="pre">&lt;global&gt;</span></tt> - use <cite>notify_fatal</cite> configuration from <cite>[ramona:notify]</cite> section</li>
+</ul>
+</dd>
+</dl>
+<p><em>Default</em>:  <tt class="docutils literal"><span class="pre">&lt;global&gt;</span></tt></p>
+<p><em>Required</em>:  No</p>
+<p>Examples:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[program:foobarcrasher]</span>
+<span class="na">notify_fatal</span><span class="o">=</span><span class="s">daily:admin@foo.bar.com</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </div>

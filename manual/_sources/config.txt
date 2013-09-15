@@ -513,12 +513,40 @@ For real-life examples, see :ref:`smtp-configs`.
 
   *Required*:  No
 
-  Examples:
+  Example:
 
   .. code-block:: ini
 
     [ramona:notify]
     dailyat=23:00
+
+
+.. attribute:: notify_fatal
+
+  Configure notification, that will be eventually triggered when any supervised program unexpectedly terminates and ends in FATAL state. This is done by specifying the `action`.
+
+  You can override this option by `notify_fatal` entry in given ``[program:...]`` section.
+
+  `action`
+    - ``now``: immediately send email notification using defaults from [ramona:notify]
+    - ``now:<email address>``: immediately send email notification to given email address
+    - ``daily``: stash notification and eventually send in daily bulk email using defaults from [ramona:notify]
+    - ``daily:<email address>``: stash notification and eventually send in daily bulk email given email address
+
+  *Magic values* of `action` field:
+    - ``<none>`` - don't publish any notification
+
+
+  *Default*:  ``now``
+
+  *Required*:  No
+
+  Examples:
+
+  .. code-block:: ini
+
+    [ramona:notify]
+    notify_fatal=now:admin@foo.bar.com
 
 
 
@@ -824,6 +852,33 @@ Example:
 .. attribute:: logscan_stderr
 
   Same as logscan_stdout_, just scanning standard error stream.
+
+
+.. attribute:: notify_fatal
+
+  Configure notification, that will be eventually triggered when this program unexpectedly terminates and ends in FATAL state. This is done by specifying the `action`.
+
+  `action`
+    - ``now``: immediately send email notification using defaults from `[ramona:notify]`
+    - ``now:<email address>``: immediately send email notification to given email address
+    - ``daily``: stash notification and eventually send in daily bulk email using defaults from [ramona:notify]
+    - ``daily:<email address>``: stash notification and eventually send in daily bulk email given email address
+
+  *Magic values* of `action` field:
+    - ``<none>`` - don't publish any notification
+    - ``<global>`` - use `notify_fatal` configuration from `[ramona:notify]` section
+
+
+  *Default*:  ``<global>``
+
+  *Required*:  No
+
+  Examples:
+
+  .. code-block:: ini
+
+    [program:foobarcrasher]
+    notify_fatal=daily:admin@foo.bar.com
 
 
 .. _config-ramonahttpfend:
