@@ -77,4 +77,6 @@ class send_mail(object):
 
 	@staticmethod
 	def get_default_fromaddr():
-		return "{0}@{1}".format(getpass.getuser(), socket.getfqdn())
+		hostname = socket.getfqdn()
+		if hostname == 'localhost': hostname = socket.gethostname()
+		return "{0}@{1}".format(getpass.getuser(), hostname)

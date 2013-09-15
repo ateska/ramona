@@ -82,6 +82,7 @@ class notificator(object):
 
 	def publish(self, target, ntfbody, ntfsubj):
 		if ntfsubj is None: ntfsubj = 'notification'
+
 		targettime, _, recipientconf = target.partition(":")
 		recipientconf = recipientconf.strip()
 		if recipientconf != "":
@@ -124,7 +125,7 @@ class notificator(object):
 		subject = '{0} / {1} / {2} (by Ramona)'.format(appname, hostname, subject)
 
 		sysident = 'Application: {0}\n'.format(appname)
-		if hostname != fqdn :
+		if hostname != fqdn and fqdn != 'localhost':
 			sysident += 'Hostname: {0} / {1}'.format(hostname, fqdn)
 		else:
 			sysident += 'Hostname: {0}'.format(hostname)
