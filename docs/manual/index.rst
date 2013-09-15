@@ -16,6 +16,14 @@ Target platforms are all modern UNIXes, BSD derivates and Windows.
 
 Project homepage: http://ateska.github.com/ramona
 
+
+This product is founded on Gittip. To help us keep development of this tool sustainable, please kindly consider your contribution.
+
+.. raw:: html
+
+   <script data-gittip-username="ateska" data-gittip-widget="button" src="//gttp.co/v1.js"></script>
+
+
 Content
 -------
 
