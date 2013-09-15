@@ -33,6 +33,9 @@ config_defaults = {
 		'sender': '<user>',
 		'dailyat': '09:00',
 		'notify_fatal': 'now',
+		'logscan_stdout': '',
+		'logscan_stderr': '',
+		'logscan': '',
 	},
 	'ramona:httpfend': {
 		'listenaddr': "tcp://localhost:5588",

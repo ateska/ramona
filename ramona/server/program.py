@@ -201,7 +201,14 @@ class program(object):
 
 		# Log scans
 		for stream, logmed in [('stdout', self.log_out),('stderr', self.log_err)]:
-			for logscanseg in self.config.get('logscan_{0}'.format(stream)).split(','):
+
+			logscanval = self.config.get('logscan_{0}'.format(stream)).strip()
+			if len(logscanval) == 0:
+				logscanval = config.get('ramona:notify','logscan_{}'.format(stream))
+				if len(logscanval) == 0:
+					logscanval = config.get('ramona:notify','logscan'.format(stream))
+
+			for logscanseg in logscanval.split(','):
 				logscanseg = logscanseg.strip()
 				if logscanseg == '': continue
 
