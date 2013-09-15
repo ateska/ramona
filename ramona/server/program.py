@@ -596,7 +596,7 @@ class program(object):
 			else:
 				ntftext += 'Auto-restart: NO (count={})\n'.format(self.autorestart_cnt)
 
-		ntftext += '\Standard output:\n'+'-'*50+'\n'
+		ntftext += '\nStandard output:\n'+'-'*50+'\n'
 		log = []
 		for i, line in enumerate(reversed(self.log_out.tailbuf)):
 			if i > 20: break
@@ -605,7 +605,7 @@ class program(object):
 		ntftext += '\n'+'-'*50+'\n'
 
 		if  self.log_err != self.log_out:
-			ntftext += '\Standard error:\n'+'-'*50+'\n'
+			ntftext += '\nStandard error:\n'+'-'*50+'\n'
 			log = []
 			for i, line in enumerate(reversed(self.log_err.tailbuf)):
 				if i > 20: break
