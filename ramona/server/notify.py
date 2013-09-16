@@ -91,13 +91,13 @@ class notificator(object):
 		appname = config.get('general','appname')
 		hostname = socket.gethostname()
 		subj = '{0} / {1} - daily'.format(appname, hostname)
-		sep = '\n'+'------'*50+'\n'
+		sep = '\n'+'-'*50+'\n'
 
 		for recipient, textssend in self.dailystash.yield_text():
 			# Use pop to get the items from the stash to ensure that items that are put on the stash
 			# during sending are not sent twice (in the current email and in the next email)
 
-			self._send_mail(subj, sep.join(textssend)+'\n, [recipient])
+			self._send_mail(subj, sep.join(textssend)+'\n', [recipient])
 
 
 	def publish(self, target, ntfbody, ntfsubj):
@@ -126,6 +126,7 @@ class notificator(object):
 		else:
 			L.warn("Target {} not implemented!".format(targettime))
 			
+
 
 	def _send_mail(self, subject, text, recipients):
 		'''
