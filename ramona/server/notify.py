@@ -8,6 +8,39 @@ L = logging.getLogger('notify')
 
 #
 
+class stash(object):
+	# Example structure of self.data dict is:
+	# {
+	#   "foo@bar.com": [] # List of lines to be included in the mail
+	#   "bar@foo.com": ['notify1', 'notify2']
+	# }
+
+
+	def __init__(self):
+		self.data = dict()
+
+
+	def add(self, recipients, ntfbody):
+		 #TODO: Consider adding also ntfsubj (subject)
+		for recipient in recipients:
+			if not self.data.has_key(recipient):
+				self.data[recipient] = list()
+			self.data[recipient].append(ntfbody)
+
+
+	def yield_text(self):
+		for recipient, ntftexts in self.data.iteritems():
+			textssend = []
+			while True:
+				try:
+					textssend.append(ntftexts.pop())
+				except IndexError:
+					break
+
+			yield recipient, textssend
+
+#
+
 class notificator(object):
 
 	def __init__(self, svrapp):
@@ -24,13 +57,9 @@ class notificator(object):
 			if self.delivery is not None:
 				self.delivery.connection_test()
 		
-		# Example structure of this dict is:
-		# {
-		#   "foo@bar.com": [] # List of lines to be included in the mail
-		# }
-		self.dailystash = dict()
+		self.dailystash = stash()
 		if self.delivery is not None:
-			svrapp.watchers.append(pyev.Periodic(self.__get_daily_time_offset(), 24*3600, svrapp.loop, self.__send_daily))
+			svrapp.watchers.append(pyev.Periodic(self.__get_daily_time_offset(), 24*3600, svrapp.loop, self.send_daily))
 
 		#TODO: <sendmail> - see http://stackoverflow.com/questions/73781/sending-mail-via-sendmail-from-python
 		#TODO: cmd:custom.sh
@@ -54,30 +83,21 @@ class notificator(object):
 		return sendtimeseconds
 	
 	
-	def __send_daily(self, watcher, revents):
-		# TODO: Call this on server shutdown not to lose any messages in the stash (or not???)
-		watcher.offset = self.__get_daily_time_offset()
-		watcher.reset()
+	def send_daily(self, watcher, revents):
+		if watcher is not None:
+			watcher.offset = self.__get_daily_time_offset()
+			watcher.reset()
+
 		appname = config.get('general','appname')
 		hostname = socket.gethostname()
-		
-		
-		for recipient, ntftexts in self.dailystash.iteritems():
+		subj = '{0} / {1} - daily'.format(appname, hostname)
+		sep = '\n'+'------'*50+'\n'
+
+		for recipient, textssend in self.dailystash.yield_text():
 			# Use pop to get the items from the stash to ensure that items that are put on the stash
 			# during sending are not sent twice (in the current email and in the next email)
-			textssend = []
-			while True:
-				try:
-					textssend.append(ntftexts.pop())
-				except IndexError:
-					break
-				
-			
-			subj = '{0} / {1} - daily'.format(
-					appname,
-					hostname)
-			sep = '\n'+'='*50+'\n'
-			self._send_mail(subj, sep.join(textssend), [recipient])
+
+			self._send_mail(subj, sep.join(textssend)+'\n, [recipient])
 
 
 	def publish(self, target, ntfbody, ntfsubj):
@@ -101,15 +121,11 @@ class notificator(object):
 			)
 
 		elif targettime == "daily":
-			for recipient in recipients:
-				if not self.dailystash.has_key(recipient):
-					self.dailystash[recipient] = list()
-				self.dailystash[recipient].append(ntfbody) #TODO: Add also ntfsubj (subject)
+			self.dailystash.add(recipients, ntfbody)
 			
 		else:
 			L.warn("Target {} not implemented!".format(targettime))
 			
-
 
 	def _send_mail(self, subject, text, recipients):
 		'''
