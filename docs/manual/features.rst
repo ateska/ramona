@@ -147,14 +147,14 @@ Windows service
 ---------------
 
 Ramona is using `Windows Services`_ for background execution on Windows platform.
-It also depends on ``pythonservice.exe`` tool from `Python for Windows extensions`_ package. Therefore it is possible to install Ramona equipped application as Windows Service via commands that are provided by Ramona system. This can be used for automatic start-up after system (re)boot or to enable smooth development on Windows machine.
+It also depends on ``pythonservice.exe`` tool from `Python for Windows extensions`_ package. Therefore it is possible to install Ramona equipped application as Windows service via commands that are provided by Ramona system. This can be used for automatic start-up after system (re)boot or to enable smooth development on Windows machine.
 
-You can have multiple Ramona Windows Services installed on a one box; for example for different Ramona-equipped applications or versions.
+You can have multiple Ramona Windows services installed on a box; for example for different Ramona-equipped applications or versions.
 
 For more details continue to:
 
 - :ref:`cmdline-wininstall`
 - :ref:`cmdline-winuninstall`
 
-.. _`Windows Services`: http://en.wikipedia.org/wiki/Windows_service
+.. _`Windows services`: http://en.wikipedia.org/wiki/Windows_service
 .. _`Python for Windows extensions`: http://sourceforge.net/projects/pywin32/
