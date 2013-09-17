@@ -3,9 +3,11 @@
 winuninstall (command-line)
 ===========================
 
-**Windows only !**
+.. warning::
 
-Uninstall the Ramona Windows Service.
+   Windows only !
+
+Uninstall the Ramona Windows service.
 
 For more details, see :ref:`features-windowsservice`.
 
