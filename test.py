@@ -1,5 +1,7 @@
 #!/usr/bin/env python
-import os
+#
+# Released under the BSD license. See LICENSE.txt file for details.
+#
 import ramona
 
 class TestConsoleApp(ramona.console_app):
