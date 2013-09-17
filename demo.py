@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+#
+# Released under the BSD license. See LICENSE.txt file for details.
+#
 import os
 import ramona
 
