@@ -939,7 +939,7 @@ Example:
   username=admin
   
   # Can get either plain text or a SHA1 hash, if the password starts with {SHA} prefix
-  password=pass
+  password=password
 
 
 .. attribute:: listen
