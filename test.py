@@ -10,7 +10,7 @@ class TestConsoleApp(ramona.console_app):
 	The programs run by this application usually fails to test
 	different corner cases.
 	"""
-	  
+	
 	pass
 	
 if __name__ == '__main__':
