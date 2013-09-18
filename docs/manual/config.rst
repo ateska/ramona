@@ -437,6 +437,13 @@ This is configuration of Ramona notification sub-system. This component (part of
   Python ``smtplib`` module is used to handle SMTP connectivity.
 
 
+Notification system support immediate or delayed delivery. This can be configured using `actions`:
+    - ``now``: notification is sent immediately
+    - ``daily``: notification is stashed and sent in daily buld email
+
+Deleayed notifications are stored in stashes which can be optionally persistent (survives eventual restart of a box).
+
+
 .. attribute:: delivery
 
   URL specifies a default delivery method for notifications.
@@ -505,22 +512,6 @@ For real-life examples, see :ref:`smtp-configs`.
     receiver=admin@foobar.com,moniting@foobar.com
 
 
-.. attribute:: dailyat
-
-  At what time the notifications should be used when ``daily`` period is used. The value is in the local timezone of your computer. Use the format ``HH:MM`` (24-hours).
-
-  *Default*:  ``09:00``
-
-  *Required*:  No
-
-  Example:
-
-  .. code-block:: ini
-
-    [ramona:notify]
-    dailyat=23:00
-
-
 .. attribute:: notify_fatal
 
   Configure notification, that will be eventually triggered when any supervised program unexpectedly terminates and ends in FATAL state. This is done by specifying the `action`.
@@ -547,6 +538,41 @@ For real-life examples, see :ref:`smtp-configs`.
 
     [ramona:notify]
     notify_fatal=now:admin@foo.bar.com
+
+
+.. attribute:: dailyat
+
+  At what time the notifications should be used when ``daily`` is used. The value is in the local timezone of your computer. Use the format ``HH:MM`` (24-hours).
+
+  *Default*:  ``09:00``
+
+  *Required*:  No
+
+  Example:
+
+  .. code-block:: ini
+
+    [ramona:notify]
+    dailyat=23:00
+
+
+.. attribute:: stashdir
+
+  Specify the directory where persistent stashes (files) are stored.
+
+  *Magic values*:
+    - ``<none>`` - disable persistence of notification stash (content will disapear when Ramona is restarted)
+
+  *Default*:  ``<none>``
+
+  *Required*:  No
+
+  Example:
+
+  .. code-block:: ini
+
+    [ramona:notify]
+    stashdir=/var/spool/ramona/stash
 
 
 
