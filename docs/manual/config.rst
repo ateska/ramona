@@ -575,6 +575,15 @@ For real-life examples, see :ref:`smtp-configs`.
     stashdir=/var/spool/ramona/stash
 
 
+.. attribute:: logscan_stdout
+
+.. attribute:: logscan_stderr
+
+.. attribute:: logscan
+
+  Global defaults for configuration values in  ``[program:...]`` section. If given, they will be used when program specific ones are not stated.
+
+
 
 [program:...] section
 ---------------------
