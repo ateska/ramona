@@ -1,4 +1,5 @@
-import datetime, socket, logging, pyev, time
+import os, datetime, socket, logging, time, pickle
+import pyev
 from ..config import config
 from ..sendmail import send_mail
 
@@ -16,8 +17,23 @@ class stash(object):
 	# }
 
 
-	def __init__(self):
+	def __init__(self, name):
 		self.data = dict()
+		self.name = name
+		stashdir = config.get('ramona:notify', 'stashdir')
+		if stashdir == '<none>':
+			self.fname = None
+		else:
+			self.fname = os.path.join(stashdir, name)
+			if os.path.isfile(self.fname):
+				try:
+					with open(self.fname, "rb") as f:
+						self.data = pickle.load(f)
+				except:
+					L.warning("Ignored issue when loading stash file '{}'".format(self.fname))
+
+		self.store_needed = False
+		
 
 
 	def add(self, recipients, ntfbody):
@@ -26,6 +42,8 @@ class stash(object):
 			if not self.data.has_key(recipient):
 				self.data[recipient] = list()
 			self.data[recipient].append(ntfbody)
+
+		self.store_needed = True
 
 
 	def yield_text(self):
@@ -38,6 +56,18 @@ class stash(object):
 					break
 
 			yield recipient, textssend
+		self.store_needed = True
+
+
+	def store(self):
+		if not self.store_needed: return
+		self.store_needed = False
+		if self.fname is None: return
+
+		with open(self.fname, "wb") as f:
+			pickle.dump(self.data, f)
+
+		L.debug("Stash '{}' persisted!".format(self.name))
 
 #
 
@@ -57,12 +87,16 @@ class notificator(object):
 			if self.delivery is not None:
 				self.delivery.connection_test()
 		
-		self.dailystash = stash()
+		self.dailystash = stash('daily')
 		if self.delivery is not None:
 			svrapp.watchers.append(pyev.Periodic(self.__get_daily_time_offset(), 24*3600, svrapp.loop, self.send_daily))
 
 		#TODO: <sendmail> - see http://stackoverflow.com/questions/73781/sending-mail-via-sendmail-from-python
 		#TODO: cmd:custom.sh
+
+
+	def on_tick(self, now):
+		self.dailystash.store()
 
 
 	def __get_daily_time_offset(self):

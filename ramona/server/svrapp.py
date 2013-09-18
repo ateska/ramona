@@ -158,6 +158,9 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 			# Finalize idle work queue
 			self.stop_idlework()
 
+			# Go thru final tick at notificator (this will ensure final persistance of a stash)
+			self.notificator.on_tick(time.time())
+
 			# Finally remove pid file
 			if pidfile !='':
 				try:
@@ -364,7 +367,11 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 
 		elif callid == cnscom.callid_notify:
 			kwargs = cnscom.parse_json_kwargs(params)
-			self.notificator.publish(kwargs['target'], kwargs['text'], kwargs['subject'])
+			t = kwargs['text']
+			if len(t) > 0:
+				self.notificator.publish(kwargs['target'], t, kwargs['subject'])
+			else:
+				self.notificator.send_daily(None, None)
 			return "OK"
 
 		else:
@@ -407,6 +414,9 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 			self.__close_idle_conns()
 			if len(self.conns) == 0:
 				self.__init_real_exit()
+
+		#Ensure stash persistence
+		self.notificator.on_tick(now)
 
 
 	def __init_soft_exit(self, cnscon=None, **kwargs):

@@ -36,6 +36,7 @@ config_defaults = {
 		'logscan_stdout': '',
 		'logscan_stderr': '',
 		'logscan': '',
+		'stashdir': '.ramona.stash',
 	},
 	'ramona:httpfend': {
 		'listenaddr': "tcp://localhost:5588",
@@ -156,6 +157,11 @@ def read_config(configs=None, use_env=True):
 				),
 				file=sys.stderr
 			)
+
+	stashdir = config.get('ramona:notify', 'stashdir')
+	if stashdir != '<none>':
+		if not os.path.isdir(stashdir):
+			os.makedirs(stashdir)
 
 ###
 
