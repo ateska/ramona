@@ -87,7 +87,9 @@ class notificator(object):
 			if self.delivery is not None:
 				self.delivery.connection_test()
 		
-		self.dailystash = stash('daily')
+		self.stashes = {
+			'daily': stash('daily'),
+		}
 		if self.delivery is not None:
 			svrapp.watchers.append(pyev.Periodic(self.__get_daily_time_offset(), 24*3600, svrapp.loop, self.send_daily))
 
@@ -96,7 +98,8 @@ class notificator(object):
 
 
 	def on_tick(self, now):
-		self.dailystash.store()
+		for stash in self.stashes.itervalues():
+			stash.store()
 
 
 	def __get_daily_time_offset(self):
@@ -127,10 +130,9 @@ class notificator(object):
 		subj = '{0} / {1} - daily'.format(appname, hostname)
 		sep = '\n'+'-'*50+'\n'
 
-		for recipient, textssend in self.dailystash.yield_text():
+		for recipient, textssend in self.stashes['daily'].yield_text():
 			# Use pop to get the items from the stash to ensure that items that are put on the stash
 			# during sending are not sent twice (in the current email and in the next email)
-
 			self._send_mail(subj, sep.join(textssend)+'\n', [recipient])
 
 
@@ -155,7 +157,7 @@ class notificator(object):
 			)
 
 		elif targettime == "daily":
-			self.dailystash.add(recipients, ntfbody)
+			self.stashes['daily'].add(recipients, ntfbody)
 			
 		else:
 			L.warn("Target {} not implemented!".format(targettime))
