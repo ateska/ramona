@@ -36,7 +36,7 @@ config_defaults = {
 		'logscan_stdout': '',
 		'logscan_stderr': '',
 		'logscan': '',
-		'stashdir': '.ramona.stash',
+		'stashdir': '<none>',
 	},
 	'ramona:httpfend': {
 		'listenaddr': "tcp://localhost:5588",
