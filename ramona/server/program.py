@@ -313,7 +313,7 @@ class program(object):
 		self.log_out.open()
 		if self.log_out != self.log_err: self.log_err.open()
 
-		self.log_err.write("\n-=[ STARTING by Ramona on {0} ]=-\n".format(time.strftime("%Y-%m-%d %H:%M:%S")))
+		self.log_err.write("\n-=[ {} STARTING by Ramona on {} ]=-\n".format(self.ident, time.strftime("%Y-%m-%d %H:%M:%S")))
 		self.state = program_state_enum.STARTING
 		self.start_time = time.time()
 		self.stop_time = None
@@ -430,7 +430,7 @@ class program(object):
 		self.subproc = None
 
 		# Close log files
-		self.log_err.write("\n-=[ EXITED on {0} with status {1} ]=-\n".format(time.strftime("%Y-%m-%d %H:%M:%S"), self.exit_status))
+		self.log_err.write("\n-=[ {} EXITED on {} with status {} ]=-\n".format(self.ident, time.strftime("%Y-%m-%d %H:%M:%S"), self.exit_status))
 		self.log_out.close()
 		self.log_err.close()
 
