@@ -94,9 +94,9 @@ def read_config(configs=None, use_env=True):
 				configs.append(config_file)
 
 	for cfile in configs:
-		rfile = os.path.expanduser(cfile)
+		rfile = os.path.abspath(os.path.expanduser(cfile))
 		if os.path.isfile(rfile):
-			config_files.append(cfile)
+			config_files.append(rfile)
 		config.read([rfile])
 
 
@@ -123,9 +123,9 @@ def read_config(configs=None, use_env=True):
 				continue
 
 		for include in includes:
-			rinclude = os.path.expanduser(include)
+			rinclude = os.path.abspath(os.path.expanduser(include))
 			if os.path.isfile(rinclude):
-				config_includes.append(include)
+				config_includes.append(rinclude)
 				config.read([rinclude])
 
 	else:
