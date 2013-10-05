@@ -50,6 +50,7 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 			stream=sys.stderr,
 			format="%(asctime)s %(levelname)s: %(message)s",
 			)
+		L.info("Ramona server started")
 		L.debug("Configuration loaded from: {0}".format(', '.join(itertools.chain(config_files,config_includes))))
 
 		# Prepare message yield logger
