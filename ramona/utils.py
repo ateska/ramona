@@ -47,7 +47,7 @@ def launch_server_daemonized():
 	"""
 This function launches Ramona server as a UNIX daemon.
 It detaches the process context from parent (caller) and session.
-In comparison to launch_server() it returns.
+This functions does return, launch_server() function doesn't due to exec() function in it.
 	"""
 	from .config import config
 
