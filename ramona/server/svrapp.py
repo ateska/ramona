@@ -6,7 +6,7 @@ from ..cnscom import program_state_enum, svrcall_error
 from .cnscon import console_connection, message_yield_loghandler, deffered_return
 from .proaster import program_roaster
 from .idlework import idlework_appmixin
-from .svrappsingl import server_app_singleton
+from .singleton import server_app_singleton
 from .notify import notificator
 
 from . import call_status

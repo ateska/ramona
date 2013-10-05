@@ -1,7 +1,7 @@
 import re, collections, os, glob, weakref, logging, gzip
 from ..config import config
 from ..kmpsearch import kmp_search
-from .svrappsingl import get_svrapp
+from .singleton import get_svrapp
 
 ###
 

@@ -4,7 +4,7 @@ from ..config import config, get_boolean
 from ..utils import parse_signals, expandvars, enable_nonblocking, disable_nonblocking, get_python_exec, get_signal_name
 from ..cnscom import program_state_enum, svrcall_error
 from .logmed import log_mediator
-from .svrappsingl import get_svrapp
+from .singleton import get_svrapp
 
 
 if sys.platform == 'win32':
