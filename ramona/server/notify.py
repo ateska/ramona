@@ -133,6 +133,7 @@ class notificator(object):
 		for recipient, textssend in self.stashes['daily'].yield_text():
 			# Use pop to get the items from the stash to ensure that items that are put on the stash
 			# during sending are not sent twice (in the current email and in the next email)
+			if len(textssend) == 0: continue
 			self._send_mail(subj, sep.join(textssend)+'\n', [recipient])
 
 
@@ -171,6 +172,8 @@ class notificator(object):
 		@param recipients: List of message recipients
 		'''
 
+		L.info("Sending '{}' mail to {}".format(subject, ', '.join(recipients)))
+
 		fqdn = socket.getfqdn()
 		appname = config.get('general','appname')
 		hostname = socket.gethostname()
@@ -186,7 +189,7 @@ class notificator(object):
 		try:
 			text = ''.join([
 				'Hello,\n\nRamona produced following notification:\n\n', text,
-				'\nSystem info:\n', sysident,
+				'\n\nSystem info:\n', sysident, #Two enters in the begging are intentional; arg 'text' should not have one at its end
 				'\n\nBest regards,\nYour Ramona\n\nhttp://ateska.github.com/ramona\n'
 			])
 			
