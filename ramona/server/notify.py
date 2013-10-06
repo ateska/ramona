@@ -83,9 +83,6 @@ class notificator(object):
 			except RuntimeError, e:
 				L.error("{0}".format(e))
 				self.delivery = None
-
-			if self.delivery is not None:
-				self.delivery.connection_test()
 		
 		self.stashes = {
 			'daily': stash('daily'),

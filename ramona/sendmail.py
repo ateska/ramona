@@ -18,7 +18,7 @@ class send_mail(object):
 		delurl = urlparse.urlparse(deliveryuri)
 		if delurl.scheme == 'smtp' :
 			if delurl.hostname is None:
-				raise RuntimeError("Delivery URL has no hostname: {0}".format(delivery))
+				raise RuntimeError("Delivery URL '{0}' has no hostname".format(deliveryuri))
 			else:
 				self.hostname = delurl.hostname
 				self.port = delurl.port if delurl.port is not None else 25
@@ -40,21 +40,6 @@ class send_mail(object):
 			raise RuntimeError("Unknown delivery method in {0}".format(deliveryuri))
 
 		self.receiver = map(string.strip, config.get('ramona:notify', 'receiver').split(','))
-		
-
-
-	def connection_test(self):
-		try: # Connection test
-			s = smtplib.SMTP(self.hostname, self.port)
-			if self.params.get('tls', '1') == '1': s.starttls()
-			if self.username is not None and self.password is not None:
-				s.login(self.username, self.password)
-
-			s.quit()
-		except Exception, e:
-			L.warning("Given SMTP server ({1}/{2}) is not responding: {0}".format(e, self.hostname, self.port))
-			return False
-		return True
 
 
 	def send(self, recipients, subject, mail_body, sender=None):
