@@ -1,8 +1,9 @@
 import sys, os, socket, signal, errno, weakref, logging, argparse, itertools, time, json
 import pyev
 from .. import cnscom, socketuri, version as ramona_version
-from ..config import config, read_config, config_files, config_includes, get_numeric_loglevel
+from ..config import config, read_config, config_files, config_includes, get_numeric_loglevel, get_logconfig
 from ..cnscom import program_state_enum, svrcall_error
+from ..utils import rotate_logfiles
 from .cnscon import console_connection, message_yield_loghandler, deffered_return
 from .proaster import program_roaster
 from .idlework import idlework_appmixin
@@ -125,6 +126,9 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 
 		# Build notificator component
 		self.notificator = notificator(self)
+
+		# Reopen stdout and stderr - if pointing to log file, this includes also log rotate check
+		self.__rotate_stdout_stderr()
 
 
 	def run(self):
@@ -419,6 +423,9 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 		#Ensure stash persistence
 		self.notificator.on_tick(now)
 
+		#Evaluate if Ramona log needs to be rotated
+		self.__rotate_stdout_stderr()
+
 
 	def __init_soft_exit(self, cnscon=None, **kwargs):
 		if self.termstatus > 1: return
@@ -450,6 +457,31 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 			   and conn.yield_enabled is False \
 			   and conn.return_expected is False:
 				conn.close()
+
+
+	def __rotate_stdout_stderr(self):
+		'''
+		Conditionally check if we need to rotate log file of Ramona server
+		'''
+
+		logfile = os.environ.get('RAMONA_LOGFILE')
+		if logfile is None: return # There is no file to rotate ...
+
+		logfstat = os.fstat(sys.stderr.fileno())
+		logbackups, logmaxsize, logcompress = get_logconfig()
+
+		if logfstat.st_size < logmaxsize:
+			# Not rotating ...
+			return
+
+		try:
+			rotate_logfiles(self, logfile, logbackups, logcompress)
+		finally:
+			# Reopen log file and attach that to stdout and stderr
+			w = os.open(logfile, os.O_WRONLY | os.O_APPEND |os.O_CREAT)
+			os.dup2(w, 1)
+			os.dup2(w, 2)
+			os.close(w)
 
 
 def _SIGALARM_handler(signum, frame):

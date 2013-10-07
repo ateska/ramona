@@ -190,3 +190,32 @@ def get_numeric_loglevel(loglevelstring):
 	numeric_level = getattr(logging, loglevelstring.upper(), None)
 	if not isinstance(numeric_level, int): raise ValueError('Invalid log level: {0}'.format(loglevelstring))
 	return numeric_level
+
+###
+
+def get_logconfig():
+	'''
+	return (logbackups, logmaxsize, logcompress) tupple
+	'''
+	if config.get('general','logmaxsize') == '<inf>':
+		logbackups = 0
+		logmaxsize = 0
+		logcompress = False
+
+	else:
+		try:
+			# TODO: Parse human-friendly logmaxsize ... e.g. 10Mb
+			logmaxsize = config.getint('general','logmaxsize')
+			x = config.get('general','logbackups')
+			if x == '<inf>':
+				logbackups = 0
+			else:
+				logbackups = int(x)
+			logcompress = config.getboolean('general', 'logcompress')
+		except Exception, e:
+			logbackups = 0
+			logmaxsize = 0
+			logcompress = False
+			L.warning("Invalid configuration of log rotation: {0} - log rotation disabled".format(e))
+
+	return logbackups, logmaxsize, logcompress

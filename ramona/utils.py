@@ -1,4 +1,4 @@
-import os, sys, re, signal, logging, itertools
+import os, sys, re, signal, logging, itertools, glob, gzip
 try:
 	import resource
 except ImportError:
@@ -10,7 +10,7 @@ L = logging.getLogger("utils")
 
 ###
 
-def launch_server(server_only=True, programs=None):
+def launch_server(server_only=True, programs=None, logfname=None):
 	'''
 This function launches Ramona server - in 'os.exec' manner which means that this function will not return
 and instead of that, current process will be replaced by launched server. 
@@ -23,6 +23,7 @@ All file descriptors above 2 are closed.
 	from .config import config_files, config_includes
 	os.environ['RAMONA_CONFIG'] = os.pathsep.join(config_files)
 	os.environ['RAMONA_CONFIG_WINC'] = os.pathsep.join(itertools.chain(config_files, config_includes))
+	if logfname is not None: os.environ['RAMONA_LOGFILE'] = logfname
 
 	# Prepare command line
 	cmdline = ["-m", "ramona.server"]
@@ -82,7 +83,8 @@ This functions does return, launch_server() function doesn't due to exec() funct
 
 		os.dup2(logf.fileno(), 1) # Prepare stdout
 		os.dup2(logf.fileno(), 2) # Prepare stderr
-	launch_server()
+
+	launch_server(logfname=logfname)
 
 ###
 
@@ -188,3 +190,39 @@ def get_python_exec(cmdline=None):
 	if cmdline is None: return pythonexec
 	elif isinstance(cmdline, basestring): return pythonexec + ' ' + cmdline
 	else: return " ".join([pythonexec] + cmdline)
+
+###
+
+def compress_logfile(fname):
+	with open(fname, 'rb') as f_in, gzip.open('{0}.gz'.format(fname), 'wb') as f_out:
+		f_out.writelines(f_in)
+	os.unlink(fname)
+
+#
+
+_rotlognamerg = re.compile('\.([0-9]+)(\.gz)?$')
+
+def rotate_logfiles(app, logfilename, logbackups, logcompress):
+	fnames = set()
+	suffixes = dict()
+	for fname in glob.iglob(logfilename+'.*'):
+		if not os.path.isfile(fname): continue
+		x = _rotlognamerg.search(fname)
+		if x is None: continue
+		idx = int(x.group(1))
+		suffix = x.group(2)
+		if suffix is not None: 
+			suffixes[idx] = suffix
+		fnames.add(idx)
+
+	for k in sorted(fnames, reverse=True):
+		suffix = suffixes.get(k, "")
+		if (logbackups > 0) and (k >= logbackups):
+			os.unlink("{0}.{1}{2}".format(logfilename, k, suffix))
+			continue
+		if ((k-1) not in fnames) and (k > 1): continue # Move only files where there is one 'bellow'
+		os.rename("{0}.{1}{2}".format(logfilename, k, suffix), "{0}.{1}{2}".format(logfilename, k+1, suffix))
+		if logcompress and suffix != ".gz" and k+1 >= 2:
+		 	app.add_idlework(compress_logfile, "{0}.{1}".format(logfilename, k+1))
+
+	os.rename("{0}".format(logfilename), "{0}.1".format(logfilename))
