@@ -1,6 +1,7 @@
 import sys, os, socket, signal, errno, weakref, logging, argparse, itertools, time, json
 import pyev
-from .. import cnscom, socketuri, version as ramona_version
+
+from .. import cnscom, socketuri, core, version as ramona_version
 from ..config import config, read_config, config_files, config_includes, get_numeric_loglevel, get_logconfig
 from ..cnscom import program_state_enum, svrcall_error
 from ..utils import rotate_logfiles
@@ -9,7 +10,6 @@ from .proaster import program_roaster
 from .idlework import idlework_appmixin
 from .singleton import server_app_singleton
 from .notify import notificator
-
 from . import call_status
 
 ###

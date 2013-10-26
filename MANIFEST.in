@@ -3,6 +3,7 @@ include LICENSE.txt
 include README.md
 
 recursive-include ramona *.py
+recursive-include ramona *.c
 
 include ramona/httpfend/index.tmpl.html
 include ramona/httpfend/401.tmpl.html
@@ -13,3 +14,39 @@ recursive-include ramona/httpfend/static/img *.ico *.gif
 
 exclude ramona/server/__utest__.py
 exclude ramona/__utest__.py
+
+include libev/Changes
+include libev/LICENSE
+include libev/Makefile.am
+include libev/Makefile.in
+include libev/README
+include libev/Symbols.ev
+include libev/Symbols.event
+include libev/aclocal.m4
+include libev/autogen.sh
+include libev/config.guess
+include libev/config.h.in
+include libev/config.sub
+include libev/configure
+include libev/configure.ac
+include libev/depcomp
+include libev/ev++.h
+include libev/ev.3
+include libev/ev.c
+include libev/ev.h
+include libev/ev.pod
+include libev/ev_epoll.c
+include libev/ev_kqueue.c
+include libev/ev_poll.c
+include libev/ev_port.c
+include libev/ev_select.c
+include libev/ev_vars.h
+include libev/ev_win32.c
+include libev/ev_wrap.h
+include libev/event.c
+include libev/event.h
+include libev/install-sh
+include libev/libev.m4
+include libev/ltmain.sh
+include libev/missing
+include libev/mkinstalldirs

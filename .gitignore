@@ -58,3 +58,4 @@ libev/Makefile
 libev/stamp-h1
 libev/.deps
 libev/.libs
+core.so
