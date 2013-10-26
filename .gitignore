@@ -46,3 +46,15 @@ MANIFEST
 gource.log
 gource.mp4
 .ramona.stash
+
+*.lo
+*.o
+*.la
+libev/config.log
+libev/config.h
+libev/config.status
+libev/libtool
+libev/Makefile
+libev/stamp-h1
+libev/.deps
+libev/.libs
