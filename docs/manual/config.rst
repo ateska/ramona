@@ -207,7 +207,7 @@ This section provides general configuration of Ramona-equiped application.
 
   *Type*: boolean
     - "1", "yes", "true", or "on" for enabling this feature
-    - "0", no", "false", and "off" for disabling
+    - "0", "no", "false", and "off" for disabling
   
   *Default*: "on"
 
@@ -792,7 +792,7 @@ Example:
 
   *Type*: boolean
     - "1", "yes", "true", or "on" for disabling program
-    - "0", no", "false", and "off" for keeping it enabled
+    - "0", "no", "false", and "off" for keeping it enabled
 
   *Default*: ``no``
 
@@ -813,7 +813,7 @@ Example:
 
   *Type*: boolean
     - "1", "yes", "true", or "on" for enabling core dump program
-    - "0", no", "false", and "off" for keeping it disabled
+    - "0", "no", "false", and "off" for keeping it disabled
 
   *Default*: ``no``
 
@@ -827,7 +827,7 @@ Example:
 
   *Type*: boolean
     - "1", "yes", "true", or "on" for enabling auto-restart feature
-    - "0", no", "false", and "off" for disabling auto-restart feature
+    - "0", "no", "false", and "off" for disabling auto-restart feature
 
   *Default*: ``no``
 
@@ -841,7 +841,7 @@ Example:
 
   *Type*: boolean
     - "1", "yes", "true", or "on" for enabling creation of own process group
-    - "0", no", "false", and "off" for disabling creation of own process group
+    - "0", "no", "false", and "off" for disabling creation of own process group
 
   *Default*: ``yes``
 
