@@ -207,7 +207,7 @@ This section provides general configuration of Ramona-equiped application.
 
   *Type*: boolean
     - "1", "yes", "true", or "on" for enabling this feature
-    - "0", no", "false", and "off" for disaling
+    - "0", no", "false", and "off" for disabling
   
   *Default*: "on"
 
