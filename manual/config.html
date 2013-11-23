@@ -245,7 +245,7 @@ foobar.log.3 &lt;-- this one will be removed</pre>
 <dt><em>Type</em>: boolean</dt>
 <dd><ul class="first last simple">
 <li>&#8220;1&#8221;, &#8220;yes&#8221;, &#8220;true&#8221;, or &#8220;on&#8221; for enabling this feature</li>
-<li>&#8220;0&#8221;, no&#8221;, &#8220;false&#8221;, and &#8220;off&#8221; for disaling</li>
+<li>&#8220;0&#8221;, &#8220;no&#8221;, &#8220;false&#8221;, and &#8220;off&#8221; for disabling</li>
 </ul>
 </dd>
 </dl>
@@ -449,6 +449,15 @@ History list is persistent and is available across program restarts.</p>
 <p class="first admonition-title">Note</p>
 <p class="last">Python <tt class="docutils literal"><span class="pre">smtplib</span></tt> module is used to handle SMTP connectivity.</p>
 </div>
+<dl class="docutils">
+<dt>Notification system support immediate or delayed delivery. This can be configured using <cite>actions</cite>:</dt>
+<dd><ul class="first last simple">
+<li><tt class="docutils literal"><span class="pre">now</span></tt>: notification is sent immediately</li>
+<li><tt class="docutils literal"><span class="pre">daily</span></tt>: notification is stashed and sent in daily buld email</li>
+</ul>
+</dd>
+</dl>
+<p>Deleayed notifications are stored in stashes which can be optionally persistent (survives eventual restart of a box).</p>
 <dl class="attribute">
 <dt id="delivery">
 <tt class="descname">delivery</tt><a class="headerlink" href="#delivery" title="Permalink to this definition">¶</a></dt>
@@ -507,19 +516,6 @@ History list is persistent and is available across program restarts.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="dailyat">
-<tt class="descname">dailyat</tt><a class="headerlink" href="#dailyat" title="Permalink to this definition">¶</a></dt>
-<dd><p>At what time the notifications should be used when <tt class="docutils literal"><span class="pre">daily</span></tt> period is used. The value is in the local timezone of your computer. Use the format <tt class="docutils literal"><span class="pre">HH:MM</span></tt> (24-hours).</p>
-<p><em>Default</em>:  <tt class="docutils literal"><span class="pre">09:00</span></tt></p>
-<p><em>Required</em>:  No</p>
-<p>Example:</p>
-<div class="highlight-ini"><div class="highlight"><pre><span class="k">[ramona:notify]</span>
-<span class="na">dailyat</span><span class="o">=</span><span class="s">23:00</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="attribute">
 <dt id="notify_fatal">
 <tt class="descname">notify_fatal</tt><a class="headerlink" href="#notify_fatal" title="Permalink to this definition">¶</a></dt>
 <dd><p>Configure notification, that will be eventually triggered when any supervised program unexpectedly terminates and ends in FATAL state. This is done by specifying the <cite>action</cite>.</p>
@@ -546,6 +542,55 @@ History list is persistent and is available across program restarts.</p>
 <span class="na">notify_fatal</span><span class="o">=</span><span class="s">now:admin@foo.bar.com</span>
 </pre></div>
 </div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dailyat">
+<tt class="descname">dailyat</tt><a class="headerlink" href="#dailyat" title="Permalink to this definition">¶</a></dt>
+<dd><p>At what time the notifications should be used when <tt class="docutils literal"><span class="pre">daily</span></tt> is used. The value is in the local timezone of your computer. Use the format <tt class="docutils literal"><span class="pre">HH:MM</span></tt> (24-hours).</p>
+<p><em>Default</em>:  <tt class="docutils literal"><span class="pre">09:00</span></tt></p>
+<p><em>Required</em>:  No</p>
+<p>Example:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[ramona:notify]</span>
+<span class="na">dailyat</span><span class="o">=</span><span class="s">23:00</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="stashdir">
+<tt class="descname">stashdir</tt><a class="headerlink" href="#stashdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify the directory where persistent stashes (files) are stored.</p>
+<dl class="docutils">
+<dt><em>Magic values</em>:</dt>
+<dd><ul class="first last simple">
+<li><tt class="docutils literal"><span class="pre">&lt;none&gt;</span></tt> - disable persistence of notification stash (content will disapear when Ramona is restarted)</li>
+</ul>
+</dd>
+</dl>
+<p><em>Default</em>:  <tt class="docutils literal"><span class="pre">&lt;none&gt;</span></tt></p>
+<p><em>Required</em>:  No</p>
+<p>Example:</p>
+<div class="highlight-ini"><div class="highlight"><pre><span class="k">[ramona:notify]</span>
+<span class="na">stashdir</span><span class="o">=</span><span class="s">/var/spool/ramona/stash</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="logscan_stdout">
+<tt class="descname">logscan_stdout</tt><a class="headerlink" href="#logscan_stdout" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="logscan_stderr">
+<tt class="descname">logscan_stderr</tt><a class="headerlink" href="#logscan_stderr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="logscan">
+<tt class="descname">logscan</tt><a class="headerlink" href="#logscan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Global defaults for configuration values in  <tt class="docutils literal"><span class="pre">[program:...]</span></tt> section. If given, they will be used when program specific ones are not stated.</p>
 </dd></dl>
 
 </div>
@@ -738,7 +783,7 @@ The program termination during <tt class="docutils literal"><span class="pre">ST
 <dt><em>Type</em>: boolean</dt>
 <dd><ul class="first last simple">
 <li>&#8220;1&#8221;, &#8220;yes&#8221;, &#8220;true&#8221;, or &#8220;on&#8221; for disabling program</li>
-<li>&#8220;0&#8221;, no&#8221;, &#8220;false&#8221;, and &#8220;off&#8221; for keeping it enabled</li>
+<li>&#8220;0&#8221;, &#8220;no&#8221;, &#8220;false&#8221;, and &#8220;off&#8221; for keeping it enabled</li>
 </ul>
 </dd>
 </dl>
@@ -759,7 +804,7 @@ The program termination during <tt class="docutils literal"><span class="pre">ST
 <dt><em>Type</em>: boolean</dt>
 <dd><ul class="first last simple">
 <li>&#8220;1&#8221;, &#8220;yes&#8221;, &#8220;true&#8221;, or &#8220;on&#8221; for enabling core dump program</li>
-<li>&#8220;0&#8221;, no&#8221;, &#8220;false&#8221;, and &#8220;off&#8221; for keeping it disabled</li>
+<li>&#8220;0&#8221;, &#8220;no&#8221;, &#8220;false&#8221;, and &#8220;off&#8221; for keeping it disabled</li>
 </ul>
 </dd>
 </dl>
@@ -775,7 +820,7 @@ The program termination during <tt class="docutils literal"><span class="pre">ST
 <dt><em>Type</em>: boolean</dt>
 <dd><ul class="first last simple">
 <li>&#8220;1&#8221;, &#8220;yes&#8221;, &#8220;true&#8221;, or &#8220;on&#8221; for enabling auto-restart feature</li>
-<li>&#8220;0&#8221;, no&#8221;, &#8220;false&#8221;, and &#8220;off&#8221; for disabling auto-restart feature</li>
+<li>&#8220;0&#8221;, &#8220;no&#8221;, &#8220;false&#8221;, and &#8220;off&#8221; for disabling auto-restart feature</li>
 </ul>
 </dd>
 </dl>
@@ -791,7 +836,7 @@ The program termination during <tt class="docutils literal"><span class="pre">ST
 <dt><em>Type</em>: boolean</dt>
 <dd><ul class="first last simple">
 <li>&#8220;1&#8221;, &#8220;yes&#8221;, &#8220;true&#8221;, or &#8220;on&#8221; for enabling creation of own process group</li>
-<li>&#8220;0&#8221;, no&#8221;, &#8220;false&#8221;, and &#8220;off&#8221; for disabling creation of own process group</li>
+<li>&#8220;0&#8221;, &#8220;no&#8221;, &#8220;false&#8221;, and &#8220;off&#8221; for disabling creation of own process group</li>
 </ul>
 </dd>
 </dl>
@@ -801,8 +846,8 @@ The program termination during <tt class="docutils literal"><span class="pre">ST
 </dd></dl>
 
 <dl class="attribute">
-<dt id="logscan_stdout">
-<tt class="descname">logscan_stdout</tt><a class="headerlink" href="#logscan_stdout" title="Permalink to this definition">¶</a></dt>
+<dt>
+<tt class="descname">logscan_stdout</tt></dt>
 <dd><p>Configures log scanner for standard output stream.
 See <a class="reference internal" href="features.html#features-logging"><em>Logging and log scanning</em></a> for more details.</p>
 <p>Stream is scanned even if <a class="reference internal" href="#stdout" title="stdout"><tt class="xref py py-attr docutils literal"><span class="pre">stdout</span></tt></a> is set to <tt class="docutils literal"><span class="pre">&lt;null&gt;</span></tt>.</p>
@@ -836,8 +881,8 @@ See <a class="reference internal" href="features.html#features-logging"><em>Logg
 </dd></dl>
 
 <dl class="attribute">
-<dt id="logscan_stderr">
-<tt class="descname">logscan_stderr</tt><a class="headerlink" href="#logscan_stderr" title="Permalink to this definition">¶</a></dt>
+<dt>
+<tt class="descname">logscan_stderr</tt></dt>
 <dd><p>Same as <a class="reference internal" href="#logscan_stdout">logscan_stdout</a>, just scanning standard error stream.</p>
 </dd></dl>
 
@@ -886,7 +931,7 @@ See <a class="reference internal" href="features.html#features-logging"><em>Logg
 <span class="na">username</span><span class="o">=</span><span class="s">admin</span>
 
 <span class="c"># Can get either plain text or a SHA1 hash, if the password starts with {SHA} prefix</span>
-<span class="na">password</span><span class="o">=</span><span class="s">pass</span>
+<span class="na">password</span><span class="o">=</span><span class="s">password</span>
 </pre></div>
 </div>
 <dl class="attribute">
