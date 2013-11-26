@@ -114,6 +114,7 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 		self.termstatus_change = None
 
 		# Enable non-terminating SIGALARM handler
+		# TODO: Why ?
 		if sys.platform != 'win32':
 			signal.signal(signal.SIGALRM, _SIGALARM_handler)
 
