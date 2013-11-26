@@ -6,6 +6,7 @@ stop (command-line)
 Stop supervised program(s).
 
 Optionally also terminate Ramona server.
+By default, the Ramona server will exit automatically after last supervised program terminates using the 'stop' command.
 
 .. code-block:: bash
 
