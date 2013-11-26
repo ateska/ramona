@@ -95,6 +95,7 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 
 		self.loop = pyev.default_loop()
 		self.watchers = [pyev.Signal(sig, self.loop, self.__terminal_signal_cb) for sig in self.STOPSIGNALS]
+		self.watchers.append(pyev.Signal(signal.SIGHUP, self.loop, self.__restart_signal_cb))
 		self.watchers.append(pyev.Periodic(0, 1.0, self.loop, self.__tick_cb))
 
 		if sys.platform == 'win32':
@@ -483,6 +484,10 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 			os.dup2(w, 1)
 			os.dup2(w, 2)
 			os.close(w)
+
+
+	def __restart_signal_cb(self, watcher, _revents):
+		return self.restart_program(cnscon=None, force=True)
 
 
 def _SIGALARM_handler(signum, frame):

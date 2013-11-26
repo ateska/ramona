@@ -3,6 +3,7 @@ restart (command-line)
 
 Restart supervised program(s)
 
+
 .. code-block:: bash
 
   <console.py> restart [-h] [-n] [-i] [-f] [program [program ...]]
@@ -30,3 +31,7 @@ Restart supervised program(s)
                restart --force-start
 
   Force restart of programs even if they are in FATAL state.
+
+  .. note::
+	On UNIX systems, you can simulate ``restart -f`` command using ``HUP`` signal
+	(e.g. ``kill -HUP [pid-of-ramona]`` from shell).
