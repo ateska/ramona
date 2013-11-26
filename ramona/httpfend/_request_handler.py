@@ -16,7 +16,7 @@ STRFTIME_FMT = "%d-%b-%Y %H:%M:%S"
 
 # Initialize mimetypes
 if not mimetypes.inited:
-		mimetypes.init()
+	mimetypes.init()
 
 ###
 
@@ -33,7 +33,7 @@ class ramona_http_req_handler(BaseHTTPServer.BaseHTTPRequestHandler):
 			L.exception("Exception while requesthandler execution")
 	
 	def do_GET(self):
-		# Static has to be handeled before authentication, as the static content is available
+		# Static has to be handled before authentication, as the static content is available
 		# even without authentication, because the static resources are used on the 401 page as well
 		if self.path.startswith("/static/"):
 			return self._handle_static()
@@ -60,13 +60,14 @@ class ramona_http_req_handler(BaseHTTPServer.BaseHTTPRequestHandler):
 		BaseHTTPServer.BaseHTTPRequestHandler.send_header(self, keyword, value)
 	
 	def _check_authentication(self):
-		'''Check if the authentication is enabled and if yes, check if the user is authenticated
+		"""
+		Check if the authentication is enabled and if yes, check if the user is authenticated
 		   to access the httpfend or not.
 		   If authentication is turned on, but the user fails to authenticate, the authentication headers
 		   are sent to client (which triggers username and password prompt in the browser)
 		   @return: True if the authentication is turned off or the user is successfully authenticated
 		            False otherwise
-		'''
+		"""
 		authheader = self.headers.getheader("Authorization", None)
 		if self.server.username is not None and authheader is None:
 			self.serve_auth_headers()
@@ -341,10 +342,10 @@ class ramona_http_req_handler(BaseHTTPServer.BaseHTTPRequestHandler):
 		return cnscom.svrcall(conn, cnscom.callid_status, json.dumps({}))
 	
 	def getAllPrograms(self, withoutSelf=False):
-		'''
+		"""
 		@param withoutSelf: If true, the process with the same pid will be ignored
 		@return iterator: Ident of all registered programs
-		'''
+		"""
 		for st in json.loads(self.getStatuses()):
 			ident = st.get("ident")
 			pid = st.get("pid")
