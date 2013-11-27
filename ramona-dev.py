@@ -84,6 +84,7 @@ class RamonaDevConsoleApp(ramona.console_app):
 
 	@ramona.tool
 	def gource(self):
+		"""Version control visualization tool"""
 		import subprocess, re
 
 		cmd= r"""git log --pretty=format:user:%aN%n%ct --reverse --raw --encoding=UTF-8 --no-renames"""
