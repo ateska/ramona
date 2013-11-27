@@ -46,3 +46,7 @@ MANIFEST
 gource.log
 gource.mp4
 .ramona.stash
+
+# Idea/PyCharm
+.idea
+
