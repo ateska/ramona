@@ -14,6 +14,12 @@ class MyDemoConsoleApp(ramona.console_app):
 		print "This is implementation of custom tool (see ./demo.sh --help)"
 		# Example how to access configuration from tool:
 		print "Value of env:RAMONADEMO = {0}".format(self.config.get("env", "RAMONADEMO"))
+		env = ramona.config.get_env()
+		print "All environment variables", env
+		print
+		env_alternative1 = ramona.config.get_env("alternative1")
+		print "All alternative1 environment variables", env_alternative1
+
 
 
 	@ramona.tool

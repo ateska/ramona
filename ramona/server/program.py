@@ -1,6 +1,6 @@
 import sys, os, time, logging, shlex, signal, subprocess, errno
 import pyev
-from ..config import config, get_boolean
+from ..config import config, get_boolean, get_env
 from ..utils import parse_signals, expandvars, enable_nonblocking, disable_nonblocking, get_python_exec, get_signal_name
 from ..cnscom import program_state_enum, svrcall_error
 from .logmed import log_mediator
@@ -227,22 +227,12 @@ class program(object):
 				logmed.add_scanner(pattern, target)
 
 		# Environment variables
-		self.env = os.environ.copy()
-				
 		try:
-			alt_env = config.get(config_section, "env")
-			alt_env = "env:{0}".format(alt_env)
+			alt_env = config.get(config_section, None)
 		except:
 			alt_env = None
-		
-		env_section = alt_env if alt_env is not None else "env"
-		
-		if config.has_section(env_section):
-			for name, value in config.items(env_section):
-				if value != '':
-					self.env[name] = value
-				else:
-					self.env.pop(name, 0)
+
+		self.env = get_env(alt_env)
 		self.env['RAMONA_SECTION'] = config_section
 
 		# Notification on state change to FATAL
