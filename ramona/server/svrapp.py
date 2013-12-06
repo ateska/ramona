@@ -114,11 +114,6 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 		self.termstatus =  None
 		self.termstatus_change = None
 
-		# Enable non-terminating SIGALARM handler
-		# TODO: Why ?
-		if sys.platform != 'win32':
-			signal.signal(signal.SIGALRM, _SIGALARM_handler)
-
 		# Prepare also exit watcher - can be used to 'simulate' terminal signal (useful on Win32)
 		self.exitwatcher = pyev.Async(self.loop, self.__terminal_signal_cb)
 		self.exitwatcher.start()
@@ -488,7 +483,3 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 
 	def __restart_signal_cb(self, watcher, _revents):
 		return self.restart_program(cnscon=None, force=True)
-
-
-def _SIGALARM_handler(signum, frame):
-	pass
