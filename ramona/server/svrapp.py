@@ -28,7 +28,11 @@ class server_app(program_roaster, idlework_appmixin, server_app_singleton):
 
 		# Create own process group
 		if os.name == 'posix':
-			os.setpgrp()
+			try:
+				os.setpgrp()
+			except:
+				#When launched from upstart, following command will fail
+				pass
 
 		# Parse command line arguments
 		parser = argparse.ArgumentParser()
