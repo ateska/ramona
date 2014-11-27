@@ -108,7 +108,7 @@ class program(object):
 		try:
 			dis = get_boolean(self.config.get('disabled'))
 		except ValueError:
-			L.error("Unknown 'disabled' option '{0}' in {1} -> CFGERROR".format(dis, config_section))
+			L.error("Unknown/invalid 'disabled' option '{0}' in {1} -> CFGERROR".format(self.config.get('disabled'), config_section))
 			self.state = program_state_enum.CFGERROR
 			return
 		if dis:
