@@ -230,6 +230,8 @@ Environment variables section allows to specify `environment variables`_ that wi
 
 These variables can be also used in other options via ``${VARNAME}`` placeholders.
 
+Setting an empty value to the variable causes the environment variable to be unset. See ``VARTOUNSET`` in the example below.
+
 .. _`environment variables` : http://en.wikipedia.org/wiki/Environment_variable
 
 Environment variable section example:
@@ -240,6 +242,7 @@ Environment variable section example:
   VARIABLE=value
   PYTHONPATH=./mylibs
   CLASSPATH=./myjars
+  VARTOUNSET=
 
 
 [ramona:server] section

@@ -109,7 +109,7 @@ class httpfend_app(object):
 
 
 	def __on_accept(self, watcher, events):
-		# Fist find relevant socket
+		# First find relevant socket
 		sock = None
 		for s in self.svrsockets:
 			if s.fileno() == watcher.data:

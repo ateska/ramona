@@ -1,6 +1,6 @@
 import sys, os, time, logging, shlex, signal, subprocess, errno
 import pyev
-from ..config import config, get_boolean
+from ..config import config, get_boolean, get_env
 from ..utils import parse_signals, expandvars, enable_nonblocking, disable_nonblocking, get_python_exec, get_signal_name
 from ..cnscom import program_state_enum, svrcall_error
 from .logmed import log_mediator
@@ -108,7 +108,7 @@ class program(object):
 		try:
 			dis = get_boolean(self.config.get('disabled'))
 		except ValueError:
-			L.error("Unknown 'disabled' option '{0}' in {1} -> CFGERROR".format(dis, config_section))
+			L.error("Unknown/invalid 'disabled' option '{0}' in {1} -> CFGERROR".format(self.config.get('disabled'), config_section))
 			self.state = program_state_enum.CFGERROR
 			return
 		if dis:
@@ -227,22 +227,12 @@ class program(object):
 				logmed.add_scanner(pattern, target)
 
 		# Environment variables
-		self.env = os.environ.copy()
-				
 		try:
-			alt_env = config.get(config_section, "env")
-			alt_env = "env:{0}".format(alt_env)
+			alt_env = config.get(config_section, None)
 		except:
 			alt_env = None
-		
-		env_section = alt_env if alt_env is not None else "env"
-		
-		if config.has_section(env_section):
-			for name, value in config.items(env_section):
-				if value != '':
-					self.env[name] = value
-				else:
-					self.env.pop(name, 0)
+
+		self.env = get_env(alt_env)
 		self.env['RAMONA_SECTION'] = config_section
 
 		# Notification on state change to FATAL
@@ -427,36 +417,38 @@ class program(object):
 			self.win32_read_stdfd()
 
 		# Explicitly destroy subprocess object
+		if self.subproc is not None: pidtext = ', pid: {}'.format(self.subproc.pid)
+		else: pidtext = ''
 		self.subproc = None
 
 		# Close log files
-		self.log_err.write("\n-=[ {} EXITED on {} with status {} ]=-\n".format(self.ident, time.strftime("%Y-%m-%d %H:%M:%S"), self.exit_status))
+		self.log_err.write("\n-=[ {} EXITED on {} with status {}{} ]=-\n".format(self.ident, time.strftime("%Y-%m-%d %H:%M:%S"), self.exit_status, pidtext))
 		self.log_out.close()
 		self.log_err.close()
 
 		# Handle state change properly
 		if self.state == program_state_enum.STARTING:
-			Lmy.error("{0} exited too quickly (exit_status:{1}, now in FATAL state)".format(self.ident, self.exit_status))
+			Lmy.error("{0} exited too quickly (exit_status:{1}{2}, now in FATAL state)".format(self.ident, self.exit_status, pidtext))
 			L.error("{0} exited too quickly -> FATAL".format(self))
 			self.state = program_state_enum.FATAL
 			self.notify_fatal_state(program_state_enum.STARTING)
 
 		elif self.state == program_state_enum.STOPPING:
-			Lmy.info("{0} is now STOPPED (exit_status:{1})".format(self.ident, self.exit_status))
+			Lmy.info("{0} is now STOPPED (exit_status:{1}{2})".format(self.ident, self.exit_status, pidtext))
 			L.debug("{0} -> STOPPED".format(self))
 			self.state = program_state_enum.STOPPED
 
 		else:
 			orig_state = self.state
 			if self.autorestart:
-				Lmy.error("{0} exited unexpectedly and going to be restarted (exit_status:{1})".format(self.ident, self.exit_status))
+				Lmy.error("{0} exited unexpectedly and going to be restarted (exit_status:{1}{2})".format(self.ident, self.exit_status, pidtext))
 				L.error("{0} exited unexpectedly -> FATAL -> autorestart".format(self))
 				self.state = program_state_enum.FATAL
 				self.autorestart_cnt += 1
 				self.notify_fatal_state(orig_state, autorestart=True)
 				self.start(reset_autorestart_cnt=False)
 			else:
-				Lmy.error("{0} exited unexpectedly (exit_status:{1}, now in FATAL state)".format(self.ident, self.exit_status))
+				Lmy.error("{0} exited unexpectedly (exit_status:{1}{2}, now in FATAL state)".format(self.ident, self.exit_status, pidtext))
 				L.error("{0} exited unexpectedly -> FATAL".format(self))
 				self.state = program_state_enum.FATAL
 				self.notify_fatal_state(orig_state)

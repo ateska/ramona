@@ -69,8 +69,8 @@ def read_config(configs=None, use_env=True):
 			config.add_section(section)
 
 		for key, val in items.iteritems():
-		 	r = psrg.match(key)
-		 	if r is None:
+			r = psrg.match(key)
+			if r is None:
 				config.set(section, key, val)
 			else:
 				if r.group(2) != config_platform_selector: continue
@@ -219,3 +219,27 @@ def get_logconfig():
 			L.warning("Invalid configuration of log rotation: {0} - log rotation disabled".format(e))
 
 	return logbackups, logmaxsize, logcompress
+
+
+def get_env(alt_env=None):
+	"""
+	Get environment variables dictionary from config.
+	If not argument provided, it is taken from [env] section of the configuration merged with os.environ
+	If alt_env argument is provided, it is taken from [env:<alt_env>] section merged with os.environ
+
+	Return is compatible with os.exec family of functions.
+	"""
+	if alt_env is not None:
+		section = "env:{0}".format(alt_env)
+	else:
+		section = "env"
+	env = os.environ.copy()
+
+	if config.has_section(section):
+		for name, value in config.items(section):
+			if value != '':
+				env[name] = value
+			else:
+				env.pop(name, 0)
+	return env
+
