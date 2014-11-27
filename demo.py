@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 #
 # Released under the BSD license. See LICENSE.txt file for details.
 #
