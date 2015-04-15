@@ -227,10 +227,7 @@ class program(object):
 				logmed.add_scanner(pattern, target)
 
 		# Environment variables
-		try:
-			alt_env = config.get(config_section, None)
-		except:
-			alt_env = None
+		alt_env = self.config.get('env')
 
 		self.env = get_env(alt_env)
 		self.env['RAMONA_SECTION'] = config_section
