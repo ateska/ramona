@@ -125,5 +125,5 @@ It is basically used only on server side of UNIX socket.
 			fname = self.__sockfile
 			self.__sockfile = None
 			os.unlink(fname)
-			assert not os.path.isfile(fname)
+			assert not os.path.exists(fname)
 
